@@ -17,18 +17,15 @@
 package org.glite.authz.common.config;
 
 import java.io.IOException;
-import java.util.List;
 import java.util.StringTokenizer;
-
-import javax.net.ssl.X509KeyManager;
-import javax.net.ssl.X509TrustManager;
 
 import net.jcip.annotations.ThreadSafe;
 
+import org.glite.authz.common.obligation.AbstractObligationHandler;
+import org.glite.authz.common.obligation.IniOHConfigurationParser;
 import org.glite.authz.common.pip.IniPIPConfigurationParser;
 import org.glite.authz.common.pip.PolicyInformationPoint;
 import org.glite.authz.common.util.Files;
-import org.glite.authz.common.util.LazyList;
 import org.glite.authz.common.util.Strings;
 import org.glite.security.trustmanager.ContextWrapper;
 import org.glite.security.trustmanager.OpensslTrustmanager;
@@ -48,74 +45,189 @@ import org.slf4j.LoggerFactory;
 public abstract class AbstractIniConfigurationParser<ConfigurationType extends AbstractConfiguration> implements
         ConfigurationParser<ConfigurationType> {
 
-    /** Property name for the property giving the file system path to the logging configuration. */
-    public static final String LOG_CONFIG_PATH_PROP = "logConfiguration";
-    
-    /** Property name for the property giving the file system path to the services private key. */
+    /** The name of the {@value} which gives the path to the service's private key. */
     public static final String SERVICE_KEY_PROP = "privateKey";
 
-    /** Property name for the property giving the file system path to the services X.509 certificate. */
+    /** The name of the {@value} which gives the path to the service's certificate. */
     public static final String SERVICE_CERT_PROP = "certificate";
 
-    /** Name of the property giving the directory in which PEM encoded trusted X.509 certificates are stored. */
+    /** The name of the {@value} which gives the path to directory of PEM-encoded trusted X.509 certificates. */
     public static final String TRUST_ANCHOR_DIR_PROP = "trustedCertificates";
 
-    /** Name of the property indicating that CRLs must be present during trust evaluation. */
+    /** The name of the {@value} which which indicates whether CRLs must be present during trust evaluation. */
     public static final String CRLS_REQUIRED_PROP = "requireCRLs";
 
-    /** Property name for the maximum number of simultaneous connections configuration property. */
+    /** The name of the {@value} which gives the maximum number of simultaneous requests. */
     public static final String MAX_REQUESTS_PROP = "maximumRequests";
 
-    /** Property name for the connection read timeout configuration property. */
+    /** The name of the {@value} which gives the connection timeout, in seconds. */
     public static final String CONN_TIMEOUT_PROP = "connectionTimeout";
 
-    /** Property name for the receiving buffer size configuration property. */
+    /** The name of the {@value} which gives the size of the receiving message buffer, in bytes. */
     public static final String REC_BUFF_SIZE_PROP = "receiveBufferSize";
 
-    /** Property name for the sending buffer size configuration property. */
+    /** The name of the {@value} which gives the sending message buffer, in bytes. */
     public static final String SEND_BUFF_SIZE_PROP = "sendBufferSize";
 
-    /** Property name containing the space-delimited lists of to-be-configured PIPs. */
+    /** The name of the {@value} which gives the space-delimited lists of to-be-configured PIPs. */
     public static final String PIP_PROP = "pips";
+
+    /** The name of the {@value} which gives the space-delimited lists of to-be-configured obligation handlers. */
+    public static final String OH_PROP = "obligationHandlers";
+
+    /** Default value of the {@value #MAX_REQUESTS_PROP} property, {@value} . */
+    public static final int DEFAULT_MAX_REQS = 50;
+
+    /** Default value of the {@value #CONN_TIMEOUT_PROP} property, {@value} seconds. */
+    public static final int DEFAULT_CONN_TIMEOUT = 30;
+
+    /** Default value of the {@value #REC_BUFF_SIZE_PROP} property, {@value} kilobytes. */
+    public static final int DEFAULT_REC_BUFF_SIZE = 4096;
+
+    /** Default value of the {@value #SEND_BUFF_SIZE_PROP} property, {@value} kilobytes. */
+    public static final int DEFAULT_SEND_BUFF_SIZE = 4096;
 
     /** Class logger. */
     private final Logger log = LoggerFactory.getLogger(AbstractIniConfigurationParser.class);
 
     /**
-     * Process a configuration section, looking for the {@value #PIP_PROP} configuration property and, if present,
-     * parsing the identified PIP configuration sections
+     * Gets the value of the {@value #MAX_REQUESTS_PROP} property from the configuration section. If the property is not
+     * present or is not valid the default value of {@value #DEFAULT_MAX_REQS} will be used.
      * 
-     * @param configSection configuration section containing the @value #PIP_PROP} configuration property
-     * @param iniFile INI file containing the PIP configuration sections
+     * @param configSection configuration section from which to extract the value
      * 
-     * @return configured PIPs, never null;
-     * 
-     * @throws ConfigurationException thrown if there is a problem configuring the PIPs
+     * @return the value
      */
-    protected List<PolicyInformationPoint> processPolicyInformationPoints(Section configSection, Ini iniFile)
-            throws ConfigurationException {
-        LazyList<PolicyInformationPoint> pips = new LazyList<PolicyInformationPoint>();
+    protected int getMaximumRequests(Section configSection) {
+        return IniConfigUtil.getInt(configSection, MAX_REQUESTS_PROP, DEFAULT_MAX_REQS, 1, Integer.MAX_VALUE);
+    }
 
-        String pipsStr = Strings.safeTrimOrNullString(configSection.get(PIP_PROP));
-        if (pipsStr == null) {
-            return pips;
-        }
+    /**
+     * Gets the value of the {@value #CONN_TIMEOUT_PROP} property from the configuration section. If the property is not
+     * present or is not valid the default value of {@value #DEFAULT_CONN_TIMEOUT} will be used.
+     * 
+     * @param configSection configuration section from which to extract the value
+     * 
+     * @return the value
+     */
+    protected int getConnectionTimeout(Section configSection) {
+        int timeout = IniConfigUtil
+                .getInt(configSection, CONN_TIMEOUT_PROP, DEFAULT_CONN_TIMEOUT, 1, Integer.MAX_VALUE);
+        return timeout * 1000;
+    }
 
-        log.debug("PDP registered PIPs: {}", pipsStr);
-        StringTokenizer pipNames = new StringTokenizer(pipsStr, " ");
-        while (pipNames.hasMoreTokens()) {
-            String pipName = pipNames.nextToken();
+    /**
+     * Gets the value of the {@value #REC_BUFF_SIZE_PROP} property from the configuration section. If the property is not
+     * present or is not valid the default value of {@value #DEFAULT_REC_BUFF_SIZE} will be used.
+     * 
+     * @param configSection configuration section from which to extract the value
+     * 
+     * @return the value
+     */
+    protected int getReceiveBufferSize(Section configSection) {
+        return IniConfigUtil.getInt(configSection, REC_BUFF_SIZE_PROP, DEFAULT_REC_BUFF_SIZE, 1, Integer.MAX_VALUE);
+    }
 
-            Section pipConfigSection = iniFile.get(pipName);
-            if (pipConfigSection == null) {
-                String errorMsg = "Unable to find configuration section for PIP " + pipName;
-                log.error(errorMsg);
-                throw new ConfigurationException(errorMsg);
+    /**
+     * Gets the value of the {@value #SEND_BUFF_SIZE_PROP} property from the configuration section. If the property is not
+     * present or is not valid the default value of {@value #DEFAULT_SEND_BUFF_SIZE} will be used.
+     * 
+     * @param configSection configuration section from which to extract the value
+     * 
+     * @return the value
+     */
+    protected int getSendBufferSize(Section configSection) {
+        return IniConfigUtil.getInt(configSection, SEND_BUFF_SIZE_PROP, DEFAULT_SEND_BUFF_SIZE, 1, Integer.MAX_VALUE);
+    }
+
+    /**
+     * Processing the {@value #OH_PROP} configuration property, if there is one.
+     * 
+     * @param iniFile INI configuration file being processed
+     * @param configSection current configuration section being processed
+     * @param configBuilder current builder being constructed from the parser
+     * 
+     * @throws ConfigurationException thrown if there is a problem building the obligations handlers
+     */
+    protected void processObligationHandlers(Ini iniFile, Section configSection,
+            AbstractConfigurationBuilder<?> configBuilder) throws ConfigurationException {
+        if (configSection.containsKey(OH_PROP)) {
+            StringTokenizer obligationHandlers = new StringTokenizer(configSection.get(OH_PROP), " ");
+            String obligationHandlerName;
+            while (obligationHandlers.hasMoreTokens()) {
+                obligationHandlerName = Strings.safeTrimOrNullString(obligationHandlers.nextToken());
+                if (!iniFile.containsKey(obligationHandlerName)) {
+                    String errorMsg = "INI configuration file does not contain a configuration section for obligation handler "
+                            + obligationHandlerName;
+                    log.error(errorMsg);
+                    throw new ConfigurationException(errorMsg);
+                }
+                if (obligationHandlerName != null) {
+                    configBuilder.getObligationService().addObligationhandler(
+                            buildObligationHandler(iniFile.get(obligationHandlerName)));
+                    log.debug("Added obligation handler: {}", obligationHandlerName);
+                }
             }
-
-            pips.add(processPolicyInformationPoint(pipConfigSection));
         }
-        return pips;
+    }
+
+    /**
+     * Processes each individual Obligation Handler configuration section.
+     * 
+     * @param ohConfig the obligation handler configuration section
+     * 
+     * @return the obligation handler configured with the information provided in the configuration section
+     * 
+     * @throws ConfigurationException throw if a obligation handler can not be instantiated
+     */
+    @SuppressWarnings("unchecked")
+    private AbstractObligationHandler buildObligationHandler(Section ohConfig) throws ConfigurationException {
+        String parserClassName = IniConfigUtil.getString(ohConfig, IniOHConfigurationParser.PARSER_CLASS_PROP);
+        if (parserClassName == null) {
+            String errorMsg = "Obligation configuration section " + ohConfig.getName() + " does not contain a valid "
+                    + IniOHConfigurationParser.PARSER_CLASS_PROP + " configuration property.";
+            log.error(errorMsg);
+            throw new ConfigurationException(errorMsg);
+        }
+
+        try {
+            Class<IniOHConfigurationParser> parserClass = (Class<IniOHConfigurationParser>) AbstractIniServiceConfigurationParser.class
+                    .getClassLoader().loadClass(parserClassName);
+            IniOHConfigurationParser parser = parserClass.getConstructor().newInstance();
+            return parser.parse(ohConfig);
+        } catch (Exception e) {
+            throw new ConfigurationException("Unable to configure Obligation Handler " + ohConfig.getName(), e);
+        }
+    }
+
+    /**
+     * Processing the {@value #PIP_PROP} configuration property, if there is one.
+     * 
+     * @param iniFile INI configuration file being processed
+     * @param configSection current configuration section being processed
+     * @param configBuilder current builder being constructed from the parser
+     * 
+     * @throws ConfigurationException thrown if there is a problem building the policy information points
+     */
+    protected void processPolicyInformationPoints(Ini iniFile, Section configSection,
+            AbstractConfigurationBuilder<?> configBuilder) throws ConfigurationException {
+        if (configSection.containsKey(PIP_PROP)) {
+            String pipName;
+            StringTokenizer pipNames = new StringTokenizer(configSection.get(PIP_PROP), " ");
+            while (pipNames.hasMoreTokens()) {
+                pipName = Strings.safeTrimOrNullString(pipNames.nextToken());
+                if (pipName != null) {
+                    if (!iniFile.containsKey(pipName)) {
+                        String errorMsg = "INI configuration file does not contain a configuration section for policy information point "
+                                + pipName;
+                        log.error(errorMsg);
+                        throw new ConfigurationException(errorMsg);
+                    }
+                    configBuilder.getPIPs().add(buildPolicyInformationPoint(iniFile.get(pipName)));
+                    log.debug("loadded policy information point: {}", pipName);
+                }
+            }
+        }
     }
 
     /**
@@ -128,9 +240,8 @@ public abstract class AbstractIniConfigurationParser<ConfigurationType extends A
      * @throws ConfigurationException throw if a PIP can not be instantiated
      */
     @SuppressWarnings("unchecked")
-    protected PolicyInformationPoint processPolicyInformationPoint(Section pipConfig) throws ConfigurationException {
-        String parserClassName = Strings.safeTrimOrNullString(pipConfig
-                .get(IniPIPConfigurationParser.PARSER_CLASS_PROP));
+    private PolicyInformationPoint buildPolicyInformationPoint(Section pipConfig) throws ConfigurationException {
+        String parserClassName = IniConfigUtil.getString(pipConfig, IniPIPConfigurationParser.PARSER_CLASS_PROP);
         if (parserClassName == null) {
             String errorMsg = "PIP configuration section " + pipConfig.getName() + " does not contain a valid "
                     + IniPIPConfigurationParser.PARSER_CLASS_PROP + " configuration property.";
@@ -150,20 +261,19 @@ public abstract class AbstractIniConfigurationParser<ConfigurationType extends A
     }
 
     /**
-     * Creates a trust manager from the X509 trust information provided in the configuration section.
+     * Processes the {@value #TRUST_ANCHOR_DIR_PROP} and {@value #CRLS_REQUIRED_PROP} properties, if there are ones.
      * 
-     * @param configSection the configuration section
+     * @param configSection current configuration section being processed
+     * @param configBuilder current builder being constructed from the parser
      * 
-     * @return the X509 trust manager
-     * 
-     * @throws ConfigurationException throw if the trust information can not be read and used
+     * @throws ConfigurationException thrown if there is a problem creating the trust manager
      */
-    protected X509TrustManager processX509TrustInformation(Section configSection) throws ConfigurationException {
-        String trustStoreDir = Strings.safeTrimOrNullString(configSection.get(TRUST_ANCHOR_DIR_PROP));
-
+    protected void processX509TrustInformation(Section configSection, AbstractConfigurationBuilder<?> configBuilder)
+            throws ConfigurationException {
+        String trustStoreDir = IniConfigUtil.getString(configSection, TRUST_ANCHOR_DIR_PROP, null);
         if (trustStoreDir == null) {
             log.debug("No truststore directory given, no trust manager will be used");
-            return null;
+            return;
         }
 
         try {
@@ -174,14 +284,11 @@ public abstract class AbstractIniConfigurationParser<ConfigurationType extends A
         }
         log.debug("Using the directory {} as the truststore directory", trustStoreDir);
 
-        boolean crlsRequired = true;
-        if (configSection.containsKey(CRLS_REQUIRED_PROP)) {
-            crlsRequired = Boolean.parseBoolean(configSection.get(CRLS_REQUIRED_PROP));
-        }
+        boolean crlsRequired = IniConfigUtil.getBoolean(configSection, CRLS_REQUIRED_PROP, true);
         log.debug("CRLs required in the truststore: {}", crlsRequired);
 
         try {
-            return new OpensslTrustmanager(trustStoreDir, crlsRequired);
+            configBuilder.setTrustManager(new OpensslTrustmanager(trustStoreDir, crlsRequired));
         } catch (Exception e) {
             log.error("Unable to create trust manager", e);
             throw new ConfigurationException("Unable to read trust information", e);
@@ -189,25 +296,25 @@ public abstract class AbstractIniConfigurationParser<ConfigurationType extends A
     }
 
     /**
-     * Creates a key manager, containing the service's credential, from the information in the configuration section.
+     * Processes the {@value #SERVICE_KEY_PROP} and {@value #SERVICE_CERT_PROP} properties, if there are ones.
      * 
-     * @param configSection the configuration section
+     * @param configSection current configuration section being processed
+     * @param configBuilder current builder being constructed from the parser
      * 
-     * @return the key manager containing the services credential
-     * 
-     * @throws ConfigurationException thrown if the credential information can not be read
+     * @throws ConfigurationException thrown if there is a problem creating the key manager
      */
-    protected X509KeyManager processX509KeyInformation(Section configSection) throws ConfigurationException {
-        String privateKeyFilePath = Strings.safeTrim(configSection.get(SERVICE_KEY_PROP));
+    protected void processX509KeyInformation(Section configSection, AbstractConfigurationBuilder<?> configBuilder)
+            throws ConfigurationException {
+        String privateKeyFilePath = IniConfigUtil.getString(configSection, SERVICE_KEY_PROP, null);
         if (privateKeyFilePath == null) {
             log.info("No service private key file provided, no service credential will be used.");
-            return null;
+            return;
         }
 
-        String certificateFilePath = Strings.safeTrim(configSection.get(SERVICE_CERT_PROP));
+        String certificateFilePath = IniConfigUtil.getString(configSection, SERVICE_CERT_PROP, null);
         if (certificateFilePath == null) {
             log.info("No service certificate file provided, no service credential will be used.");
-            return null;
+            return;
         }
 
         log.info("Service credential will use private key {} and certificate {}", privateKeyFilePath,
@@ -217,7 +324,7 @@ public abstract class AbstractIniConfigurationParser<ConfigurationType extends A
         keystoreProps.setProperty(ContextWrapper.CREDENTIALS_CERT_FILE, certificateFilePath);
 
         try {
-            return new UpdatingKeyManager(keystoreProps, null);
+            configBuilder.setKeyManager(new UpdatingKeyManager(keystoreProps, null));
         } catch (Exception e) {
             log.error("Unable to create service key manager", e);
             throw new ConfigurationException("Unable to read service credential information", e);

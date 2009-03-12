@@ -43,6 +43,11 @@
     <dependencies>
         <!-- Compile Dependencies-->
         <dependency>
+            <groupId>org.opensaml</groupId>
+            <artifactId>opensaml</artifactId>
+            <version>2.2.4</version>
+        </dependency>
+        <dependency>
             <groupId>net.sourceforge</groupId>
             <artifactId>ini4j</artifactId>
             <version>0.4.0</version>

@@ -24,6 +24,7 @@ import javax.net.ssl.X509TrustManager;
 
 import net.jcip.annotations.ThreadSafe;
 
+import org.glite.authz.common.obligation.ObligationService;
 import org.glite.authz.common.pip.PolicyInformationPoint;
 
 /** Base configuration implementation for PEP clients and daemons. */
@@ -34,7 +35,7 @@ public abstract class AbstractConfiguration {
     public static final String BINDING_NAME = "org.glite.authz.common.config";
 
     /** A key manager containing the service's credential. */
-    private X509KeyManager serviceCredential;
+    private X509KeyManager keyManager;
 
     /** Trust manager containing the trust certificates and CRLs used by the service. */
     private X509TrustManager trustManager;
@@ -54,17 +55,21 @@ public abstract class AbstractConfiguration {
     /** Registered policy information points. */
     private List<PolicyInformationPoint> policyInformationPoints;
 
+    /** Service used to handle obligations. */
+    private ObligationService obligationService;
+
     /** Constructor. */
     protected AbstractConfiguration() {
-        serviceCredential = null;
+        keyManager = null;
         trustManager = null;
         maxRequests = 0;
         connectionTimeout = 0;
         receiveBufferSize = 0;
         sendBufferSize = 0;
         policyInformationPoints = null;
+        obligationService = null;
     }
-    
+
     /**
      * Gets the connection socket timeout, in milliseconds.
      * 
@@ -81,6 +86,15 @@ public abstract class AbstractConfiguration {
      */
     public int getMaxRequests() {
         return maxRequests;
+    }
+
+    /**
+     * Gets the service used to handle obligations.
+     * 
+     * @return service used to handle obligations
+     */
+    public ObligationService getObligationService() {
+        return obligationService;
     }
 
     /**
@@ -115,8 +129,8 @@ public abstract class AbstractConfiguration {
      * 
      * @return credential used by this service to create SSL connections and digital signatures
      */
-    public X509KeyManager getServiceCredential() {
-        return serviceCredential;
+    public X509KeyManager getKeyManager() {
+        return keyManager;
     }
 
     /**
@@ -134,10 +148,10 @@ public abstract class AbstractConfiguration {
      * @param timeout HTTP connection timeout, in milliseconds; may not be less than 1
      */
     protected synchronized final void setConnectionTimeout(int timeout) {
-        if(connectionTimeout != 0){
+        if (connectionTimeout != 0) {
             throw new IllegalStateException("The connection timeout has already been set, it may not be changed.");
         }
-        
+
         if (timeout < 1) {
             throw new IllegalArgumentException("Connection timeout may not be less than 1 millisecond");
         }
@@ -150,29 +164,47 @@ public abstract class AbstractConfiguration {
      * @param max maximum number of concurrent connections that may be in-process at one time; may not be less than 1
      */
     protected synchronized final void setMaxRequests(int max) {
-        if(maxRequests != 0){
-            throw new IllegalStateException("The maximum number of requests has already been set, it may not be changed.");
+        if (maxRequests != 0) {
+            throw new IllegalStateException(
+                    "The maximum number of requests has already been set, it may not be changed.");
         }
-        
+
         if (max < 1) {
             throw new IllegalArgumentException("Maximum number of requests may not be less than 1");
         }
         maxRequests = max;
     }
-    
+
+    /**
+     * Sets the service used to handle obligations.
+     * 
+     * @param service service used to handle obligations
+     */
+    protected synchronized final void setObligationService(ObligationService service) {
+        if (service == null) {
+            return;
+        }
+
+        if (obligationService != null) {
+            throw new IllegalStateException("Obligation service has already been set, it may not be changed");
+        }
+        obligationService = service;
+    }
+
     /**
      * Sets the list of registered policy information points.
      * 
      * @param pips list of registered policy information points
      */
     protected synchronized final void setPolicyInformationPoints(List<PolicyInformationPoint> pips) {
-        if(policyInformationPoints != null){
-            throw new IllegalArgumentException("A list of registered policy information points has already been set, it may not be changed.");
+        if (policyInformationPoints != null) {
+            throw new IllegalArgumentException(
+                    "A list of registered policy information points has already been set, it may not be changed.");
         }
-        if(pips == null){
+        if (pips == null) {
             return;
         }
-        
+
         policyInformationPoints = Collections.unmodifiableList(pips);
     }
 
@@ -182,10 +214,10 @@ public abstract class AbstractConfiguration {
      * @param size size of the buffer, in bytes, used when receiving data; may not be less than 1
      */
     protected synchronized final void setReceiveBufferSize(int size) {
-        if(receiveBufferSize != 0){
+        if (receiveBufferSize != 0) {
             throw new IllegalStateException("Receive buffer size has already been set, it may not be changed.");
         }
-        
+
         if (size < 1) {
             throw new IllegalArgumentException("Receive buffer size may not be less than 1 byte in size");
         }
@@ -198,7 +230,7 @@ public abstract class AbstractConfiguration {
      * @param size size of the buffer, in bytes, used when sending data; may not be less than 1
      */
     protected synchronized final void setSendBufferSize(int size) {
-        if(sendBufferSize != 0){
+        if (sendBufferSize != 0) {
             throw new IllegalStateException("Send buffer size has already been set, it may not be changed.");
         }
         if (size < 1) {
@@ -212,11 +244,11 @@ public abstract class AbstractConfiguration {
      * 
      * @param manager credential used by this service to create SSL connections and digital signatures
      */
-    protected synchronized final void setServiceCredential(X509KeyManager manager) {
-        if(manager != null){
-            throw new IllegalStateException("The service credential has already been set, it may not be changed.");
+    protected synchronized final void setKeyManager(X509KeyManager manager) {
+        if (manager != null) {
+            throw new IllegalStateException("The service key manager has already been set, it may not be changed.");
         }
-        serviceCredential = manager;
+        keyManager = manager;
     }
 
     /**
@@ -225,7 +257,7 @@ public abstract class AbstractConfiguration {
      * @param manager trust manager used to evaluate X509 certificates
      */
     protected synchronized final void setTrustManager(X509TrustManager manager) {
-        if(manager != null){
+        if (manager != null) {
             throw new IllegalStateException("The trust manager has already been set, it may not be changed");
         }
         trustManager = manager;

@@ -24,6 +24,7 @@ import javax.net.ssl.X509TrustManager;
 
 import net.jcip.annotations.NotThreadSafe;
 
+import org.glite.authz.common.obligation.ObligationService;
 import org.glite.authz.common.pip.PolicyInformationPoint;
 import org.glite.authz.common.util.Strings;
 
@@ -37,9 +38,9 @@ public abstract class AbstractConfigurationBuilder<ConfigType extends AbstractCo
 
     /** Logging configuration file path. */
     private String loggingConfigFilePath;
-    
+
     /** A key manager containing the service's credential. */
-    private X509KeyManager serviceCredential;
+    private X509KeyManager keyManager;
 
     /** Trust manager containing the trust certificates and CRLs used by the service. */
     private X509TrustManager trustManager;
@@ -57,22 +58,60 @@ public abstract class AbstractConfigurationBuilder<ConfigType extends AbstractCo
     private int sendBufferSize;
 
     /** Registered policy information points. */
-    private List<PolicyInformationPoint> pips;
+    private List<PolicyInformationPoint> policyInformationPoints;
+
+    /** Service used to handler obligations. */
+    private ObligationService obligationService;
 
     /** Constructor. */
     protected AbstractConfigurationBuilder() {
-        maxConnections = 100;
-
-        // 30 seconds
-        connectionTimeout = 1000 * 30;
-
-        // 4KB
-        receiveBufferSize = 1024 * 4;
-        sendBufferSize = 1024 * 4;
-
-        pips = new ArrayList<PolicyInformationPoint>();
+        maxConnections = 0;
+        connectionTimeout = 0;
+        receiveBufferSize = 0;
+        sendBufferSize = 0;
+        keyManager = null;
+        trustManager = null;
+        policyInformationPoints = new ArrayList<PolicyInformationPoint>();
+        obligationService = new ObligationService();
     }
-    
+
+    /**
+     * Constructor thats creates a builder factory with the same settings as the given prototype configuration.
+     * 
+     * @param prototype the prototype configuration whose values will be used to initialize this builder
+     */
+    protected AbstractConfigurationBuilder(AbstractConfiguration prototype) {
+        maxConnections = prototype.getMaxRequests();
+        connectionTimeout = prototype.getConnectionTimeout();
+        receiveBufferSize = prototype.getReceiveBufferSize();
+        sendBufferSize = prototype.getSendBufferSize();
+
+        if (prototype.getPolicyInformationPoints() != null) {
+            policyInformationPoints = new ArrayList<PolicyInformationPoint>(prototype.getPolicyInformationPoints());
+        } else {
+            policyInformationPoints = new ArrayList<PolicyInformationPoint>();
+        }
+        obligationService = prototype.getObligationService();
+    }
+
+    /**
+     * Builds the configuration represented by the current set properties. Please note that configuration builders are
+     * <strong>not</strong> threadsafe.  So care should be taken that another thread does not change properties while 
+     * the configuration is being built.
+     * 
+     * @return the constructed configuration
+     */
+    public abstract ConfigType build();
+
+    /**
+     * Gets the connection socket timeout, in milliseconds.
+     * 
+     * @return connection socket timeout, in milliseconds
+     */
+    public int getConnectionTimeout() {
+        return connectionTimeout;
+    }
+
     /**
      * Gets the path to the logging file configuration location.
      * 
@@ -80,33 +119,6 @@ public abstract class AbstractConfigurationBuilder<ConfigType extends AbstractCo
      */
     public String getLoggingConfigFilePath() {
         return loggingConfigFilePath;
-    }
-
-    /**
-     * Sets the path to the logging file configuration location.
-     * 
-     * @param path path to the logging file configuration location
-     */
-    public void setLoggingConfigFilePath(String path) {
-        loggingConfigFilePath = Strings.safeTrimOrNullString(path);
-    }
-    
-    /**
-     * Constructor thats creates a builder factory with the same settings as the given prototype configuration.
-     * 
-     * @param prototype the prototype configuration whose values will be used to initialize this builder
-     */
-    protected AbstractConfigurationBuilder(AbstractConfiguration prototype){
-        maxConnections = prototype.getMaxRequests();
-        connectionTimeout = prototype.getConnectionTimeout();
-        receiveBufferSize = prototype.getReceiveBufferSize();
-        sendBufferSize = prototype.getSendBufferSize();
-        
-        if(prototype.getPolicyInformationPoints() != null){
-            pips = new ArrayList<PolicyInformationPoint>(prototype.getPolicyInformationPoints());
-        }else{
-            pips = new ArrayList<PolicyInformationPoint>();
-        }
     }
 
     /**
@@ -119,24 +131,72 @@ public abstract class AbstractConfigurationBuilder<ConfigType extends AbstractCo
     }
 
     /**
-     * Sets the maximum number of concurrent connections that may be in-process at one time.
+     * Gets the service used to handle obligations.
      * 
-     * @param max maximum number of concurrent connections that may be in-process at one time; may not be less than 1
+     * @return service used to handle obligations
      */
-    public void setMaxConnections(int max) {
-        if (max < 1) {
-            throw new IllegalArgumentException("Maximum number of threads may not be less than 1");
-        }
-        maxConnections = max;
+    public ObligationService getObligationService() {
+        return obligationService;
     }
 
     /**
-     * Gets the connection socket timeout, in milliseconds.
+     * Gets the list of registered PIPs.
      * 
-     * @return connection socket timeout, in milliseconds
+     * @return list of registered PIPs
      */
-    public int getConnectionTimeout() {
-        return connectionTimeout;
+    public List<PolicyInformationPoint> getPIPs() {
+        return policyInformationPoints;
+    }
+
+    /**
+     * Gets the size of the buffer, in bytes, used when receiving data.
+     * 
+     * @return Size of the buffer, in bytes, used when receiving data
+     */
+    public int getReceiveBufferSize() {
+        return receiveBufferSize;
+    }
+
+    /**
+     * Gets the size of the buffer, in bytes, used when sending data.
+     * 
+     * @return size of the buffer, in bytes, used when sending data
+     */
+    public int getSendBufferSize() {
+        return sendBufferSize;
+    }
+
+    /**
+     * Gets the credential used by this service to create SSL connections and digital signatures.
+     * 
+     * @return credential used by this service to create SSL connections and digital signatures
+     */
+    public X509KeyManager getKeyManager() {
+        return keyManager;
+    }
+
+    /**
+     * Gets the trust manager used to evaluate X509 certificates.
+     * 
+     * @return trust manager used to evaluate X509 certificates
+     */
+    public X509TrustManager getTrustManager() {
+        return trustManager;
+    }
+
+    /**
+     * Populates the given configuration with information from this builder.
+     * 
+     * @param config the configuration to populate
+     */
+    protected void populateConfiguration(ConfigType config) {
+        config.setConnectionTimeout(connectionTimeout);
+        config.setMaxRequests(maxConnections);
+        config.setPolicyInformationPoints(policyInformationPoints);
+        config.setReceiveBufferSize(receiveBufferSize);
+        config.setSendBufferSize(sendBufferSize);
+        config.setKeyManager(keyManager);
+        config.setTrustManager(trustManager);
     }
 
     /**
@@ -152,12 +212,33 @@ public abstract class AbstractConfigurationBuilder<ConfigType extends AbstractCo
     }
 
     /**
-     * Gets the size of the buffer, in bytes, used when receiving data.
+     * Sets the path to the logging file configuration location.
      * 
-     * @return Size of the buffer, in bytes, used when receiving data
+     * @param path path to the logging file configuration location
      */
-    public int getReceiveBufferSize() {
-        return receiveBufferSize;
+    public void setLoggingConfigFilePath(String path) {
+        loggingConfigFilePath = Strings.safeTrimOrNullString(path);
+    }
+
+    /**
+     * Sets the maximum number of concurrent connections that may be in-process at one time.
+     * 
+     * @param max maximum number of concurrent connections that may be in-process at one time; may not be less than 1
+     */
+    public void setMaxConnections(int max) {
+        if (max < 1) {
+            throw new IllegalArgumentException("Maximum number of threads may not be less than 1");
+        }
+        maxConnections = max;
+    }
+
+    /**
+     * Sets the service used to handle obligations.
+     * 
+     * @param service service used to handle obligations
+     */
+    public void setObligationService(ObligationService service) {
+        obligationService = service;
     }
 
     /**
@@ -173,15 +254,6 @@ public abstract class AbstractConfigurationBuilder<ConfigType extends AbstractCo
     }
 
     /**
-     * Gets the size of the buffer, in bytes, used when sending data.
-     * 
-     * @return size of the buffer, in bytes, used when sending data
-     */
-    public int getSendBufferSize() {
-        return sendBufferSize;
-    }
-
-    /**
      * Sets the size of the buffer, in bytes, used when sending data
      * 
      * @param size size of the buffer, in bytes, used when sending data; may not be less than 1
@@ -194,39 +266,12 @@ public abstract class AbstractConfigurationBuilder<ConfigType extends AbstractCo
     }
 
     /**
-     * Gets the list of registered PIPs.
-     * 
-     * @return list of registered PIPs
-     */
-    public List<PolicyInformationPoint> getPIPs() {
-        return pips;
-    }
-
-    /**
-     * Gets the credential used by this service to create SSL connections and digital signatures.
-     * 
-     * @return credential used by this service to create SSL connections and digital signatures
-     */
-    public X509KeyManager getServiceCredential() {
-        return serviceCredential;
-    }
-
-    /**
      * Sets the credential used by this service to create SSL connections and digital signatures.
      * 
      * @param manager credential used by this service to create SSL connections and digital signatures
      */
-    public void setServiceCredential(X509KeyManager manager) {
-        serviceCredential = manager;
-    }
-
-    /**
-     * Gets the trust manager used to evaluate X509 certificates.
-     * 
-     * @return trust manager used to evaluate X509 certificates
-     */
-    public X509TrustManager getTrustManager() {
-        return trustManager;
+    public void setKeyManager(X509KeyManager manager) {
+        keyManager = manager;
     }
 
     /**
@@ -236,20 +281,5 @@ public abstract class AbstractConfigurationBuilder<ConfigType extends AbstractCo
      */
     public void setTrustManager(X509TrustManager manager) {
         trustManager = manager;
-    }
-
-    /**
-     * Populates the given configuration with information from this builder.
-     * 
-     * @param config the configuration to populate
-     */
-    protected void populateConfiguration(AbstractConfiguration config) {
-        config.setConnectionTimeout(connectionTimeout);
-        config.setMaxRequests(maxConnections);
-        config.setPolicyInformationPoints(pips);
-        config.setReceiveBufferSize(receiveBufferSize);
-        config.setSendBufferSize(sendBufferSize);
-        config.setServiceCredential(serviceCredential);
-        config.setTrustManager(trustManager);
     }
 }
