@@ -63,20 +63,20 @@ public final class Files {
 
         File file = new File(filePath);
 
-        if (requireFile && !file.isFile()) {
-            throw new IOException("The path " + filePath + " is a directory not a file");
+        if (requireExistance && !file.exists()) {
+            throw new IOException("The file '" + filePath + "' does not exist.");
         }
 
-        if (requireExistance && !file.exists()) {
-            throw new IOException("The file " + filePath + " does not exist.");
+        if (requireFile && !file.isFile()) {
+            throw new IOException("The path '" + filePath + "' is a directory not a file");
         }
 
         if (requireReadable && !file.canRead()) {
-            throw new IOException("The file " + filePath + " is not readable.");
+            throw new IOException("The file '" + filePath + "' is not readable.");
         }
 
         if (requireWritable && !file.canWrite()) {
-            throw new IOException("The file " + filePath + " is not writable.");
+            throw new IOException("The file '" + filePath + "' is not writable.");
         }
 
         return file;

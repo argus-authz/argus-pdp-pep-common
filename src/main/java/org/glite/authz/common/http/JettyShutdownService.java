@@ -68,8 +68,10 @@ public class JettyShutdownService {
 
         ServletHolder shutdownServlet = new ServletHolder(new HttpServlet() {
             protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-                shutdownCommandThread.start();
                 resp.setStatus(HttpServletResponse.SC_OK);
+                resp.getWriter().write("ok");
+                resp.flushBuffer();
+                shutdownCommandThread.start();
                 return;
             }
         });
