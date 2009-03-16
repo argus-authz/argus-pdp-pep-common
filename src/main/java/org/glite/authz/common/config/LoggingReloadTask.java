@@ -69,7 +69,7 @@ public class LoggingReloadTask extends TimerTask {
 
         if (lastModification >= loggingConfigFile.lastModified()) {
             // file hasn't changed since the last time we looked
-            log.debug("Logging configuration has not changed, skipping reload");
+            log.trace("Logging configuration has not changed, skipping reload");
             return;
         }
 
