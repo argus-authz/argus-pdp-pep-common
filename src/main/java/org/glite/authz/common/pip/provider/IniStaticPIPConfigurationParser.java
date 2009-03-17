@@ -72,7 +72,7 @@ public class IniStaticPIPConfigurationParser implements IniPIPConfigurationParse
         String staticAttributesFilePath = iniConfig.get(CONFIG_FILE_PROP);
         Ini iniFile = readIniFile(staticAttributesFilePath);
 
-        String pipId = Strings.safeTrimOrNullString(iniConfig.get(ID_PROP));
+        String pipId = Strings.safeTrimOrNullString(iniConfig.getName());
         Map<String, List<String>> actionAttributes = iniSectionToAttributeMap(iniFile.get(ACTION_SECTION_HEADER));
         Map<String, List<String>> environmentAttributes = iniSectionToAttributeMap(iniFile
                 .get(ENVIRONMENT_SECTION_HEADER));

@@ -28,9 +28,6 @@ public interface IniPIPConfigurationParser {
     /** "parserClass" configuration property name. */
     public static final String PARSER_CLASS_PROP = "parserClass";
 
-    /** "id" configuration property name. */
-    public static final String ID_PROP = "id";
-
     /**
      * Created a {@link PolicyInformationPoint} from the information within the {@link Section}.
      * 

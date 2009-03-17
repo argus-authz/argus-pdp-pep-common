@@ -30,6 +30,6 @@ public class IniEnvironmentTimePIPConfigurationParser implements IniPIPConfigura
 
     /** {@inheritDoc} */
     public PolicyInformationPoint parse(Section iniConfig) throws ConfigurationException {
-        return new EnvironmentTimePIP(Strings.safeTrimOrNullString(iniConfig.get(ID_PROP)));
+        return new EnvironmentTimePIP(Strings.safeTrimOrNullString(iniConfig.getName()));
     }
 }
