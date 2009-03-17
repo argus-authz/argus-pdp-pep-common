@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.glite.authz.common.config;
+package org.glite.authz.common.logging;
 
 import java.io.File;
 import java.io.FileInputStream;
