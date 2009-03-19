@@ -52,7 +52,7 @@ public abstract class AbstractIniConfigurationParser<ConfigurationType extends A
     public static final String SERVICE_CERT_PROP = "certificate";
 
     /** The name of the {@value} which gives the path to directory of PEM-encoded trusted X.509 certificates. */
-    public static final String TRUST_ANCHOR_DIR_PROP = "trustedCertificates";
+    public static final String TRUST_INFO_DIR_PROP = "trustInfoDir";
 
     /** The name of the {@value} which which indicates whether CRLs must be present during trust evaluation. */
     public static final String CRLS_REQUIRED_PROP = "requireCRLs";
@@ -261,7 +261,7 @@ public abstract class AbstractIniConfigurationParser<ConfigurationType extends A
     }
 
     /**
-     * Processes the {@value #TRUST_ANCHOR_DIR_PROP} and {@value #CRLS_REQUIRED_PROP} properties, if there are ones.
+     * Processes the {@value #TRUST_INFO_DIR_PROP} and {@value #CRLS_REQUIRED_PROP} properties, if there are ones.
      * 
      * @param configSection current configuration section being processed
      * @param configBuilder current builder being constructed from the parser
@@ -270,7 +270,7 @@ public abstract class AbstractIniConfigurationParser<ConfigurationType extends A
      */
     protected void processX509TrustInformation(Section configSection, AbstractConfigurationBuilder<?> configBuilder)
             throws ConfigurationException {
-        String trustStoreDir = IniConfigUtil.getString(configSection, TRUST_ANCHOR_DIR_PROP, null);
+        String trustStoreDir = IniConfigUtil.getString(configSection, TRUST_INFO_DIR_PROP, null);
         if (trustStoreDir == null) {
             log.debug("No truststore directory given, no trust manager will be used");
             return;

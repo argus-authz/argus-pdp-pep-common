@@ -46,10 +46,10 @@ public abstract class AbstractIniServiceConfigurationParser<ConfigurationType ex
     public static final String SD_PORT_PROP = "shutdownPort";
 
     /** The name of the {@value} property which indicates the maximum number of requests that will be queued up. */
-    public static final String MAX_QUEUE_PROP = "maxRequestQueueSize";
+    public static final String REQUEST_QUEUE_PROP = "requestQueueSize";
 
-    /** Default value of the {@value #MAX_QUEUE_PROP} property, {@value} . */
-    public static final int DEFAULT_MAX_QUEUE = 50;
+    /** Default value of the {@value #REQUEST_QUEUE_PROP} property, {@value} . */
+    public static final int DEFAULT_REQUEST_QUEUE = 50;
 
     /** Class logger. */
     private final Logger log = LoggerFactory.getLogger(AbstractIniServiceConfigurationParser.class);
@@ -104,15 +104,15 @@ public abstract class AbstractIniServiceConfigurationParser<ConfigurationType ex
     }
 
     /**
-     * Gets the value of the {@value #MAX_QUEUE_PROP} property from the configuration section. If the property is not
-     * present or is not valid the default value of {@value #DEFAULT_MAX_QUEUE} will be used.
+     * Gets the value of the {@value #REQUEST_QUEUE_PROP} property from the configuration section. If the property is not
+     * present or is not valid the default value of {@value #DEFAULT_REQUEST_QUEUE} will be used.
      * 
      * @param configSection configuration section from which to extract the value
      * 
      * @return the value
      */
     protected int getMaxRequestQueueSize(Section configSection) {
-        return IniConfigUtil.getInt(configSection, MAX_QUEUE_PROP, DEFAULT_MAX_QUEUE, 1, Integer.MAX_VALUE);
+        return IniConfigUtil.getInt(configSection, REQUEST_QUEUE_PROP, DEFAULT_REQUEST_QUEUE, 1, Integer.MAX_VALUE);
     }
 
     /**
