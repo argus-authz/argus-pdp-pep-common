@@ -17,29 +17,29 @@
 package org.glite.authz.common.model;
 
 import java.io.Serializable;
-import java.util.List;
+import java.util.Set;
 
 import net.jcip.annotations.NotThreadSafe;
 
-import org.glite.authz.common.util.LazyList;
+import org.glite.authz.common.util.LazySet;
 import org.glite.authz.common.util.Strings;
 
 /** Attribute-based description of the subject of an authorization request. */
 @NotThreadSafe
-public class Subject implements Serializable {
+public final class Subject implements Serializable {
 
     /** Serial version UID. */
-    private static final long serialVersionUID = -240320117226294650L;
+    private static final long serialVersionUID = 8938715874477342336L;
 
     /** Category to which the subject belongs. */
     private String category;
 
     /** Attributes describing the subject. */
-    private LazyList<Attribute> attributes;
+    private LazySet<Attribute> attributes;
 
     /** Constructor. */
     public Subject() {
-        attributes = new LazyList<Attribute>();
+        attributes = new LazySet<Attribute>();
     }
 
     /**
@@ -65,7 +65,7 @@ public class Subject implements Serializable {
      * 
      * @return attributes that describe the subject
      */
-    public List<Attribute> getAttributes() {
+    public Set<Attribute> getAttributes() {
         return attributes;
     }
 
@@ -86,5 +86,30 @@ public class Subject implements Serializable {
         stringBuilder.append("}");
 
         return stringBuilder.toString();
+    }
+
+    /** {@inheritDoc} */
+    public int hashCode() {
+        int hash = 13;
+
+        hash = 31 * hash + (null == category ? 0 : category.hashCode());
+        hash = 31 * hash + attributes.hashCode();
+
+        return hash;
+    }
+
+    /** {@inheritDoc} */
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+
+        if (obj == null || this.getClass() != obj.getClass()) {
+            return false;
+        }
+
+        Subject otherSubject = (Subject) obj;
+        return Strings.safeEquals(category, otherSubject.getCategory())
+                && attributes.equals(otherSubject.getAttributes());
     }
 }

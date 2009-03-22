@@ -25,10 +25,10 @@ import org.glite.authz.common.util.LazyList;
 
 /** An attribute-based description of an action to be authorized. */
 @NotThreadSafe
-public class Action implements Serializable {
+public final class Action implements Serializable {
 
     /** Serial version UID. */
-    private static final long serialVersionUID = -231587978541700578L;
+    private static final long serialVersionUID = -2085506180809169465L;
 
     /** Attributes that identify the action. */
     private LazyList<Attribute> attributes;
@@ -62,5 +62,23 @@ public class Action implements Serializable {
         stringBuilder.append("}");
 
         return stringBuilder.toString();
+    }
+
+    /** {@inheritDoc} */
+    public int hashCode() {
+        return attributes.hashCode();
+    }
+
+    /** {@inheritDoc} */
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+
+        if (obj == null || this.getClass() != obj.getClass()) {
+            return false;
+        }
+
+        return attributes.equals(((Action) obj).getAttributes());
     }
 }

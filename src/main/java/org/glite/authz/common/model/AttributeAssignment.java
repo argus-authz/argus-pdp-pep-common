@@ -26,10 +26,10 @@ import org.glite.authz.common.util.Strings;
 
 /** A requirement that a particular attribute have a given set of values within the PEP. */
 @NotThreadSafe
-public class AttributeAssignment implements Serializable {
+public final class AttributeAssignment implements Serializable {
 
     /** Serial version UID. */
-    private static final long serialVersionUID = -299864756968026128L;
+    private static final long serialVersionUID = -1159499031052230298L;
 
     /** ID of the attribute. */
     private String attributeId;
@@ -85,5 +85,29 @@ public class AttributeAssignment implements Serializable {
         stringBuilder.append("}");
 
         return stringBuilder.toString();
+    }
+
+    /** {@inheritDoc} */
+    public int hashCode() {
+        int hash = 13;
+
+        hash = 31 * hash + (null == attributeId ? 0 : attributeId.hashCode());
+        hash = 31 * hash + values.hashCode();
+
+        return hash;
+    }
+
+    /** {@inheritDoc} */
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+
+        if (obj == null || this.getClass() != obj.getClass()) {
+            return false;
+        }
+
+        AttributeAssignment otherAssignment = (AttributeAssignment) obj;
+        return Strings.safeEquals(attributeId, otherAssignment) && values.equals(otherAssignment.getValues());
     }
 }

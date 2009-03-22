@@ -26,10 +26,10 @@ import org.glite.authz.common.util.Strings;
 
 /** Description of an obligation that must be performed by the PEP. */
 @NotThreadSafe
-public class Obligation implements Serializable {
+public final class Obligation implements Serializable {
 
     /** Serial version UID. */
-    private static final long serialVersionUID = -2281898313095018203L;
+    private static final long serialVersionUID = -5500418892138258526L;
 
     /** ID for the obligation. */
     private String id;
@@ -111,5 +111,31 @@ public class Obligation implements Serializable {
         stringBuilder.append("}");
 
         return stringBuilder.toString();
+    }
+
+    /** {@inheritDoc} */
+    public int hashCode() {
+        int hash = 13;
+
+        hash = 31 * hash + (null == id ? 0 : id.hashCode());
+        hash = 31 * hash + fulfillOn;
+        hash = 31 * hash + attributeAssignments.hashCode();
+
+        return hash;
+    }
+
+    /** {@inheritDoc} */
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+
+        if (obj == null || this.getClass() != obj.getClass()) {
+            return false;
+        }
+
+        Obligation otherObligation = (Obligation) obj;
+        return Strings.safeEquals(id, otherObligation.getId()) && fulfillOn == otherObligation.getFulfillOn()
+                && attributeAssignments.equals(otherObligation.getAttributeAssignments());
     }
 }

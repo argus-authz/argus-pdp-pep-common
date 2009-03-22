@@ -17,25 +17,25 @@
 package org.glite.authz.common.model;
 
 import java.io.Serializable;
-import java.util.List;
+import java.util.Set;
 
 import net.jcip.annotations.NotThreadSafe;
 
-import org.glite.authz.common.util.LazyList;
+import org.glite.authz.common.util.LazySet;
 
 /** An attribute-based description of the environment in which an {@link Action} is to be performed. */
 @NotThreadSafe
-public class Environment implements Serializable {
+public final class Environment implements Serializable {
 
     /** Serial version UID. */
-    private static final long serialVersionUID = 4157470545855157618L;
+    private static final long serialVersionUID = 4988368497865461384L;
 
     /** Attributes describing the environment. */
-    private LazyList<Attribute> attributes;
+    private LazySet<Attribute> attributes;
 
     /** Constructor. */
     public Environment() {
-        attributes = new LazyList<Attribute>();
+        attributes = new LazySet<Attribute>();
     }
 
     /**
@@ -43,7 +43,7 @@ public class Environment implements Serializable {
      * 
      * @return attributes that describe the environment
      */
-    public List<Attribute> getAttributes() {
+    public Set<Attribute> getAttributes() {
         return attributes;
     }
 
@@ -62,5 +62,23 @@ public class Environment implements Serializable {
         stringBuilder.append("}");
 
         return stringBuilder.toString();
+    }
+
+    /** {@inheritDoc} */
+    public int hashCode() {
+        return attributes.hashCode();
+    }
+
+    /** {@inheritDoc} */
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+
+        if (obj == null || this.getClass() != obj.getClass()) {
+            return false;
+        }
+
+        return attributes.equals(((Environment) obj).getAttributes());
     }
 }

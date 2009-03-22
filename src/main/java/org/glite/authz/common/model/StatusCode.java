@@ -24,10 +24,10 @@ import org.glite.authz.common.util.Strings;
 
 /** The code for a {@link Status}. */
 @NotThreadSafe
-public class StatusCode implements Serializable {
+public final class StatusCode implements Serializable {
 
     /** Serial version UID. */
-    private static final long serialVersionUID = -5480399364145540292L;
+    private static final long serialVersionUID = 5112432894946515561L;
 
     /** The status code. */
     private String code;
@@ -85,5 +85,41 @@ public class StatusCode implements Serializable {
         stringBuilder.append("}");
 
         return stringBuilder.toString();
+    }
+
+    /** {@inheritDoc} */
+    public int hashCode() {
+        int hash = 13;
+
+        hash = 31 * hash + (null == code ? 0 : code.hashCode());
+        hash = 31 * hash + (null == subCode ? 0 : subCode.hashCode());
+
+        return hash;
+    }
+
+    /** {@inheritDoc} */
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+
+        if (obj == null || this.getClass() != obj.getClass()) {
+            return false;
+        }
+
+        StatusCode otherCode = (StatusCode) obj;
+
+        boolean subCodesEqual;
+        if (subCode == null) {
+            if (otherCode.getSubCode() == null) {
+                subCodesEqual = true;
+            } else {
+                subCodesEqual = false;
+            }
+        } else {
+            subCodesEqual = subCode.equals(otherCode.getSubCode());
+        }
+
+        return Strings.safeEquals(code, otherCode.getCode()) && subCodesEqual;
     }
 }

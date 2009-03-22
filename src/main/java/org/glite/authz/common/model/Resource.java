@@ -17,29 +17,29 @@
 package org.glite.authz.common.model;
 
 import java.io.Serializable;
-import java.util.List;
+import java.util.Set;
 
 import net.jcip.annotations.NotThreadSafe;
 
-import org.glite.authz.common.util.LazyList;
+import org.glite.authz.common.util.LazySet;
 import org.glite.authz.common.util.Strings;
 
 /** An attribute-based description of the resource within which an {@link Action} to be authorized is made. */
 @NotThreadSafe
-public class Resource implements Serializable {
+public final class Resource implements Serializable {
 
     /** Serial version UID. */
-    private static final long serialVersionUID = -8739476103285586961L;
+    private static final long serialVersionUID = -3526903430795707644L;
 
     /** Content of the resource. */
     private String resourceContent;
 
     /** Attributes that describe the resource. */
-    private LazyList<Attribute> attributes;
+    private LazySet<Attribute> attributes;
 
     /** Constructor. */
     public Resource() {
-        attributes = new LazyList<Attribute>();
+        attributes = new LazySet<Attribute>();
     }
 
     /**
@@ -65,7 +65,7 @@ public class Resource implements Serializable {
      * 
      * @return attributes that describe the resource
      */
-    public List<Attribute> getAttributes() {
+    public Set<Attribute> getAttributes() {
         return attributes;
     }
 
@@ -85,5 +85,31 @@ public class Resource implements Serializable {
         stringBuilder.append("}");
 
         return stringBuilder.toString();
+    }
+
+    /** {@inheritDoc} */
+    public int hashCode() {
+        int hash = 13;
+
+        hash = 31 * hash + (null == resourceContent ? 0 : resourceContent.hashCode());
+        hash = 31 * hash + attributes.hashCode();
+
+        return hash;
+    }
+
+    /** {@inheritDoc} */
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+
+        if (obj == null || this.getClass() != obj.getClass()) {
+            return false;
+        }
+
+        Resource otherResource = (Resource) obj;
+
+        return Strings.safeEquals(resourceContent, otherResource.getResourceContent())
+                && attributes.equals(otherResource.getAttributes());
     }
 }

@@ -17,24 +17,24 @@
 package org.glite.authz.common.model;
 
 import java.io.Serializable;
-import java.util.List;
+import java.util.Set;
 
 import net.jcip.annotations.NotThreadSafe;
 
-import org.glite.authz.common.util.LazyList;
+import org.glite.authz.common.util.LazySet;
 
 /** An authorization request. */
 @NotThreadSafe
-public class Request implements Serializable {
+public final class Request implements Serializable {
 
     /** Serial version UID. */
-    private static final long serialVersionUID = 273060270038179896L;
+    private static final long serialVersionUID = 7263488106115027959L;
 
     /** Subjects about which the request is being made. */
-    private LazyList<Subject> subjects;
+    private LazySet<Subject> subjects;
 
     /** Resources about which the request is being made. */
-    private LazyList<Resource> resources;
+    private LazySet<Resource> resources;
 
     /** The action to be authorized. */
     private Action action;
@@ -44,8 +44,8 @@ public class Request implements Serializable {
 
     /** Constructor. */
     public Request() {
-        subjects = new LazyList<Subject>();
-        resources = new LazyList<Resource>();
+        subjects = new LazySet<Subject>();
+        resources = new LazySet<Resource>();
     }
 
     /**
@@ -53,7 +53,7 @@ public class Request implements Serializable {
      * 
      * @return subject about which the request is being made
      */
-    public List<Subject> getSubjects() {
+    public Set<Subject> getSubjects() {
         return subjects;
     }
 
@@ -62,7 +62,7 @@ public class Request implements Serializable {
      * 
      * @return resources about which the request is being made
      */
-    public List<Resource> getResources() {
+    public Set<Resource> getResources() {
         return resources;
     }
 
@@ -132,5 +132,33 @@ public class Request implements Serializable {
         stringBuilder.append("}");
 
         return stringBuilder.toString();
+    }
+
+    /** {@inheritDoc} */
+    public int hashCode() {
+        int hash = 13;
+
+        hash = 31 * hash + action.hashCode();
+        hash = 31 * hash + environment.hashCode();
+        hash = 31 * hash + resources.hashCode();
+        hash = 31 * hash + subjects.hashCode();
+
+        return hash;
+    }
+
+    /** {@inheritDoc} */
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+
+        if (obj == null || this.getClass() != obj.getClass()) {
+            return false;
+        }
+
+        Request otherRequest = (Request) obj;
+
+        return action.equals(otherRequest.getAction()) && environment.equals(otherRequest.getEnvironment())
+                && resources.equals(otherRequest.getResources()) && subjects.equals(otherRequest.getSubjects());
     }
 }

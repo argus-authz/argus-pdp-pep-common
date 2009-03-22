@@ -25,11 +25,11 @@ import org.glite.authz.common.util.LazyList;
 
 /** Response for an authorization {@link Request}. */
 @NotThreadSafe
-public class Response implements Serializable {
+public final class Response implements Serializable {
 
     /** Serial version UID. */
-    private static final long serialVersionUID = 2315359866285813660L;
-    
+    private static final long serialVersionUID = -3976503749290974107L;
+
     /** The effective request that led to the given results. */
     private Request request;
 
@@ -40,7 +40,7 @@ public class Response implements Serializable {
     public Response() {
         results = new LazyList<Result>();
     }
-    
+
     /**
      * Gets the effective request that led to the given results.
      * 
@@ -49,7 +49,7 @@ public class Response implements Serializable {
     public Request getRequest() {
         return request;
     }
-    
+
     /**
      * Sets the effective request that led to the given results.
      * 
@@ -82,5 +82,41 @@ public class Response implements Serializable {
         stringBuilder.append("}");
 
         return stringBuilder.toString();
+    }
+
+    /** {@inheritDoc} */
+    public int hashCode() {
+        int hash = 13;
+
+        hash = 31 * hash + (null == request ? 0 : request.hashCode());
+        hash = 31 * hash + results.hashCode();
+
+        return hash;
+    }
+
+    /** {@inheritDoc} */
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+
+        if (obj == null || this.getClass() != obj.getClass()) {
+            return false;
+        }
+
+        Response otherResponse = (Response) obj;
+
+        boolean requestsEqual;
+        if (request == null) {
+            if (otherResponse.getRequest() == null) {
+                requestsEqual = true;
+            } else {
+                requestsEqual = false;
+            }
+        } else {
+            requestsEqual = request.equals(otherResponse.getRequest());
+        }
+
+        return results.equals(otherResponse.getResults()) && requestsEqual;
     }
 }

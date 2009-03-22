@@ -26,22 +26,22 @@ import org.glite.authz.common.util.Strings;
 
 /** Result of an authorization request. */
 @NotThreadSafe
-public class Result implements Serializable {
+public final class Result implements Serializable {
 
-    /** Decision Deny value. */
+    /** Decision Deny value, {@value}. */
     public static final int DECISION_DENY = 0;
 
-    /** Decision Permit value. */
+    /** Decision Permit value, {@value}. */
     public static final int DECISION_PERMIT = 1;
 
-    /** Decision Indeterminate value. */
+    /** Decision Indeterminate value, {@value}. */
     public static final int DECISION_INDETERMINATE = 2;
 
-    /** Decision NotApplicable value. */
+    /** Decision NotApplicable value, {@value}. */
     public static final int DECISION_NOT_APPLICABLE = 3;
 
     /** Serial version UID. */
-    private static final long serialVersionUID = 7383965289690031053L;
+    private static final long serialVersionUID = 6419281476715041885L;
 
     /** Decision of the authorization request. */
     private int decision;
@@ -146,5 +146,44 @@ public class Result implements Serializable {
         stringBuilder.append("}");
 
         return stringBuilder.toString();
+    }
+
+    /** {@inheritDoc} */
+    public int hashCode() {
+        int hash = 13;
+
+        hash = 31 * hash + decision;
+        hash = 31 * hash + (null == resourceId ? 0 : resourceId.hashCode());
+        hash = 31 * hash + obligations.hashCode();
+        hash = 31 * hash + (null == status ? 0 : status.hashCode());
+
+        return hash;
+    }
+
+    /** {@inheritDoc} */
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+
+        if (obj == null || this.getClass() != obj.getClass()) {
+            return false;
+        }
+
+        Result otherResult = (Result) obj;
+
+        boolean statsEqual;
+        if (status == null) {
+            if (otherResult.getStatus() == null) {
+                statsEqual = true;
+            } else {
+                statsEqual = false;
+            }
+        } else {
+            statsEqual = status.equals(otherResult.getStatus());
+        }
+
+        return decision == otherResult.getDecision() && Strings.safeEquals(resourceId, otherResult.getResourceId())
+                && obligations.equals(otherResult.getObligations()) && statsEqual;
     }
 }

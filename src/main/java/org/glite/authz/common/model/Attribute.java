@@ -17,19 +17,19 @@
 package org.glite.authz.common.model;
 
 import java.io.Serializable;
-import java.util.List;
+import java.util.Set;
 
 import net.jcip.annotations.NotThreadSafe;
 
-import org.glite.authz.common.util.LazyList;
+import org.glite.authz.common.util.LazySet;
 import org.glite.authz.common.util.Strings;
 
 /** An attribute that identifies either a {@link Subject}, {@link Resource}, {@link Environment} or {@link Action}. */
 @NotThreadSafe
-public class Attribute implements Serializable {
+public final class Attribute implements Serializable {
 
     /** Serial version UID. */
-    private static final long serialVersionUID = 3291370150790288490L;
+    private static final long serialVersionUID = -998357326993743203L;
 
     /** ID of the attribute. */
     private String id;
@@ -41,11 +41,11 @@ public class Attribute implements Serializable {
     private String issuer;
 
     /** Values of the attribute. */
-    private LazyList<Object> values;
+    private LazySet<Object> values;
 
     /** Constructor. */
     public Attribute() {
-        values = new LazyList<Object>();
+        values = new LazySet<Object>();
     }
 
     /**
@@ -107,7 +107,7 @@ public class Attribute implements Serializable {
      * 
      * @return values of the attribute
      */
-    public List<Object> getValues() {
+    public Set<Object> getValues() {
         return values;
     }
 
@@ -125,9 +125,37 @@ public class Attribute implements Serializable {
             stringBuilder.append(value.toString()).append(", ");
         }
         stringBuilder.append("]");
-        
+
         stringBuilder.append("}");
 
         return stringBuilder.toString();
+    }
+
+    /** {@inheritDoc} */
+    public int hashCode() {
+        int hash = 13;
+
+        hash = 31 * hash + (null == id ? 0 : id.hashCode());
+        hash = 31 * hash + (null == dataType ? 0 : dataType.hashCode());
+        hash = 31 * hash + (null == issuer ? 0 : dataType.hashCode());
+        hash = 31 * hash + values.hashCode();
+
+        return hash;
+    }
+
+    /** {@inheritDoc} */
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+
+        if (obj == null || this.getClass() != obj.getClass()) {
+            return false;
+        }
+
+        Attribute otherAttribute = (Attribute) obj;
+        return Strings.safeEquals(id, otherAttribute.getId())
+                && Strings.safeEquals(dataType, otherAttribute.getDataType())
+                && Strings.safeEquals(issuer, otherAttribute.getIssuer()) && values.equals(otherAttribute.getValues());
     }
 }

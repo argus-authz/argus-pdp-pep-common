@@ -19,6 +19,7 @@ package org.glite.authz.common.pip.provider;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import net.jcip.annotations.ThreadSafe;
 
@@ -171,7 +172,7 @@ public class StaticPIP extends AbstractPolicyInformationPoint {
         environment.getAttributes().addAll(environmentAttributes);
 
         if (!resourceAttributes.isEmpty()) {
-            List<Resource> resources = request.getResources();
+            Set<Resource> resources = request.getResources();
             if (resources.size() > 1 && !addAttributesToAllResources) {
                 throw new AuthorizationServiceException(
                         "More than one Resource present in request and PIP configured to only add attribues to a single Resource");
@@ -187,7 +188,7 @@ public class StaticPIP extends AbstractPolicyInformationPoint {
         }
 
         if (!subjectAttributes.isEmpty()) {
-            List<Subject> subjects = request.getSubjects();
+            Set<Subject> subjects = request.getSubjects();
             if (subjects.size() > 1 && !addAttributesToAllSubjects) {
                 throw new AuthorizationServiceException(
                         "More than one Subject present in request and PIP configured to only add attribues to a single Subject");
