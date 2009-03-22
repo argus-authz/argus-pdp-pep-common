@@ -38,6 +38,7 @@ public class AccessLoggingFilter implements Filter {
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException,
             ServletException {
         accessLog.info(new AccessLogEntry((HttpServletRequest) request).toString());
+        chain.doFilter(request, response);
     }
 
     /** {@inheritDoc} */
