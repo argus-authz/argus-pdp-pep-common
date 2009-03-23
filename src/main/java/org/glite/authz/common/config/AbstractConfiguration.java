@@ -245,7 +245,7 @@ public abstract class AbstractConfiguration {
      * @param manager credential used by this service to create SSL connections and digital signatures
      */
     protected synchronized final void setKeyManager(X509KeyManager manager) {
-        if (manager != null) {
+        if (keyManager != null) {
             throw new IllegalStateException("The service key manager has already been set, it may not be changed.");
         }
         keyManager = manager;
@@ -257,7 +257,7 @@ public abstract class AbstractConfiguration {
      * @param manager trust manager used to evaluate X509 certificates
      */
     protected synchronized final void setTrustManager(X509TrustManager manager) {
-        if (manager != null) {
+        if (trustManager != null) {
             throw new IllegalStateException("The trust manager has already been set, it may not be changed");
         }
         trustManager = manager;

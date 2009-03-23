@@ -19,6 +19,11 @@ package org.glite.authz.common.config;
 import java.io.IOException;
 import java.util.StringTokenizer;
 
+import javax.net.ssl.KeyManager;
+import javax.net.ssl.TrustManager;
+import javax.net.ssl.X509KeyManager;
+import javax.net.ssl.X509TrustManager;
+
 import net.jcip.annotations.ThreadSafe;
 
 import org.glite.authz.common.obligation.AbstractObligationHandler;
@@ -45,11 +50,14 @@ import org.slf4j.LoggerFactory;
 public abstract class AbstractIniConfigurationParser<ConfigurationType extends AbstractConfiguration> implements
         ConfigurationParser<ConfigurationType> {
 
+    /** The name of the {@value} INI header which contains the property for configuring credential/trust information. */
+    public static final String SECURITY_SECTION_HEADER = "SECURITY";
+
     /** The name of the {@value} which gives the path to the service's private key. */
-    public static final String SERVICE_KEY_PROP = "privateKey";
+    public static final String SERVICE_KEY_PROP = "servicePrivateKey";
 
     /** The name of the {@value} which gives the path to the service's certificate. */
-    public static final String SERVICE_CERT_PROP = "certificate";
+    public static final String SERVICE_CERT_PROP = "serviceCertificate";
 
     /** The name of the {@value} which gives the path to directory of PEM-encoded trusted X.509 certificates. */
     public static final String TRUST_INFO_DIR_PROP = "trustInfoDir";
@@ -117,8 +125,8 @@ public abstract class AbstractIniConfigurationParser<ConfigurationType extends A
     }
 
     /**
-     * Gets the value of the {@value #REC_BUFF_SIZE_PROP} property from the configuration section. If the property is not
-     * present or is not valid the default value of {@value #DEFAULT_REC_BUFF_SIZE} will be used.
+     * Gets the value of the {@value #REC_BUFF_SIZE_PROP} property from the configuration section. If the property is
+     * not present or is not valid the default value of {@value #DEFAULT_REC_BUFF_SIZE} will be used.
      * 
      * @param configSection configuration section from which to extract the value
      * 
@@ -129,8 +137,8 @@ public abstract class AbstractIniConfigurationParser<ConfigurationType extends A
     }
 
     /**
-     * Gets the value of the {@value #SEND_BUFF_SIZE_PROP} property from the configuration section. If the property is not
-     * present or is not valid the default value of {@value #DEFAULT_SEND_BUFF_SIZE} will be used.
+     * Gets the value of the {@value #SEND_BUFF_SIZE_PROP} property from the configuration section. If the property is
+     * not present or is not valid the default value of {@value #DEFAULT_SEND_BUFF_SIZE} will be used.
      * 
      * @param configSection configuration section from which to extract the value
      * 
@@ -261,19 +269,25 @@ public abstract class AbstractIniConfigurationParser<ConfigurationType extends A
     }
 
     /**
-     * Processes the {@value #TRUST_INFO_DIR_PROP} and {@value #CRLS_REQUIRED_PROP} properties, if there are ones.
+     * Creates a {@link TrustManager} from the {@value #TRUST_INFO_DIR_PROP} and {@value #CRLS_REQUIRED_PROP}
+     * properties, if they exist.
      * 
      * @param configSection current configuration section being processed
      * @param configBuilder current builder being constructed from the parser
      * 
+     * @return the constructed trust manager, or null if the required attribute did not exist
+     * 
      * @throws ConfigurationException thrown if there is a problem creating the trust manager
      */
-    protected void processX509TrustInformation(Section configSection, AbstractConfigurationBuilder<?> configBuilder)
-            throws ConfigurationException {
+    protected X509TrustManager getX509TrustManager(Section configSection) throws ConfigurationException {
+        if (configSection == null) {
+            return null;
+        }
+
         String trustStoreDir = IniConfigUtil.getString(configSection, TRUST_INFO_DIR_PROP, null);
         if (trustStoreDir == null) {
             log.debug("No truststore directory given, no trust manager will be used");
-            return;
+            return null;
         }
 
         try {
@@ -288,7 +302,7 @@ public abstract class AbstractIniConfigurationParser<ConfigurationType extends A
         log.debug("CRLs required in the truststore: {}", crlsRequired);
 
         try {
-            configBuilder.setTrustManager(new OpensslTrustmanager(trustStoreDir, crlsRequired));
+            return new OpensslTrustmanager(trustStoreDir, crlsRequired);
         } catch (Exception e) {
             log.error("Unable to create trust manager", e);
             throw new ConfigurationException("Unable to read trust information", e);
@@ -296,35 +310,41 @@ public abstract class AbstractIniConfigurationParser<ConfigurationType extends A
     }
 
     /**
-     * Processes the {@value #SERVICE_KEY_PROP} and {@value #SERVICE_CERT_PROP} properties, if there are ones.
+     * Creates a {@link KeyManager} from the {@value #SERVICE_KEY_PROP} and {@value #SERVICE_CERT_PROP} properties, if
+     * they exist.
      * 
      * @param configSection current configuration section being processed
      * @param configBuilder current builder being constructed from the parser
      * 
+     * @return the constructed key manager, or null if the required properties do not exist
+     * 
      * @throws ConfigurationException thrown if there is a problem creating the key manager
      */
-    protected void processX509KeyInformation(Section configSection, AbstractConfigurationBuilder<?> configBuilder)
-            throws ConfigurationException {
+    protected X509KeyManager getX509KeyManager(Section configSection) throws ConfigurationException {
+        if (configSection == null) {
+            return null;
+        }
+
         String privateKeyFilePath = IniConfigUtil.getString(configSection, SERVICE_KEY_PROP, null);
         if (privateKeyFilePath == null) {
             log.debug("No service private key file provided, no service credential will be used.");
-            return;
+            return null;
         }
 
         String certificateFilePath = IniConfigUtil.getString(configSection, SERVICE_CERT_PROP, null);
         if (certificateFilePath == null) {
             log.debug("No service certificate file provided, no service credential will be used.");
-            return;
+            return null;
         }
 
-        log.info("Service credential will use private key {} and certificate {}", privateKeyFilePath,
+        log.debug("Service credential will use private key {} and certificate {}", privateKeyFilePath,
                 certificateFilePath);
         CaseInsensitiveProperties keystoreProps = new CaseInsensitiveProperties();
         keystoreProps.setProperty(ContextWrapper.CREDENTIALS_KEY_FILE, privateKeyFilePath);
         keystoreProps.setProperty(ContextWrapper.CREDENTIALS_CERT_FILE, certificateFilePath);
 
         try {
-            configBuilder.setKeyManager(new UpdatingKeyManager(keystoreProps, null));
+            return new UpdatingKeyManager(keystoreProps, null);
         } catch (Exception e) {
             log.error("Unable to create service key manager", e);
             throw new ConfigurationException("Unable to read service credential information", e);

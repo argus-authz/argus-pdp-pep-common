@@ -16,9 +16,13 @@
 
 package org.glite.authz.common.config;
 
+import javax.net.ssl.X509KeyManager;
+import javax.net.ssl.X509TrustManager;
+
 import org.ini4j.Ini;
 import org.ini4j.Ini.Section;
 import org.opensaml.ws.soap.client.http.HttpClientBuilder;
+import org.opensaml.ws.soap.client.http.TLSProtocolSocketFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -77,7 +81,7 @@ public abstract class AbstractIniServiceConfigurationParser<ConfigurationType ex
      * 
      * @throws ConfigurationException thrown if no host name is given
      */
-    protected String getHostname(Section configSection) throws ConfigurationException{
+    protected String getHostname(Section configSection) throws ConfigurationException {
         return IniConfigUtil.getString(configSection, HOST_PROP);
     }
 
@@ -104,8 +108,8 @@ public abstract class AbstractIniServiceConfigurationParser<ConfigurationType ex
     }
 
     /**
-     * Gets the value of the {@value #REQUEST_QUEUE_PROP} property from the configuration section. If the property is not
-     * present or is not valid the default value of {@value #DEFAULT_REQUEST_QUEUE} will be used.
+     * Gets the value of the {@value #REQUEST_QUEUE_PROP} property from the configuration section. If the property is
+     * not present or is not valid the default value of {@value #DEFAULT_REQUEST_QUEUE} will be used.
      * 
      * @param configSection configuration section from which to extract the value
      * 
@@ -174,19 +178,21 @@ public abstract class AbstractIniServiceConfigurationParser<ConfigurationType ex
 
         processPolicyInformationPoints(iniFile, configSection, configBuilder);
 
-        processX509KeyInformation(configSection, configBuilder);
-
-        processX509TrustInformation(configSection, configBuilder);
+        configBuilder.setKeyManager(getX509KeyManager(iniFile.get(SECURITY_SECTION_HEADER)));
+        configBuilder.setTrustManager(getX509TrustManager(iniFile.get(SECURITY_SECTION_HEADER)));
     }
 
     /**
      * Builds a SOAP client builder from the information contained in the configuration section.
      * 
      * @param configSection client configuration
+     * @param keyManager key manager used for outbound SSL/TLS connections
+     * @param trustManager trust manager used for inbound SSL/TLS connections
      * 
      * @return the constructed SOAP client
      */
-    protected HttpClientBuilder buildSOAPClientBuilder(Section configSection) {
+    protected HttpClientBuilder buildSOAPClientBuilder(Section configSection, X509KeyManager keyManager,
+            X509TrustManager trustManager) {
         HttpClientBuilder httpClientBuilder = new HttpClientBuilder();
         httpClientBuilder.setContentCharSet("UTF-8");
 
@@ -207,7 +213,11 @@ public abstract class AbstractIniServiceConfigurationParser<ConfigurationType ex
         log.debug("send buffer size: {} bytes", sendBuffSize);
         httpClientBuilder.setSendBufferSize(sendBuffSize);
 
-        // TODO SSL/TLS
+        if (keyManager != null && trustManager != null) {
+            log.debug("adding configured X509 key & trust manager to SOAP client");
+            TLSProtocolSocketFactory factory = new TLSProtocolSocketFactory(keyManager, trustManager);
+            httpClientBuilder.setHttpsProtocolSocketFactory(factory);
+        }
 
         return httpClientBuilder;
     }
