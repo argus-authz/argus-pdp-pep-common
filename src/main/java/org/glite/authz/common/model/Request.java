@@ -138,8 +138,8 @@ public final class Request implements Serializable {
     public int hashCode() {
         int hash = 13;
 
-        hash = 31 * hash + action.hashCode();
-        hash = 31 * hash + environment.hashCode();
+        hash = 31 * hash + (null == action ? 0 : action.hashCode());
+        hash = 31 * hash + (null == environment ? 0 : environment.hashCode());
         hash = 31 * hash + resources.hashCode();
         hash = 31 * hash + subjects.hashCode();
 
@@ -158,7 +158,29 @@ public final class Request implements Serializable {
 
         Request otherRequest = (Request) obj;
 
-        return action.equals(otherRequest.getAction()) && environment.equals(otherRequest.getEnvironment())
-                && resources.equals(otherRequest.getResources()) && subjects.equals(otherRequest.getSubjects());
+        boolean actionsEqual;
+        if (action == null) {
+            if (otherRequest.getAction() == null) {
+                actionsEqual = true;
+            } else {
+                actionsEqual = false;
+            }
+        } else {
+            actionsEqual = action.equals(otherRequest.getAction());
+        }
+
+        boolean environmentsEqual;
+        if (environment == null) {
+            if (otherRequest.getEnvironment() == null) {
+                environmentsEqual = true;
+            } else {
+                environmentsEqual = false;
+            }
+        } else {
+            environmentsEqual = environment.equals(otherRequest.getEnvironment());
+        }
+
+        return actionsEqual && environmentsEqual && resources.equals(otherRequest.getResources())
+                && subjects.equals(otherRequest.getSubjects());
     }
 }

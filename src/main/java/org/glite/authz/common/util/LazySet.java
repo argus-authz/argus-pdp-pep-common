@@ -126,4 +126,22 @@ public class LazySet<ElementType> implements Set<ElementType>, Serializable {
 
         return new HashSet<ElementType>(delegate);
     }
+
+    /** {@inheritDoc} */
+    public int hashCode() {
+        return delegate.hashCode();
+    }
+
+    /** {@inheritDoc} */
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+
+        if (obj == null || this.getClass() != obj.getClass()) {
+            return false;
+        }
+
+        return delegate.equals(((LazySet<?>) obj).delegate);
+    }
 }

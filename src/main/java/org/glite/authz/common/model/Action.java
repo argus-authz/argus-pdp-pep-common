@@ -17,11 +17,11 @@
 package org.glite.authz.common.model;
 
 import java.io.Serializable;
-import java.util.List;
+import java.util.Set;
 
 import net.jcip.annotations.NotThreadSafe;
 
-import org.glite.authz.common.util.LazyList;
+import org.glite.authz.common.util.LazySet;
 
 /** An attribute-based description of an action to be authorized. */
 @NotThreadSafe
@@ -31,11 +31,11 @@ public final class Action implements Serializable {
     private static final long serialVersionUID = -2085506180809169465L;
 
     /** Attributes that identify the action. */
-    private LazyList<Attribute> attributes;
+    private LazySet<Attribute> attributes;
 
     /** Constructor. */
     public Action() {
-        attributes = new LazyList<Attribute>();
+        attributes = new LazySet<Attribute>();
     }
 
     /**
@@ -43,7 +43,7 @@ public final class Action implements Serializable {
      * 
      * @return attributes that identify the action
      */
-    public List<Attribute> getAttributes() {
+    public Set<Attribute> getAttributes() {
         return attributes;
     }
 

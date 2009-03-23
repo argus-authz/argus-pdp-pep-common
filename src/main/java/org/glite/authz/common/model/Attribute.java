@@ -137,7 +137,7 @@ public final class Attribute implements Serializable {
 
         hash = 31 * hash + (null == id ? 0 : id.hashCode());
         hash = 31 * hash + (null == dataType ? 0 : dataType.hashCode());
-        hash = 31 * hash + (null == issuer ? 0 : dataType.hashCode());
+        hash = 31 * hash + (null == issuer ? 0 : issuer.hashCode());
         hash = 31 * hash + values.hashCode();
 
         return hash;

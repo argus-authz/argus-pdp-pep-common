@@ -36,7 +36,7 @@ public class LazyList<ElementType> implements List<ElementType>, Serializable {
 
     /** Serial version UID. */
     private static final long serialVersionUID = -7741904523916701817L;
-    
+
     /** Delegate list. */
     private List<ElementType> delegate = Collections.emptyList();
 
@@ -180,5 +180,23 @@ public class LazyList<ElementType> implements List<ElementType>, Serializable {
         }
 
         return new ArrayList<ElementType>(delegate);
+    }
+
+    /** {@inheritDoc} */
+    public int hashCode() {
+        return delegate.hashCode();
+    }
+
+    /** {@inheritDoc} */
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+
+        if (obj == null || this.getClass() != obj.getClass()) {
+            return false;
+        }
+
+        return delegate.equals(((LazyList<?>) obj).delegate);
     }
 }
