@@ -307,13 +307,13 @@ public abstract class AbstractIniConfigurationParser<ConfigurationType extends A
             throws ConfigurationException {
         String privateKeyFilePath = IniConfigUtil.getString(configSection, SERVICE_KEY_PROP, null);
         if (privateKeyFilePath == null) {
-            log.info("No service private key file provided, no service credential will be used.");
+            log.debug("No service private key file provided, no service credential will be used.");
             return;
         }
 
         String certificateFilePath = IniConfigUtil.getString(configSection, SERVICE_CERT_PROP, null);
         if (certificateFilePath == null) {
-            log.info("No service certificate file provided, no service credential will be used.");
+            log.debug("No service certificate file provided, no service credential will be used.");
             return;
         }
 
