@@ -28,6 +28,9 @@ import org.glite.authz.common.util.Strings;
 @NotThreadSafe
 public final class Attribute implements Serializable {
 
+    /** The default data type for an attribute, {@value}. */
+    public static String DEFAULT_DATA_TYPE = "http://www.w3.org/2001/XMLSchema#string";
+
     /** Serial version UID. */
     private static final long serialVersionUID = -998357326993743203L;
 
@@ -45,6 +48,7 @@ public final class Attribute implements Serializable {
 
     /** Constructor. */
     public Attribute() {
+        dataType = DEFAULT_DATA_TYPE;
         values = new LazySet<Object>();
     }
 

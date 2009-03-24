@@ -224,7 +224,14 @@ public class XACMLConverter {
         AttributeType xacmlAttribute = attributeBuilder.buildObject();
 
         xacmlAttribute.setAttributeID(Strings.safeTrimOrNullString(attribute.getId()));
-        xacmlAttribute.setDataType(Strings.safeTrimOrNullString(attribute.getDataType()));
+        
+        String datatype = Strings.safeTrimOrNullString(attribute.getDataType());
+        if(datatype != null){
+            xacmlAttribute.setDataType(datatype);
+        }else{
+            xacmlAttribute.setDataType(Attribute.DEFAULT_DATA_TYPE);
+        }
+        
         xacmlAttribute.setIssuer(Strings.safeTrimOrNullString(attribute.getIssuer()));
 
         if (attribute.getValues() != null) {
