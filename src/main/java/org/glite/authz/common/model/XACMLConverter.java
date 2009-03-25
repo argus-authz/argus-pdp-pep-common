@@ -229,7 +229,7 @@ public class XACMLConverter {
         if(datatype != null){
             xacmlAttribute.setDataType(datatype);
         }else{
-            xacmlAttribute.setDataType(Attribute.DEFAULT_DATA_TYPE);
+            xacmlAttribute.setDataType(Attribute.DT_STRING);
         }
         
         xacmlAttribute.setIssuer(Strings.safeTrimOrNullString(attribute.getIssuer()));
