@@ -31,6 +31,8 @@ import org.mortbay.jetty.Server;
 import org.mortbay.jetty.nio.BlockingChannelConnector;
 import org.mortbay.jetty.servlet.Context;
 import org.mortbay.jetty.servlet.ServletHolder;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * A Jetty instance that listens on a give port for a request to the URL path <em>/shutdown</em>.
@@ -43,6 +45,9 @@ import org.mortbay.jetty.servlet.ServletHolder;
  * Additionally, the same shutdown procedure is bound as a JVM shutdown hook in the event that the process is terminated in that fashion.
  */
 public class JettyShutdownService {
+    
+    /** Class logger. */
+    private final static Logger log = LoggerFactory.getLogger(JettyShutdownService.class);
 
     /**
      * Creates and starts the shutdown service.
@@ -71,6 +76,7 @@ public class JettyShutdownService {
                 resp.setStatus(HttpServletResponse.SC_OK);
                 resp.getWriter().write("ok");
                 resp.flushBuffer();
+                log.info("Service shutting down");
                 shutdownCommandThread.start();
                 return;
             }
