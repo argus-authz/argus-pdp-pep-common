@@ -40,6 +40,7 @@ public class JettyRunThread extends Thread {
             httpServer.join();
         } catch (Exception e) {
             e.printStackTrace();
+            System.exit(1);
         }
     }
 }
