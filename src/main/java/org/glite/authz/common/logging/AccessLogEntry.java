@@ -19,19 +19,13 @@ package org.glite.authz.common.logging;
 import javax.servlet.http.HttpServletRequest;
 
 import org.joda.time.DateTime;
-import org.joda.time.DateTimeZone;
-import org.joda.time.format.DateTimeFormatter;
-import org.joda.time.format.ISODateTimeFormat;
 import org.opensaml.xml.util.DatatypeHelper;
 
 /** Data object for generating service access logs. */
 public class AccessLogEntry {
     
-    /** Formatter used to convert timestamps to strings. */
-    private static DateTimeFormatter dateFormatter = ISODateTimeFormat.basicDateTimeNoMillis();
-    
-    /** Request timestamp. */
-    private DateTime requestTime;
+    /** Time the request was made. */
+    private long requestTime;
 
     /** Hostname or IP address of the remote host. */
     private String remoteHost;
@@ -51,7 +45,7 @@ public class AccessLogEntry {
      * @param request the request
      */
     public AccessLogEntry(HttpServletRequest request) {
-        requestTime = new DateTime();
+        requestTime = new DateTime().toDateTimeISO().getMillis();
         remoteHost = request.getRemoteHost();
         serverHost = request.getServerName();
         serverPort = request.getServerPort();
@@ -73,7 +67,7 @@ public class AccessLogEntry {
      * @param path the request path information minus the servlet context information
      */
     public AccessLogEntry(String remote, String host, int port, String path) {
-        requestTime = new DateTime();
+        requestTime = new DateTime().toDateTimeISO().getMillis();
         remoteHost = DatatypeHelper.safeTrimOrNullString(remote);
         serverHost = DatatypeHelper.safeTrimOrNullString(host);
         serverPort = port;
@@ -103,7 +97,7 @@ public class AccessLogEntry {
      * 
      * @return time the request was made
      */
-    public DateTime getRequestTime(){
+    public long getRequestTime(){
         return requestTime;
     }
 
@@ -129,7 +123,7 @@ public class AccessLogEntry {
     public String toString() {
         StringBuilder entryString = new StringBuilder();
 
-        entryString.append(getRequestTime().toString(dateFormatter.withZone(DateTimeZone.UTC)));
+        entryString.append(getRequestTime());
         entryString.append("|");
 
         entryString.append(getRemoteHost());

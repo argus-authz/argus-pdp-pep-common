@@ -174,12 +174,12 @@ public abstract class AbstractIniServiceConfigurationParser<ConfigurationType ex
         log.debug("send buffer size: {} bytes", sendBuffer);
         configBuilder.setSendBufferSize(sendBuffer);
 
+        configBuilder.setKeyManager(getX509KeyManager(iniFile.get(SECURITY_SECTION_HEADER)));
+        configBuilder.setTrustManager(getX509TrustManager(iniFile.get(SECURITY_SECTION_HEADER)));
+
         processObligationHandlers(iniFile, configSection, configBuilder);
 
         processPolicyInformationPoints(iniFile, configSection, configBuilder);
-
-        configBuilder.setKeyManager(getX509KeyManager(iniFile.get(SECURITY_SECTION_HEADER)));
-        configBuilder.setTrustManager(getX509TrustManager(iniFile.get(SECURITY_SECTION_HEADER)));
     }
 
     /**

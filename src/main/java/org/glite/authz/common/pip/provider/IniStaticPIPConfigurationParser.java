@@ -27,6 +27,7 @@ import java.util.StringTokenizer;
 
 import net.jcip.annotations.ThreadSafe;
 
+import org.glite.authz.common.config.AbstractConfigurationBuilder;
 import org.glite.authz.common.config.ConfigurationException;
 import org.glite.authz.common.pip.IniPIPConfigurationParser;
 import org.glite.authz.common.pip.PolicyInformationPoint;
@@ -68,7 +69,8 @@ public class IniStaticPIPConfigurationParser implements IniPIPConfigurationParse
     public static final String SUBJECT_SECTION_HEADER = "SUBJECT";
 
     /** {@inheritDoc} */
-    public PolicyInformationPoint parse(Section iniConfig) throws ConfigurationException {
+    public PolicyInformationPoint parse(Section iniConfig, AbstractConfigurationBuilder<?> configBuilder)
+            throws ConfigurationException {
         String staticAttributesFilePath = iniConfig.get(CONFIG_FILE_PROP);
         Ini iniFile = readIniFile(staticAttributesFilePath);
 

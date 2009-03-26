@@ -75,12 +75,17 @@
         <dependency>
             <groupId>org.glite</groupId>
             <artifactId>glite-security-trustmanager</artifactId>
-            <version>head-101208</version>
+            <version>head-300109</version>
+        </dependency>
+        <dependency>
+            <groupId>org.glite</groupId>
+            <artifactId>glite-security-voms-java-api</artifactId>
+            <version>1.9.2</version>
         </dependency>
         <dependency>
             <groupId>org.glite</groupId>
             <artifactId>glite-security-util-java</artifactId>
-            <version>head-101208</version>
+            <version>2.0.1.1</version>
         </dependency>
         <dependency>
             <groupId>org.bouncycastle</groupId>

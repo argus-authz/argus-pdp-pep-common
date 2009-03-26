@@ -231,7 +231,7 @@ public abstract class AbstractIniConfigurationParser<ConfigurationType extends A
                         log.error(errorMsg);
                         throw new ConfigurationException(errorMsg);
                     }
-                    configBuilder.getPIPs().add(buildPolicyInformationPoint(iniFile.get(pipName)));
+                    configBuilder.getPIPs().add(buildPolicyInformationPoint(iniFile.get(pipName), configBuilder));
                     log.debug("loadded policy information point: {}", pipName);
                 }
             }
@@ -242,13 +242,15 @@ public abstract class AbstractIniConfigurationParser<ConfigurationType extends A
      * Processes each individual PIP configuration section.
      * 
      * @param pipConfig the PIP configuration section
+     * @param configBuilder configuration builder currently being populated
      * 
      * @return the PIP configured with the information provided in the configuration section
      * 
      * @throws ConfigurationException throw if a PIP can not be instantiated
      */
     @SuppressWarnings("unchecked")
-    private PolicyInformationPoint buildPolicyInformationPoint(Section pipConfig) throws ConfigurationException {
+    private PolicyInformationPoint buildPolicyInformationPoint(Section pipConfig,
+            AbstractConfigurationBuilder<?> configBuilder) throws ConfigurationException {
         String parserClassName = IniConfigUtil.getString(pipConfig, IniPIPConfigurationParser.PARSER_CLASS_PROP);
         if (parserClassName == null) {
             String errorMsg = "PIP configuration section " + pipConfig.getName() + " does not contain a valid "
@@ -262,7 +264,7 @@ public abstract class AbstractIniConfigurationParser<ConfigurationType extends A
             Class<IniPIPConfigurationParser> parserClass = (Class<IniPIPConfigurationParser>) AbstractIniConfigurationParser.class
                     .getClassLoader().loadClass(parserClassName);
             IniPIPConfigurationParser parser = parserClass.getConstructor().newInstance();
-            return parser.parse(pipConfig);
+            return parser.parse(pipConfig, configBuilder);
         } catch (Exception e) {
             throw new ConfigurationException("Unable to configure PIP " + pipConfig.getName(), e);
         }

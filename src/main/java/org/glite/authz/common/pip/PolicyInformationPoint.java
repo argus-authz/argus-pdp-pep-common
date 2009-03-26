@@ -34,8 +34,7 @@ import org.glite.authz.common.model.Request;
  * Some example of what a policy information point may do would be:
  * <ul>
  * <li>evaluate a user's authentication credential in order to populate subject information</li>
- * <li>interrogate the operating system to provide information about the current environment
- * <li>
+ * <li>interrogate the operating system to provide information about the current environment</li>
  * <li>call out to other portions of the application in order to determine the identity of the application and populate
  * resource information</li>
  * </ul>
@@ -65,14 +64,14 @@ public interface PolicyInformationPoint {
     /**
      * Stars the PIP. This is called so that the PIP may initialize itself before its first invocation.
      * 
-     * @throws AuthorizationServiceException thrown if there is a problem starting the PIP.
+     * @throws AuthorizationServiceException thrown if there is a problem starting the PIP
      */
     public void start() throws AuthorizationServiceException;
 
     /**
      * Stops the PIP. This is called so that the PIP may clean up any resource before the service shuts down.
      * 
-     * @throws AuthorizationServiceException
+     * @throws AuthorizationServiceException throw if there is a problem stop the PIP
      */
     public void stop() throws AuthorizationServiceException;
 }
