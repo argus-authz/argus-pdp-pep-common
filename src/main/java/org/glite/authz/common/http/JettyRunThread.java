@@ -17,6 +17,8 @@
 package org.glite.authz.common.http;
 
 import org.mortbay.jetty.Server;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /** A thread that spawns a Jetty {@link Server} instance. */
 public class JettyRunThread extends Thread {
@@ -39,6 +41,8 @@ public class JettyRunThread extends Thread {
             httpServer.start();
             httpServer.join();
         } catch (Exception e) {
+            Logger log = LoggerFactory.getLogger(JettyRunThread.class);
+            log.error("Unable to start service, shutting down", e);
             e.printStackTrace();
             System.exit(1);
         }
