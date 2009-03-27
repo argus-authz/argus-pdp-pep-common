@@ -18,14 +18,9 @@ package org.glite.authz.common.config;
 
 import org.glite.authz.common.util.Strings;
 import org.ini4j.Ini.Section;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /** Utilities for getting values for configuration files. */
 public class IniConfigUtil {
-
-    /** Class logger. */
-    private static final Logger log = LoggerFactory.getLogger(IniConfigUtil.class);
 
     /**
      * Extracts a boolean value from a configuration property. The values 'true', 'yes', and '1' are treated as true,
@@ -41,7 +36,7 @@ public class IniConfigUtil {
      * @throws ConfigurationException thrown if the value does not exist
      */
     public static boolean getBoolean(Section configSection, String propName, boolean defaultValue) {
-        String value = getString(configSection, propName, null);
+        String value = getString(configSection, propName, "true");
 
         if ("true".equalsIgnoreCase(value) || "yes".equalsIgnoreCase(value) || "1".equalsIgnoreCase(value)) {
             return true;
@@ -93,7 +88,6 @@ public class IniConfigUtil {
         String propValue = Strings.safeTrimOrNullString(configSection.get(propName));
 
         if (propValue == null) {
-            log.debug(propName + " is an empty value, using default value of " + defaultValue);
             propValue = defaultValue;
         }
 
@@ -170,16 +164,11 @@ public class IniConfigUtil {
         if (configSection.containsKey(propName)) {
             try {
                 int tempInt = Integer.parseInt(configSection.get(propName));
-                if (tempInt < minValue) {
-                    log.debug(propName + " must be greater than " + minValue + ", using default value of "
-                            + defaultValue);
+                if(tempInt > minValue && tempInt < maxValue){
+                    return tempInt;
                 }
-                if (tempInt > maxValue) {
-                    log.debug(propName + " must be less than " + maxValue + ", using default value of " + defaultValue);
-                }
-                return tempInt;
             } catch (NumberFormatException e) {
-                log.debug(propName + " is not a valid integer, using default value of " + defaultValue);
+                // do nothing
             }
         }
 

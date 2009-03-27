@@ -41,7 +41,7 @@ public abstract class AbstractIniServiceConfigurationParser<ConfigurationType ex
     public static final String ENTITY_ID_PROP = "entityId";
 
     /** The name of the {@value} property which indicates the service hostname. */
-    public static final String HOST_PROP = "host";
+    public static final String HOST_PROP = "hostname";
 
     /** The name of the {@value} property which indicates the port to which the service will bind. */
     public static final String PORT_PROP = "port";
