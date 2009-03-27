@@ -28,16 +28,16 @@ import org.glite.authz.common.util.Strings;
 @NotThreadSafe
 public final class Result implements Serializable {
 
-    /** Decision Deny value, {@value}. */
+    /** Decision Deny value, {@value} . */
     public static final int DECISION_DENY = 0;
 
-    /** Decision Permit value, {@value}. */
+    /** Decision Permit value, {@value} . */
     public static final int DECISION_PERMIT = 1;
 
-    /** Decision Indeterminate value, {@value}. */
+    /** Decision Indeterminate value, {@value} . */
     public static final int DECISION_INDETERMINATE = 2;
 
-    /** Decision NotApplicable value, {@value}. */
+    /** Decision NotApplicable value, {@value} . */
     public static final int DECISION_NOT_APPLICABLE = 3;
 
     /** Serial version UID. */
@@ -67,6 +67,26 @@ public final class Result implements Serializable {
      */
     public int getDecision() {
         return decision;
+    }
+
+    /**
+     * Helper method for converting the numeric decision code to its equivalent XACML string.
+     * 
+     * @return numeric decision code's equivalent XACML string
+     */
+    public String getDecisionString() {
+        switch (decision) {
+            case 0:
+                return "Deny";
+            case 1:
+                return "Permit";
+            case 2:
+                return "Indeterminate";
+            case 3:
+                return "NotApplicable";
+            default:
+                return null;
+        }
     }
 
     /**
