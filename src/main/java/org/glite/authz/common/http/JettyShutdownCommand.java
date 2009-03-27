@@ -28,7 +28,7 @@ public class JettyShutdownCommand implements Runnable {
 
     /** Server to be shutdown. */
     private Server httpServer;
-
+    
     /**
      * Constructor.
      * 
@@ -45,6 +45,7 @@ public class JettyShutdownCommand implements Runnable {
                 httpServer.stop();
             } catch (Exception e) {
                 log.error("Unable to shutdown HTTP server", e);
+                System.exit(1);
             }
         }
     }
