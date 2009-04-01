@@ -55,6 +55,7 @@ public class JettyShutdownService {
      * @param shutdownPort port on which the service will listen
      * @param shutdownCommands list of commands to run at shutdown time
      */
+    @SuppressWarnings("serial")
     public static void startJettyShutdownService(int shutdownPort, List<Runnable> shutdownCommands) {
 
         final Server shutdownService = new Server();

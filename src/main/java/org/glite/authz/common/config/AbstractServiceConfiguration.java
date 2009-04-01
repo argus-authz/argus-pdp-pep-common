@@ -16,10 +16,14 @@
 
 package org.glite.authz.common.config;
 
+import org.glite.authz.common.ServiceMetrics;
 import org.opensaml.ws.soap.client.SOAPClient;
 
 /** Base class for service configurations. */
 public abstract class AbstractServiceConfiguration extends AbstractConfiguration {
+
+    /** Metrics for this service. */
+    private ServiceMetrics serviceMetrics;
 
     /** The entity ID for the PDP service. */
     private String entityId;
@@ -39,14 +43,28 @@ public abstract class AbstractServiceConfiguration extends AbstractConfiguration
     /** SOAP client used to communicate with the PAP. */
     private SOAPClient soapClient;
 
-    /** Constructor. */
-    protected AbstractServiceConfiguration() {
+    /**
+     * Constructor.
+     * 
+     * @param metrics metrics container for this store
+     */
+    protected AbstractServiceConfiguration(ServiceMetrics metrics) {
         super();
+        serviceMetrics = metrics;
         hostname = null;
         port = 0;
         shutdownPort = 0;
         maxRequestQueueSize = 0;
         soapClient = null;
+    }
+
+    /**
+     * Gets the metrics for this service.
+     * 
+     * @return metrics for this service
+     */
+    public ServiceMetrics getServiceMetrics() {
+        return serviceMetrics;
     }
 
     /**

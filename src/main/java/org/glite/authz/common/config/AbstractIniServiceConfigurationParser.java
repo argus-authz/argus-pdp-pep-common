@@ -139,39 +139,39 @@ public abstract class AbstractIniServiceConfigurationParser<ConfigurationType ex
         }
 
         String entityId = getEntityId(configSection);
-        log.debug("entity ID: {}", entityId);
+        log.info("entity ID: {}", entityId);
         configBuilder.setEntityId(entityId);
 
         String host = getHostname(configSection);
-        log.debug("service host address: {}", host);
+        log.info("service host address: {}", host);
         configBuilder.setHost(host);
 
         int port = getPort(configSection);
-        log.debug("service listening port: {}", port);
+        log.info("service listening port: {}", (port == 0 ? "default" : port));
         configBuilder.setPort(port);
 
         int shutdownPort = getShutdownPort(configSection);
-        log.debug("service shutdown port: {}", shutdownPort);
+        log.info("service shutdown port: {}", (shutdownPort == 0 ? "default" : shutdownPort));
         configBuilder.setShutdownPort(shutdownPort);
 
         int maxConnections = getMaximumRequests(configSection);
-        log.debug("max requests: {}", maxConnections);
+        log.info("max requests: {}", maxConnections);
         configBuilder.setMaxConnections(maxConnections);
 
         int connTimeout = getConnectionTimeout(configSection);
-        log.debug("connection timeout: {}ms", connTimeout);
+        log.info("connection timeout: {}ms", connTimeout);
         configBuilder.setConnectionTimeout(connTimeout);
 
         int maxReqQueue = getMaxRequestQueueSize(configSection);
-        log.debug("max request queue size: {}", maxReqQueue);
+        log.info("max request queue size: {}", maxReqQueue);
         configBuilder.setMaxRequestQueueSize(maxReqQueue);
 
         int receiveBuffer = getReceiveBufferSize(configSection);
-        log.debug("recieve buffer size: {} bytes", receiveBuffer);
+        log.info("recieve buffer size: {} bytes", receiveBuffer);
         configBuilder.setReceiveBufferSize(receiveBuffer);
 
         int sendBuffer = getSendBufferSize(configSection);
-        log.debug("send buffer size: {} bytes", sendBuffer);
+        log.info("send buffer size: {} bytes", sendBuffer);
         configBuilder.setSendBufferSize(sendBuffer);
 
         configBuilder.setKeyManager(getX509KeyManager(iniFile.get(SECURITY_SECTION_HEADER)));
@@ -197,20 +197,20 @@ public abstract class AbstractIniServiceConfigurationParser<ConfigurationType ex
         httpClientBuilder.setContentCharSet("UTF-8");
 
         int conTimeout = getConnectionTimeout(configSection);
-        log.debug("connection timeout: {}ms", conTimeout);
+        log.info("connection timeout: {}ms", conTimeout);
         httpClientBuilder.setConnectionTimeout(conTimeout);
 
         int maxRequests = getMaximumRequests(configSection);
-        log.debug("maximum requests: {}", maxRequests);
+        log.info("maximum requests: {}", maxRequests);
         httpClientBuilder.setMaxTotalConnections(maxRequests);
         httpClientBuilder.setMaxConnectionsPerHost(maxRequests);
 
         int recBuffSize = getSendBufferSize(configSection);
-        log.debug("recieve buffer size: {} bytes", recBuffSize);
+        log.info("recieve buffer size: {} bytes", recBuffSize);
         httpClientBuilder.setReceiveBufferSize(recBuffSize);
 
         int sendBuffSize = getSendBufferSize(configSection);
-        log.debug("send buffer size: {} bytes", sendBuffSize);
+        log.info("send buffer size: {} bytes", sendBuffSize);
         httpClientBuilder.setSendBufferSize(sendBuffSize);
 
         if (keyManager != null && trustManager != null) {

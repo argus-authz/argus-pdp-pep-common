@@ -173,7 +173,7 @@ public abstract class AbstractIniConfigurationParser<ConfigurationType extends A
                 if (obligationHandlerName != null) {
                     configBuilder.getObligationService().addObligationhandler(
                             buildObligationHandler(iniFile.get(obligationHandlerName)));
-                    log.debug("Added obligation handler: {}", obligationHandlerName);
+                    log.info("Added obligation handler: {}", obligationHandlerName);
                 }
             }
         }
@@ -232,7 +232,7 @@ public abstract class AbstractIniConfigurationParser<ConfigurationType extends A
                         throw new ConfigurationException(errorMsg);
                     }
                     configBuilder.getPIPs().add(buildPolicyInformationPoint(iniFile.get(pipName), configBuilder));
-                    log.debug("loadded policy information point: {}", pipName);
+                    log.info("loadded policy information point: {}", pipName);
                 }
             }
         }
@@ -260,7 +260,7 @@ public abstract class AbstractIniConfigurationParser<ConfigurationType extends A
         }
 
         try {
-            log.debug("Creating INI PIP parser class {}", parserClassName);
+            log.info("Creating INI PIP parser class {}", parserClassName);
             Class<IniPIPConfigurationParser> parserClass = (Class<IniPIPConfigurationParser>) AbstractIniConfigurationParser.class
                     .getClassLoader().loadClass(parserClassName);
             IniPIPConfigurationParser parser = parserClass.getConstructor().newInstance();
@@ -288,7 +288,7 @@ public abstract class AbstractIniConfigurationParser<ConfigurationType extends A
 
         String trustStoreDir = IniConfigUtil.getString(configSection, TRUST_INFO_DIR_PROP, null);
         if (trustStoreDir == null) {
-            log.debug("No truststore directory given, no trust manager will be used");
+            log.info("No truststore directory given, no trust manager will be used");
             return null;
         }
 
@@ -301,7 +301,7 @@ public abstract class AbstractIniConfigurationParser<ConfigurationType extends A
         log.debug("Using the directory {} as the truststore directory", trustStoreDir);
 
         boolean crlsRequired = IniConfigUtil.getBoolean(configSection, CRLS_REQUIRED_PROP, true);
-        log.debug("CRLs required in the truststore: {}", crlsRequired);
+        log.info("CRLs required in the truststore: {}", crlsRequired);
 
         try {
             return new OpensslTrustmanager(trustStoreDir, crlsRequired);
@@ -329,17 +329,17 @@ public abstract class AbstractIniConfigurationParser<ConfigurationType extends A
 
         String privateKeyFilePath = IniConfigUtil.getString(configSection, SERVICE_KEY_PROP, null);
         if (privateKeyFilePath == null) {
-            log.debug("No service private key file provided, no service credential will be used.");
+            log.info("No service private key file provided, no service credential will be used.");
             return null;
         }
 
         String certificateFilePath = IniConfigUtil.getString(configSection, SERVICE_CERT_PROP, null);
         if (certificateFilePath == null) {
-            log.debug("No service certificate file provided, no service credential will be used.");
+            log.info("No service certificate file provided, no service credential will be used.");
             return null;
         }
 
-        log.debug("Service credential will use private key {} and certificate {}", privateKeyFilePath,
+        log.info("Service credential will use private key {} and certificate {}", privateKeyFilePath,
                 certificateFilePath);
         CaseInsensitiveProperties keystoreProps = new CaseInsensitiveProperties();
         keystoreProps.setProperty(ContextWrapper.CREDENTIALS_KEY_FILE, privateKeyFilePath);
