@@ -48,9 +48,6 @@ public class EnvironmentTimePIP extends AbstractPolicyInformationPoint {
     /** Name of the current date/time attribute. */
     public static final String CURRENT_DATETIME_ATTRIB_NAME = "urn:oasis:names:tc:xacml:1.0:environment:current-dateTime";
 
-    /** Attribute data type. */
-    public static final String DATA_TYPE = "http://www.w3.org/2001/XMLSchema#dateTime";
-
     /** ID for the PIP. */
     private String id;
 
@@ -97,7 +94,7 @@ public class EnvironmentTimePIP extends AbstractPolicyInformationPoint {
         currentTime.setMillisecond(DatatypeConstants.FIELD_UNDEFINED);
         Attribute currentTimeAttribute = new Attribute();
         currentTimeAttribute.setId(CURRENT_TIME_ATTRIB_NAME);
-        currentTimeAttribute.setDataType(DATA_TYPE);
+        currentTimeAttribute.setDataType(Attribute.DT_TIME);
         currentTimeAttribute.getValues().add(currentTime.toXMLFormat());
         environment.getAttributes().add(currentTimeAttribute);
 
@@ -108,7 +105,7 @@ public class EnvironmentTimePIP extends AbstractPolicyInformationPoint {
         currentDate.setMillisecond(DatatypeConstants.FIELD_UNDEFINED);
         Attribute currentDateAttribute = new Attribute();
         currentDateAttribute.setId(CURRENT_DATE_ATTRIB_NAME);
-        currentDateAttribute.setDataType(DATA_TYPE);
+        currentDateAttribute.setDataType(Attribute.DT_DATE);
         currentDateAttribute.getValues().add(currentDate.toXMLFormat());
         environment.getAttributes().add(currentDateAttribute);
 
@@ -116,7 +113,7 @@ public class EnvironmentTimePIP extends AbstractPolicyInformationPoint {
         currentDateTime.setMillisecond(DatatypeConstants.FIELD_UNDEFINED);
         Attribute currentDateTimeAttribute = new Attribute();
         currentDateTimeAttribute.setId(CURRENT_DATETIME_ATTRIB_NAME);
-        currentDateTimeAttribute.setDataType(DATA_TYPE);
+        currentDateTimeAttribute.setDataType(Attribute.DT_DATE_TIME);
         currentDateTimeAttribute.getValues().add(currentDateTime.toXMLFormat());
         environment.getAttributes().add(currentDateTimeAttribute);
 

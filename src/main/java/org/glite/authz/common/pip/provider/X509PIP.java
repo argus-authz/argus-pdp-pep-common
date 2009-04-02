@@ -108,6 +108,9 @@ public class X509PIP implements PolicyInformationPoint {
     /** The id of this PIP */
     private String id;
 
+    /** Whether to perform PKIX validation on the incoming certificate. */
+    private boolean performPKIXValidation;
+
     /** Trust manager used to validate an X.509 entity certificate. */
     private X509TrustManager certTrustManager;
 
@@ -137,6 +140,7 @@ public class X509PIP implements PolicyInformationPoint {
         if (trustManager == null) {
             throw new ConfigurationException("Policy information point trust manager may not be null");
         }
+        performPKIXValidation = true;
         certTrustManager = trustManager;
 
         try {
@@ -155,8 +159,7 @@ public class X509PIP implements PolicyInformationPoint {
      * 
      * @throws ConfigurationException thrown if the configuration of the PIP fails
      */
-    public X509PIP(String pipID, X509TrustManager trustManager, String vomsDir)
-            throws ConfigurationException {
+    public X509PIP(String pipID, X509TrustManager trustManager, String vomsDir) throws ConfigurationException {
         this(pipID, trustManager);
 
         String vomsDirPath = null;
@@ -189,6 +192,24 @@ public class X509PIP implements PolicyInformationPoint {
         return vomsSupportEnabled;
     }
 
+    /**
+     * Gets whether the PKIX validation is performed against the processed cert chain.
+     * 
+     * @return whether the PKIX validation is performed against the processed cert chain
+     */
+    public boolean performsPKIXValidation() {
+        return performPKIXValidation;
+    }
+
+    /**
+     * Sets whether the PKIX validation is performed against the processed cert chain.
+     * 
+     * @param perform whether the PKIX validation is performed against the processed cert chain
+     */
+    public void performPKIXValidation(boolean perform) {
+        performPKIXValidation = perform;
+    }
+
     /** {@inheritDoc} */
     public boolean populateRequest(Request request) throws AuthorizationServiceException {
         boolean pipApplied = false;
@@ -204,12 +225,14 @@ public class X509PIP implements PolicyInformationPoint {
 
             endEntityCert = certChain[CertUtil.findClientCert(certChain)];
             String endEntitySubjectDN = endEntityCert.getSubjectX500Principal().getName(X500Principal.RFC2253);
-            try {
-                certTrustManager.checkClientTrusted(certChain, endEntityCert.getPublicKey().getAlgorithm());
-            } catch (CertificateException e) {
-                String errorMsg = "Certificate with subject DN " + endEntitySubjectDN + " failed PKIX validation";
-                log.error(errorMsg, e);
-                throw new AuthorizationServiceException(errorMsg, e);
+            if (performPKIXValidation) {
+                try {
+                    certTrustManager.checkClientTrusted(certChain, endEntityCert.getPublicKey().getAlgorithm());
+                } catch (CertificateException e) {
+                    String errorMsg = "Certificate with subject DN " + endEntitySubjectDN + " failed PKIX validation";
+                    log.error(errorMsg, e);
+                    throw new AuthorizationServiceException(errorMsg, e);
+                }
             }
 
             log.debug("Extracting subject attributes from certificate with subject DN {}", endEntitySubjectDN);

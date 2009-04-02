@@ -83,7 +83,7 @@ public class StaticPIPIniConfigurationParser implements IniPIPConfigurationParse
     public static final String ATTRIBUTE_ISSUER_PROP = "issuer";
 
     /** The name of the {@value} attribute definition property which gives the values of the static attribute. */
-    public static final String ATTRIBUTE_VALUE_PROP = "value";
+    public static final String ATTRIBUTE_VALUE_PROP = "values";
 
     /**
      * The name of the {@value} attribute definition property which gives the delimiter used in the
