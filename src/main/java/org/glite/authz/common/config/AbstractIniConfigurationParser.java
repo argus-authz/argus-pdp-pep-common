@@ -232,7 +232,7 @@ public abstract class AbstractIniConfigurationParser<ConfigurationType extends A
                         throw new ConfigurationException(errorMsg);
                     }
                     configBuilder.getPIPs().add(buildPolicyInformationPoint(iniFile.get(pipName), configBuilder));
-                    log.info("loadded policy information point: {}", pipName);
+                    log.debug("loadded policy information point: {}", pipName);
                 }
             }
         }
@@ -260,7 +260,8 @@ public abstract class AbstractIniConfigurationParser<ConfigurationType extends A
         }
 
         try {
-            log.info("Creating INI PIP parser class {}", parserClassName);
+            log.info("Loading PIP {}", pipConfig.getName());
+            log.debug("Creating INI PIP parser class {}", parserClassName);
             Class<IniPIPConfigurationParser> parserClass = (Class<IniPIPConfigurationParser>) AbstractIniConfigurationParser.class
                     .getClassLoader().loadClass(parserClassName);
             IniPIPConfigurationParser parser = parserClass.getConstructor().newInstance();

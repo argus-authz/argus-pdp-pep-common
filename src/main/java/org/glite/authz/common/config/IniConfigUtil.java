@@ -18,9 +18,14 @@ package org.glite.authz.common.config;
 
 import org.glite.authz.common.util.Strings;
 import org.ini4j.Ini.Section;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /** Utilities for getting values for configuration files. */
 public class IniConfigUtil {
+
+    /** Class logger. */
+    private static Logger log = LoggerFactory.getLogger(IniConfigUtil.class);
 
     /**
      * Extracts a boolean value from a configuration property. The values 'true', 'yes', and '1' are treated as true,
@@ -161,14 +166,20 @@ public class IniConfigUtil {
      * @return the value for the property
      */
     public static int getInt(Section configSection, String propName, int defaultValue, int minValue, int maxValue) {
-        if (configSection.containsKey(propName)) {
+        String strValue = Strings.safeTrimOrNullString(configSection.get(propName));
+        if (strValue != null) {
             try {
-                int tempInt = Integer.parseInt(configSection.get(propName));
-                if(tempInt > minValue && tempInt < maxValue){
+                int tempInt = Integer.parseInt(strValue);
+                if (tempInt >= minValue && tempInt <= maxValue) {
                     return tempInt;
+                } else {
+                    log.warn("Property {} in configuration section {} with a value of {} was not greater than or equal to {} and less than or equal to {}, using default value of {}",
+                                    new Object[] { propName, configSection.getName(), tempInt, minValue, maxValue,
+                                            defaultValue });
                 }
             } catch (NumberFormatException e) {
-                // do nothing
+                log.warn("Property {} in configuration section {} was not a valid integer, using default value of {}, using default value of {}",
+                                new Object[] { propName, configSection.getName(), strValue, defaultValue });
             }
         }
 

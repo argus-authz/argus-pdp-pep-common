@@ -94,7 +94,7 @@ public class X509PIP implements PolicyInformationPoint {
     public final static String VOMS_FQAN = "http://authz-interop.org/xacml/subject/voms-fqan";
 
     /** The ID of the subject attribute, {@value} , containing the primary FQAN given in the VOMS attribute certificate. */
-    public final static String VOMS_PRIMARY_FQAN = "http://authz-interop.org/xacml/subject/primary-fqan";
+    public final static String VOMS_PRIMARY_FQAN = "http://authz-interop.org/xacml/subject/voms-primary-fqan";
 
     /**
      * The ID of the subject attribute, {@value} , containing the generic attributes given in the VOMS attribute
