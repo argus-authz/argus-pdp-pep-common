@@ -39,6 +39,7 @@ import org.glite.authz.common.pip.PolicyInformationPoint;
 import org.glite.authz.common.util.Files;
 import org.glite.authz.common.util.Strings;
 import org.glite.security.util.CertUtil;
+import org.glite.security.util.DNHandler;
 import org.glite.security.util.FileCertReader;
 import org.glite.voms.FQAN;
 import org.glite.voms.PKIStore;
@@ -60,10 +61,16 @@ import org.slf4j.LoggerFactory;
  * 
  * @see <a href="https://twiki.cnaf.infn.it/cgi-bin/twiki/view/VOMS">VOMS website</a>
  */
-public class X509PolicyInformationPoint implements PolicyInformationPoint {
+public class X509PIP implements PolicyInformationPoint {
 
     /** The ID of the subject attribute, {@value} , containing the end-entity certificate processed by the PIP. */
     public final static String X509_CERT_CHAIN_ID = "http://authz-interop.org/xacml/subject/cert-chain";
+
+    /**
+     * The ID of the subject attribute, {@value} , containing the end-entity certificate's issuer's DN in the
+     * non-standard OpenSSL format.
+     */
+    public final static String SUBJECT_X509_ID = "http://authz-interop.org/xacml/subject/subject-x509-id";
 
     /** The ID of the subject attribute, {@value} , containing the end-entity certificate's issuer's DN. */
     public final static String X509_DN_ISSUER = "http://authz-interop.org/xacml/subject/subject-x509-issuer";
@@ -96,7 +103,7 @@ public class X509PolicyInformationPoint implements PolicyInformationPoint {
     public final static String VOMS_GA = "http://authz-interop.org/xacml/subject/generic-attribute";
 
     /** Class logger. */
-    private Logger log = LoggerFactory.getLogger(X509PolicyInformationPoint.class);
+    private Logger log = LoggerFactory.getLogger(X509PIP.class);
 
     /** The id of this PIP */
     private String id;
@@ -121,7 +128,7 @@ public class X509PolicyInformationPoint implements PolicyInformationPoint {
      * 
      * @throws ConfigurationException thrown if the configuration of the PIP fails
      */
-    public X509PolicyInformationPoint(String pipID, X509TrustManager trustManager) throws ConfigurationException {
+    public X509PIP(String pipID, X509TrustManager trustManager) throws ConfigurationException {
         id = Strings.safeTrimOrNullString(pipID);
         if (id == null) {
             throw new ConfigurationException("Policy information point ID may not be null");
@@ -148,7 +155,7 @@ public class X509PolicyInformationPoint implements PolicyInformationPoint {
      * 
      * @throws ConfigurationException thrown if the configuration of the PIP fails
      */
-    public X509PolicyInformationPoint(String pipID, X509TrustManager trustManager, String vomsDir)
+    public X509PIP(String pipID, X509TrustManager trustManager, String vomsDir)
             throws ConfigurationException {
         this(pipID, trustManager);
 
@@ -301,6 +308,14 @@ public class X509PolicyInformationPoint implements PolicyInformationPoint {
         attribute.setDataType(Attribute.DT_X500_NAME);
         attribute.setIssuer(endEntityIssuerDn);
         attribute.getValues().add(endEntitySubjectDN);
+        log.debug("Extracted attribute: {}", attribute);
+        subjectAttributes.add(attribute);
+
+        attribute = new Attribute();
+        attribute.setId(SUBJECT_X509_ID);
+        attribute.setDataType(Attribute.DT_STRING);
+        attribute.setIssuer(endEntityIssuerDn);
+        attribute.getValues().add(DNHandler.getSubject(endEntityCertificate).getX500());
         log.debug("Extracted attribute: {}", attribute);
         subjectAttributes.add(attribute);
 

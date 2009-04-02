@@ -16,6 +16,9 @@
 
 package org.glite.authz.common.util;
 
+import java.util.List;
+import java.util.StringTokenizer;
+
 /** Helper class for working with Strings. */
 public final class Strings {
 
@@ -91,5 +94,38 @@ public final class Strings {
         }
 
         return null;
+    }
+    
+    /**
+     * Creates a list of strings from delimited string.
+     * 
+     * @param valuesStr the delimited string of values
+     * @param delimiter the delimiter, if null, then ',' (comma) will be used
+     * 
+     * @return the list of values, without nulls, or null if the delimited value string is null or empty
+     */
+    public static List<String> toList(String valuesStr, String delimiter){
+        String trimmedValueStr = safeTrimOrNullString(valuesStr);
+        if(trimmedValueStr == null){
+            return null;
+        }
+        
+        String effectiveDelimiter = safeTrimOrNullString(delimiter);
+        if(effectiveDelimiter == null){
+            effectiveDelimiter = ",";
+        }
+        
+        StringTokenizer valueTokens = new StringTokenizer(trimmedValueStr, effectiveDelimiter);
+        LazyList<String> values = new LazyList<String>();
+        String value;
+        
+        while(valueTokens.hasMoreTokens()){
+            value = safeTrimOrNullString(valueTokens.nextToken());
+            if(value != null){
+                values.add(value);
+            }
+        }
+        
+        return values;
     }
 }

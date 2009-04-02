@@ -16,9 +16,7 @@
 
 package org.glite.authz.common.pip.provider;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 import net.jcip.annotations.ThreadSafe;
@@ -36,14 +34,8 @@ import org.glite.authz.common.util.Strings;
 @ThreadSafe
 public class StaticPIP extends AbstractPolicyInformationPoint {
 
-    /** String attribute data type URI. */
-    private static final String DATA_TYPE = "http://www.w3.org/2001/XMLSchema#string";
-
     /** ID of this PIP. */
     private String id;
-
-    /** Issuer of the attributes. */
-    private String attributeIssuer;
 
     /** Action attributes to be added to the request. */
     private List<Attribute> actionAttributes;
@@ -78,8 +70,8 @@ public class StaticPIP extends AbstractPolicyInformationPoint {
      * @param resource attributes to be added to the resource attributes in the request
      * @param subject attributes to be added to the subject attributes in the request
      */
-    public StaticPIP(String pipID, Map<String, List<String>> action, Map<String, List<String>> environment,
-            Map<String, List<String>> resource, Map<String, List<String>> subject) {
+    public StaticPIP(String pipID, List<Attribute> action, List<Attribute> environment, List<Attribute> resource,
+            List<Attribute> subject) {
         id = Strings.safeTrimOrNullString(pipID);
         if (id == null) {
             throw new IllegalArgumentException("PIP ID may not be null");
@@ -88,33 +80,15 @@ public class StaticPIP extends AbstractPolicyInformationPoint {
         addAttributesToAllResources = false;
         addAttributesToAllSubjects = false;
 
-        actionAttributes = mapToAttributes(action);
-        environmentAttributes = mapToAttributes(environment);
-        resourceAttributes = mapToAttributes(resource);
-        subjectAttributes = mapToAttributes(subject);
+        actionAttributes = action;
+        environmentAttributes = environment;
+        resourceAttributes = resource;
+        subjectAttributes = subject;
     }
 
     /** {@inheritDoc} */
     public String getId() {
         return id;
-    }
-
-    /**
-     * Gets the ID of the attribute issuer.
-     * 
-     * @return ID of the attribute issuer
-     */
-    public String getAttributeIssuer() {
-        return attributeIssuer;
-    }
-
-    /**
-     * Sets the ID of the attribute issuer.
-     * 
-     * @param issuer ID of the attribute issuer
-     */
-    public void setAttributeIssuer(String issuer) {
-        attributeIssuer = Strings.safeTrimOrNullString(issuer);
     }
 
     /**
@@ -157,21 +131,25 @@ public class StaticPIP extends AbstractPolicyInformationPoint {
 
     /** {@inheritDoc} */
     public boolean populateRequest(Request request) throws AuthorizationServiceException {
-        Action action = request.getAction();
-        if (action == null) {
-            action = new Action();
-            request.setAction(action);
+        if (actionAttributes != null && !actionAttributes.isEmpty()) {
+            Action action = request.getAction();
+            if (action == null) {
+                action = new Action();
+                request.setAction(action);
+            }
+            action.getAttributes().addAll(actionAttributes);
         }
-        action.getAttributes().addAll(actionAttributes);
 
-        Environment environment = request.getEnvironment();
-        if (environment == null) {
-            environment = new Environment();
-            request.setEnvironment(environment);
+        if (environmentAttributes != null && !environmentAttributes.isEmpty()) {
+            Environment environment = request.getEnvironment();
+            if (environment == null) {
+                environment = new Environment();
+                request.setEnvironment(environment);
+            }
+            environment.getAttributes().addAll(environmentAttributes);
         }
-        environment.getAttributes().addAll(environmentAttributes);
 
-        if (!resourceAttributes.isEmpty()) {
+        if (resourceAttributes != null && !resourceAttributes.isEmpty()) {
             Set<Resource> resources = request.getResources();
             if (resources.size() > 1 && !addAttributesToAllResources) {
                 throw new AuthorizationServiceException(
@@ -187,7 +165,7 @@ public class StaticPIP extends AbstractPolicyInformationPoint {
             }
         }
 
-        if (!subjectAttributes.isEmpty()) {
+        if (subjectAttributes != null && !subjectAttributes.isEmpty()) {
             Set<Subject> subjects = request.getSubjects();
             if (subjects.size() > 1 && !addAttributesToAllSubjects) {
                 throw new AuthorizationServiceException(
@@ -204,47 +182,5 @@ public class StaticPIP extends AbstractPolicyInformationPoint {
         }
 
         return true;
-    }
-
-    /**
-     * Converts a map in to a list of {@link Attribute}s.
-     * 
-     * @param attributeMap map of attributes where the key is the attribute ID and the value is the list of attribute
-     *            values
-     * 
-     * @return the list of {@link Attribute}s.
-     */
-    private List<Attribute> mapToAttributes(Map<String, List<String>> attributeMap) {
-        ArrayList<Attribute> attributes = new ArrayList<Attribute>();
-
-        if (attributeMap == null) {
-            return attributes;
-        }
-
-        Attribute attribute;
-        List<String> attributeValues;
-        for (String attributeId : attributeMap.keySet()) {
-            if (Strings.isEmpty(attributeId)) {
-                continue;
-            }
-
-            attribute = new Attribute();
-            attribute.setId(attributeId);
-            attribute.setIssuer(attributeIssuer);
-            attribute.setDataType(DATA_TYPE);
-
-            attributeValues = attributeMap.get(attributeId);
-            if (attributeValues != null) {
-                for (String attributeValue : attributeValues) {
-                    if (!Strings.isEmpty(attributeValue)) {
-                        attribute.getValues().add(Strings.safeTrim(attributeValue));
-                    }
-                }
-            }
-
-            attributes.add(attribute);
-        }
-
-        return attributes;
     }
 }
