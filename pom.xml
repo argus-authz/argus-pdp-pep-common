@@ -6,7 +6,7 @@
     <groupId>org.glite.authz</groupId>
     <artifactId>pdp-pep-common</artifactId>
     <name>gLite Authorization Service - PDP/PEP Common</name>
-    <version>SNAPSHOT</version>
+    <version>1.0-SNAPSHOT</version>
 
     <description>XACML based authorization service developed within the gLite project.
     </description>
@@ -86,11 +86,6 @@
             <groupId>org.glite</groupId>
             <artifactId>glite-security-util-java</artifactId>
             <version>2.0.1.1</version>
-        </dependency>
-        <dependency>
-            <groupId>org.bouncycastle</groupId>
-            <artifactId>bcprov-jdk15</artifactId>
-            <version>1.40</version>
         </dependency>
         <dependency>
             <groupId>com.caucho</groupId>
@@ -194,6 +189,7 @@
                         <descriptor>src/main/assembly/bin.xml</descriptor>
                         <descriptor>src/main/assembly/src.xml</descriptor>
                     </descriptors>
+                    <tarLongFileMode>gnu</tarLongFileMode>
                 </configuration>
             </plugin>
         </plugins>
