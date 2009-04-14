@@ -17,7 +17,6 @@
 package org.glite.authz.common;
 
 import java.io.PrintWriter;
-import java.math.BigInteger;
 
 import net.jcip.annotations.ThreadSafe;
 
@@ -37,16 +36,10 @@ public class ServiceMetrics {
     private long startupTime;
 
     /** Total number of completed requests to service */
-    private BigInteger totalRequests;
-
-    /** Accumulator of requests. */
-    private int totalRequestAccumulator;
+    private long totalRequests;
 
     /** Total number of request that error'ed out. */
-    private BigInteger totalErrors;
-
-    /** Accumulator of error'ed out requests. */
-    private int totalErrorsAccumulator;
+    private long totalErrors;
 
     /**
      * Constructor. Ê
@@ -57,8 +50,8 @@ public class ServiceMetrics {
         runtime = Runtime.getRuntime();
         serviceId = Strings.safeTrimOrNullString(id);
         startupTime = System.currentTimeMillis();
-        totalRequests = new BigInteger("0");
-        totalErrors = new BigInteger("0");
+        totalRequests = 0;
+        totalErrors = 0;
     }
 
     /**
@@ -84,13 +77,13 @@ public class ServiceMetrics {
      * 
      * @return total number of completed requests
      */
-    public BigInteger getTotalServiceRequests() {
-        return totalRequests.add(integerToBigInteger(totalRequestAccumulator));
+    public long getTotalServiceRequests() {
+        return totalRequests;
     }
 
     /** Adds one to the total number of requests. */
     public synchronized void incrementTotalServiceRequests() {
-        totalRequestAccumulator = incrementMetric(totalRequests, totalRequestAccumulator);
+        totalRequests++;
     }
 
     /**
@@ -98,13 +91,13 @@ public class ServiceMetrics {
      * 
      * @return total number of requests that error'ed out
      */
-    public BigInteger getTotalServiceRequestErrors() {
-        return totalErrors.add(integerToBigInteger(totalErrorsAccumulator));
+    public long getTotalServiceRequestErrors() {
+        return totalErrors;
     }
 
     /** Adds one to the total number of requests that have error'ed out. */
     public synchronized void incrementTotalServiceRequestErrors() {
-        totalErrorsAccumulator = incrementMetric(totalErrors, totalErrorsAccumulator);
+        totalErrors++;
     }
 
     /**
@@ -125,42 +118,13 @@ public class ServiceMetrics {
         long usedMemory = (runtime.totalMemory() - runtime.freeMemory()) / 1048576;
 
         writer.println("service: " + serviceId);
-        writer.println("start time: " + startupTime);
-        writer.println("number of processors: " + runtime.availableProcessors());
-        writer.println("memory usage: " + usedMemory + "MB");
-        writer.println("total requests: " + getTotalServiceRequests().toString());
-        writer.println("total completed requests: "
-                + getTotalServiceRequests().subtract(getTotalServiceRequestErrors()).toString());
-        writer.println("total request errors: " + getTotalServiceRequestErrors());
+        writer.println("start_time: " + startupTime);
+        writer.println("number_of_processors: " + runtime.availableProcessors());
+        writer.println("memory_usage: " + usedMemory + "MB");
+        writer.println("total_requests: " + getTotalServiceRequests());
+        writer.println("total_completed_requests: "
+                + (getTotalServiceRequests() - getTotalServiceRequestErrors()));
+        writer.println("total_request_errors: " + getTotalServiceRequestErrors());
 
-    }
-
-    /**
-     * Increments a measurement stored in a BigInteger but with a integer accumulator serving as a temporary bucket.
-     * This avoids the cost of creating new BigIntegers, which are immutable, every time the metric is incremented.
-     * 
-     * @param store the BigInteger store
-     * @param accumulator the temporary accumulation bucket
-     * 
-     * @return new value for the accumulator
-     */
-    private int incrementMetric(BigInteger store, int accumulator) {
-        if (accumulator == Integer.MAX_VALUE - 1) {
-            store = store.add(integerToBigInteger(accumulator++));
-            return 0;
-        } else {
-            return accumulator + 1;
-        }
-    }
-
-    /**
-     * Converted an integer in to a {@link BigInteger}.
-     * 
-     * @param integer integer to convert
-     * 
-     * @return BigInteger form of the integer
-     */
-    private BigInteger integerToBigInteger(Integer integer) {
-        return new BigInteger(Integer.toString(integer));
     }
 }

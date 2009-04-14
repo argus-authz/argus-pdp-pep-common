@@ -132,7 +132,7 @@ public abstract class AbstractIniServiceConfigurationParser<ConfigurationType ex
             throws ConfigurationException {
         Section configSection = iniFile.get(SERVICE_SECTION_HEADER);
         if (configSection == null) {
-            String errorMsg = "INI configuration does not contain the rquired '" + SERVICE_SECTION_HEADER
+            String errorMsg = "INI configuration does not contain the required '" + SERVICE_SECTION_HEADER
                     + "' INI section";
             log.error(errorMsg);
             throw new ConfigurationException(errorMsg);
