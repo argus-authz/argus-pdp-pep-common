@@ -19,15 +19,12 @@ package org.glite.authz.common.pip.provider;
 import java.io.BufferedInputStream;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.security.cert.CRLException;
-import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Vector;
 
-import javax.net.ssl.X509TrustManager;
 import javax.security.auth.x500.X500Principal;
 
 import org.glite.authz.common.AuthorizationServiceException;
@@ -36,15 +33,16 @@ import org.glite.authz.common.model.Attribute;
 import org.glite.authz.common.model.Request;
 import org.glite.authz.common.model.Subject;
 import org.glite.authz.common.pip.PolicyInformationPoint;
-import org.glite.authz.common.util.Files;
 import org.glite.authz.common.util.Strings;
 import org.glite.security.util.CertUtil;
 import org.glite.security.util.DNHandler;
 import org.glite.security.util.FileCertReader;
 import org.glite.voms.FQAN;
 import org.glite.voms.PKIStore;
+import org.glite.voms.PKIVerifier;
 import org.glite.voms.VOMSAttribute;
 import org.glite.voms.VOMSValidator;
+import org.glite.voms.ac.ACValidator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -108,73 +106,49 @@ public class X509PIP implements PolicyInformationPoint {
     /** The id of this PIP */
     private String id;
 
+    /** Reads a set of certificates in to a chain of {@link X509Certificate} objects. */
+    private FileCertReader certReader;
+
     /** Whether to perform PKIX validation on the incoming certificate. */
     private boolean performPKIXValidation;
 
-    /** Trust manager used to validate an X.509 entity certificate. */
-    private X509TrustManager certTrustManager;
-
-    /** Certificate reader that is used to parse the certificate PEM into a certificate */
-    private FileCertReader reader;
-
-    /** Indicates whether VOMS, and hence attribute certificate, support is enabled. */
+    /** Whether VOMS AC support is currently enabled. */
     private boolean vomsSupportEnabled;
 
-    /** The trustStore used by voms validator. Make it instance variable to be able to stop the updater. */
-    private PKIStore vomsStore;
-
-    /**
-     * The constructor for this PIP. This constructor disable VOMS support.
-     * 
-     * @param pipID ID of this PIP
-     * @param trustManager trust manager used to validate the subject end entity certificate
-     * 
-     * @throws ConfigurationException thrown if the configuration of the PIP fails
-     */
-    public X509PIP(String pipID, X509TrustManager trustManager) throws ConfigurationException {
-        id = Strings.safeTrimOrNullString(pipID);
-        if (id == null) {
-            throw new ConfigurationException("Policy information point ID may not be null");
-        }
-
-        if (trustManager == null) {
-            throw new ConfigurationException("Policy information point trust manager may not be null");
-        }
-        performPKIXValidation = true;
-        certTrustManager = trustManager;
-
-        try {
-            reader = new FileCertReader();
-        } catch (CertificateException e) {
-            throw new ConfigurationException("The certificate parser initialization failed: " + e.getMessage());
-        }
-    }
+    /** Verifier used to validate an X.509 certificate chain which may, or may not, include AC certs. */
+    private PKIVerifier certVerifier;
 
     /**
      * The constructor for this PIP. This constructor enables support for the VOMS attribute certificates.
      * 
      * @param pipID ID of this PIP
-     * @param trustManager trust manager used to validate the subject end entity certificate
-     * @param vomsDir path to the directory which contains the VOMS server .lsc files of certificates
+     * @param eeTrustMaterial trust material used to validate the subject's end entity certificate
+     * @param acTrustMaterial trust material used to validate the subject's attribute certificate certificate, may be
+     *            null of AC support is not desired
      * 
      * @throws ConfigurationException thrown if the configuration of the PIP fails
      */
-    public X509PIP(String pipID, X509TrustManager trustManager, String vomsDir) throws ConfigurationException {
-        this(pipID, trustManager);
+    public X509PIP(String pipID, PKIStore eeTrustMaterial, PKIStore acTrustMaterial) throws ConfigurationException {
+        id = Strings.safeTrimOrNullString(pipID);
+        if (id == null) {
+            throw new ConfigurationException("Policy information point ID may not be null");
+        }
 
-        String vomsDirPath = null;
-        try {
-            vomsDirPath = Files.getFile(Strings.safeTrimOrNullString(vomsDir), false, true, true, false)
-                    .getAbsolutePath();
-            vomsStore = new PKIStore(vomsDirPath, PKIStore.TYPE_VOMSDIR);
-            VOMSValidator.setTrustStore(vomsStore);
+        if (eeTrustMaterial == null) {
+            throw new ConfigurationException("Policy information point trust material may not be null");
+        }
+
+        if (acTrustMaterial == null) {
+            vomsSupportEnabled = false;
+        } else {
             vomsSupportEnabled = true;
-        } catch (IOException e) {
-            throw new ConfigurationException("VOMS directory file path " + vomsDir + " cannot be read", e);
-        } catch (CertificateException e) {
-            throw new ConfigurationException("Error processing certificates in VOMS directory  " + vomsDirPath, e);
-        } catch (CRLException e) {
-            throw new ConfigurationException("Error processing CRLs in VOMS directory " + vomsDirPath, e);
+        }
+
+        try {
+            certReader = new FileCertReader();
+            certVerifier = new PKIVerifier(acTrustMaterial, eeTrustMaterial);
+        } catch (Exception e) {
+            throw new ConfigurationException("Unable to create X509 trust manager: " + e.getMessage());
         }
     }
 
@@ -225,14 +199,10 @@ public class X509PIP implements PolicyInformationPoint {
 
             endEntityCert = certChain[CertUtil.findClientCert(certChain)];
             String endEntitySubjectDN = endEntityCert.getSubjectX500Principal().getName(X500Principal.RFC2253);
-            if (performPKIXValidation) {
-                try {
-                    certTrustManager.checkClientTrusted(certChain, endEntityCert.getPublicKey().getAlgorithm());
-                } catch (CertificateException e) {
-                    String errorMsg = "Certificate with subject DN " + endEntitySubjectDN + " failed PKIX validation";
-                    log.error(errorMsg, e);
-                    throw new AuthorizationServiceException(errorMsg, e);
-                }
+            if (performPKIXValidation && !certVerifier.verify(certChain)) {
+                String errorMsg = "Certificate with subject DN " + endEntitySubjectDN + " failed PKIX validation";
+                log.error(errorMsg);
+                throw new AuthorizationServiceException(errorMsg);
             }
 
             log.debug("Extracting subject attributes from certificate with subject DN {}", endEntitySubjectDN);
@@ -283,7 +253,7 @@ public class X509PIP implements PolicyInformationPoint {
         BufferedInputStream bis = new BufferedInputStream(new ByteArrayInputStream(pemCertChain.getBytes()));
         Vector<X509Certificate> chainVector;
         try {
-            chainVector = reader.readCertChain(bis);
+            chainVector = certReader.readCertChain(bis);
         } catch (IOException e) {
             log.error("Unable to parse subject cert chain", e);
             throw new AuthorizationServiceException("Unable to parse subject cert chain", e);
@@ -360,7 +330,7 @@ public class X509PIP implements PolicyInformationPoint {
         log.debug("Extracted attribute: {}", attribute);
         subjectAttributes.add(attribute);
 
-        if (vomsSupportEnabled) {
+        if (isVOMSSupportEnabled()) {
             Collection<Attribute> vomsAttributes = processVOMS(endEntityCertificate, certChain);
             if (vomsAttributes != null) {
                 subjectAttributes.addAll(vomsAttributes);
@@ -389,7 +359,7 @@ public class X509PIP implements PolicyInformationPoint {
         log.debug("Extracting VOMS attribute certificate attributes");
         VOMSValidator vomsValidator = null;
         try {
-            vomsValidator = new VOMSValidator(certChain);
+            vomsValidator = new VOMSValidator(certChain, new ACValidator(certVerifier));
             vomsValidator.validate();
 
             // get attribute certificates
@@ -424,8 +394,8 @@ public class X509PIP implements PolicyInformationPoint {
             List<FQAN> fqans = attributeCertificate.getListOfFQAN();
             if (fqans != null && !fqans.isEmpty()) {
                 Attribute primaryFqanAttribute = new Attribute();
-                primaryFqanAttribute.setDataType(VOMS_PRIMARY_FQAN);
-                primaryFqanAttribute.setId(Attribute.DT_STRING);
+                primaryFqanAttribute.setId(VOMS_PRIMARY_FQAN);
+                primaryFqanAttribute.setDataType(Attribute.DT_STRING);
                 primaryFqanAttribute.setIssuer(attributeCertificate.getIssuerX509());
                 primaryFqanAttribute.getValues().add(fqans.get(0).getFQAN());
                 log.debug("Extracted attribute: {}", primaryFqanAttribute);
@@ -457,9 +427,7 @@ public class X509PIP implements PolicyInformationPoint {
      * CAs directory.
      */
     public void stop() {
-        if (vomsSupportEnabled && vomsStore != null) {
-            vomsStore.stopRefresh();
-        }
+        // nothing to do
     }
 
     /** {@inheritDoc} */

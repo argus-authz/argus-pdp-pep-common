@@ -82,7 +82,7 @@ public class ServiceMetrics {
     }
 
     /** Adds one to the total number of requests. */
-    public synchronized void incrementTotalServiceRequests() {
+    public void incrementTotalServiceRequests() {
         totalRequests++;
     }
 
@@ -96,7 +96,7 @@ public class ServiceMetrics {
     }
 
     /** Adds one to the total number of requests that have error'ed out. */
-    public synchronized void incrementTotalServiceRequestErrors() {
+    public void incrementTotalServiceRequestErrors() {
         totalErrors++;
     }
 

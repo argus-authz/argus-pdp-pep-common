@@ -45,6 +45,9 @@ public abstract class AbstractIniServiceConfigurationParser<ConfigurationType ex
 
     /** The name of the {@value} property which indicates the port to which the service will bind. */
     public static final String PORT_PROP = "port";
+    
+    /** The name of the {@value} property which indicates that the service port should use SSL instead of plain HTTP. */
+    public static final String SSL_ON_PORT_PROP="enableSSL";
 
     /** The name of the {@value} property which indicates the port the service will listen on for shutdown commands. */
     public static final String SD_PORT_PROP = "shutdownPort";
@@ -52,6 +55,9 @@ public abstract class AbstractIniServiceConfigurationParser<ConfigurationType ex
     /** The name of the {@value} property which indicates the maximum number of requests that will be queued up. */
     public static final String REQUEST_QUEUE_PROP = "requestQueueSize";
 
+    /** Default value of the {@value #SSL_ON_PORT_PROP} property, {@value} . */
+    public static final boolean DEFAULT_SSL_ON_PORT = false;
+    
     /** Default value of the {@value #REQUEST_QUEUE_PROP} property, {@value} . */
     public static final int DEFAULT_REQUEST_QUEUE = 50;
 
@@ -92,8 +98,19 @@ public abstract class AbstractIniServiceConfigurationParser<ConfigurationType ex
      * 
      * @return the value, or 0 if it is not set
      */
-    protected int getPort(Section configSection) throws ConfigurationException {
+    protected int getPort(Section configSection){
         return IniConfigUtil.getInt(configSection, PORT_PROP, 0, 1, 65535);
+    }
+    
+    /**
+     * Gets the value of the {@value #SSL_ON_PORT_PROP} property from the configuration section.
+     *
+     * @param configSection configuration section from which to extract the value
+     * 
+     * @return whether SSL should be enabled on the service port, defaults to {@value #DEFAULT_SSL_ON_PORT}.
+     */
+    protected boolean isSSLEnabled(Section configSection){
+        return IniConfigUtil.getBoolean(configSection, SSL_ON_PORT_PROP, DEFAULT_SSL_ON_PORT);
     }
 
     /**
@@ -103,7 +120,7 @@ public abstract class AbstractIniServiceConfigurationParser<ConfigurationType ex
      * 
      * @return the value, or 0 if is not set
      */
-    protected int getShutdownPort(Section configSection) throws ConfigurationException {
+    protected int getShutdownPort(Section configSection) {
         return IniConfigUtil.getInt(configSection, SD_PORT_PROP, 0, 1, 65535);
     }
 
@@ -147,8 +164,12 @@ public abstract class AbstractIniServiceConfigurationParser<ConfigurationType ex
         configBuilder.setHost(host);
 
         int port = getPort(configSection);
-        log.info("service listening port: {}", (port == 0 ? "default" : port));
+        log.info("service listening port: {}", port);
         configBuilder.setPort(port);
+        
+        boolean sslOn = isSSLEnabled(configSection);
+        log.info("service port using SSL: {}", sslOn);
+        configBuilder.setSslEnabled(sslOn);
 
         int shutdownPort = getShutdownPort(configSection);
         log.info("service shutdown port: {}", (shutdownPort == 0 ? "default" : shutdownPort));
@@ -175,7 +196,7 @@ public abstract class AbstractIniServiceConfigurationParser<ConfigurationType ex
         configBuilder.setSendBufferSize(sendBuffer);
 
         configBuilder.setKeyManager(getX509KeyManager(iniFile.get(SECURITY_SECTION_HEADER)));
-        configBuilder.setTrustManager(getX509TrustManager(iniFile.get(SECURITY_SECTION_HEADER)));
+        configBuilder.setX509TrustMaterial(getX509TrustMaterialStore(iniFile.get(SECURITY_SECTION_HEADER)));
 
         processObligationHandlers(iniFile, configSection, configBuilder);
 

@@ -25,22 +25,25 @@ public abstract class AbstractServiceConfiguration extends AbstractConfiguration
     /** Metrics for this service. */
     private ServiceMetrics serviceMetrics;
 
-    /** The entity ID for the PDP service. */
+    /** The entity ID for the service. */
     private String entityId;
 
-    /** Hostname upon which the PDP service listens. */
+    /** Hostname upon which the service listens. */
     private String hostname;
 
-    /** Port number upon which the PDP service listens. */
+    /** Port number upon which the service listens. */
     private int port;
 
-    /** Port number upon which the PDP shutdown service listens. */
+    /** Whether SSL is enabled on the service port. */
+    private Boolean sslEnabled;
+
+    /** Port number upon which the shutdown service listens. */
     private int shutdownPort;
 
-    /** Max number of requests that will be queued if all PDP processing threads are busy. */
+    /** Max number of requests that will be queued if all processing threads are busy. */
     private int maxRequestQueueSize;
 
-    /** SOAP client used to communicate with the PAP. */
+    /** SOAP client used to communicate with other services. */
     private SOAPClient soapClient;
 
     /**
@@ -53,9 +56,46 @@ public abstract class AbstractServiceConfiguration extends AbstractConfiguration
         serviceMetrics = metrics;
         hostname = null;
         port = 0;
+        sslEnabled = null;
         shutdownPort = 0;
         maxRequestQueueSize = 0;
         soapClient = null;
+    }
+
+    /**
+     * Gets the entity ID of the service.
+     * 
+     * @return entity ID of the service
+     */
+    public String getEntityId() {
+        return entityId;
+    }
+
+    /**
+     * Gets the hostname upon which the service listens.
+     * 
+     * @return hostname upon which the service listens
+     */
+    public String getHostname() {
+        return hostname;
+    }
+
+    /**
+     * Gets the maximum number of requests the will queue up if all of its request processing threads are busy.
+     * 
+     * @return maximum number of requests the will queue up if all of its request processing threads are busy
+     */
+    public int getMaxRequestQueueSize() {
+        return maxRequestQueueSize;
+    }
+
+    /**
+     * Gets the port number upon which the service listens.
+     * 
+     * @return the port number upon which the service listens
+     */
+    public int getPort() {
+        return port;
     }
 
     /**
@@ -68,63 +108,36 @@ public abstract class AbstractServiceConfiguration extends AbstractConfiguration
     }
 
     /**
-     * Gets the entity ID of the PDP service.
+     * Gets the port number upon which the shutdown service listens.
      * 
-     * @return entity ID of the PDP service
-     */
-    public String getEntityId() {
-        return entityId;
-    }
-
-    /**
-     * Gets the hostname upon which the PDP service listens.
-     * 
-     * @return hostname upon which the PDP service listens
-     */
-    public String getHostname() {
-        return hostname;
-    }
-
-    /**
-     * Gets the maximum number of requests the PDP will queue up if all of its request processing threads are busy.
-     * 
-     * @return maximum number of requests the PDP will queue up if all of its request processing threads are busy
-     */
-    public int getMaxRequestQueueSize() {
-        return maxRequestQueueSize;
-    }
-
-    /**
-     * Gets the port number upon which the PDP service listens.
-     * 
-     * @return the port number upon which the PDP service listens
-     */
-    public int getPort() {
-        return port;
-    }
-
-    /**
-     * Gets the port number upon which the PDP shutdown service listens.
-     * 
-     * @return port number upon which the PDP shutdown service listens
+     * @return port number upon which the shutdown service listens
      */
     public int getShutdownPort() {
         return shutdownPort;
     }
 
     /**
-     * Gets the SOAP client used to communicate with the PAP.
+     * Gets the SOAP client used to communicate with other services.
      * 
-     * @return SOAP client used to communicate with the PAP
+     * @return SOAP client used to communicate with other services
      */
     public SOAPClient getSOAPClient() {
         return soapClient;
     }
 
     /**
-     * Sets the entity ID of the PDP service.
+     * Gets whether SSL is enabled on the service port.
      * 
-     * @param id entity ID of the PDP service
+     * @return whether SSL is enabled on the service port
+     */
+    public boolean isSslEnabled() {
+        return sslEnabled == null ? false : sslEnabled;
+    }
+
+    /**
+     * Sets the entity ID of the service.
+     * 
+     * @param id entity ID of the service
      */
     protected synchronized final void setEntityId(String id) {
         if (entityId != null) {
@@ -134,9 +147,9 @@ public abstract class AbstractServiceConfiguration extends AbstractConfiguration
     }
 
     /**
-     * Sets the hostname upon which the PDP service listens.
+     * Sets the hostname upon which the service listens.
      * 
-     * @param newHost hostname upon which the PDP service listens
+     * @param newHost hostname upon which the service listens
      */
     protected synchronized final void setHostname(String newHost) {
         if (hostname != null) {
@@ -146,9 +159,9 @@ public abstract class AbstractServiceConfiguration extends AbstractConfiguration
     }
 
     /**
-     * Sets the maximum number of requests the PDP will queue up if all of its request processing threads are busy.
+     * Sets the maximum number of requests the will queue up if all of its request processing threads are busy.
      * 
-     * @param max maximum number of requests the PDP will queue up if all of its request processing threads are busy
+     * @param max maximum number of requests the will queue up if all of its request processing threads are busy
      */
     protected synchronized final void setMaxRequestQueueSize(int max) {
         if (maxRequestQueueSize != 0) {
@@ -158,9 +171,9 @@ public abstract class AbstractServiceConfiguration extends AbstractConfiguration
     }
 
     /**
-     * Sets the port number upon which the PDP service listens.
+     * Sets the port number upon which the service listens.
      * 
-     * @param newPort number upon which the PDP service listens
+     * @param newPort number upon which the service listens
      */
     protected synchronized final void setPort(int newPort) {
         if (port != 0) {
@@ -170,9 +183,9 @@ public abstract class AbstractServiceConfiguration extends AbstractConfiguration
     }
 
     /**
-     * Sets the port number upon which the PDP shutdown service listens.
+     * Sets the port number upon which the shutdown service listens.
      * 
-     * @param port the shutdownPort to set
+     * @param port port number upon which the shutdown service listens
      */
     protected synchronized final void setShutdownPort(int port) {
         if (shutdownPort != 0) {
@@ -183,14 +196,27 @@ public abstract class AbstractServiceConfiguration extends AbstractConfiguration
     }
 
     /**
-     * Sets the SOAP client used to communicate with the PAP.
+     * Sets the SOAP client used to communicate with other services.
      * 
-     * @param client SOAP client used to communicate with the PAP
+     * @param client SOAP client used to communicate with other services
      */
     protected synchronized final void setSOAPClient(SOAPClient client) {
         if (soapClient != null) {
             throw new IllegalStateException("SOAP client has already been set, it may not be changed");
         }
         soapClient = client;
+    }
+
+    /**
+     * Sets whether SSL is enabled on the service port.
+     * 
+     * @param enabled whether SSL is enabled on the service port
+     */
+    protected synchronized final void setSslEnabled(boolean enabled) {
+        if (sslEnabled != null) {
+            throw new IllegalStateException(
+                    "SSL enablement of service port has already been set, it may not be changed");
+        }
+        sslEnabled = enabled;
     }
 }

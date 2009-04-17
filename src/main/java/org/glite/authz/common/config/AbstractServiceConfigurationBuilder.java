@@ -28,16 +28,19 @@ import org.opensaml.ws.soap.client.SOAPClient;
 public abstract class AbstractServiceConfigurationBuilder<ConfigType extends AbstractServiceConfiguration> extends
         AbstractConfigurationBuilder<ConfigType> {
 
-    /** The entity ID for the PDP service. */
+    /** The entity ID for the service. */
     private String entityId;
 
-    /** Hostname upon which the PDP service listens. */
+    /** Hostname upon which the service listens. */
     private String hostname;
 
-    /** Port number upon which the PDP service listens. */
+    /** Port number upon which the service listens. */
     private int port;
+    
+    /** Whether SSL is enabled on the service port. */
+    private boolean sslEnabled;
 
-    /** Port number upon which the PDP shutdown service listens. */
+    /** Port number upon which the shutdown service listens. */
     private int shutdownPort;
 
     /** Max number of requests that will be queued if all PDP processing threads are busy. */
@@ -72,6 +75,7 @@ public abstract class AbstractServiceConfigurationBuilder<ConfigType extends Abs
         entityId = prototype.getEntityId();
         hostname = prototype.getHostname();
         port = prototype.getPort();
+        sslEnabled = prototype.isSslEnabled();
         shutdownPort = prototype.getShutdownPort();
         maxRequestQueueSize = prototype.getMaxRequestQueueSize();
         soapClient = prototype.getSOAPClient();
@@ -79,18 +83,18 @@ public abstract class AbstractServiceConfigurationBuilder<ConfigType extends Abs
     }
     
     /**
-     * Gets the Entity ID of the PEP daemon.
+     * Gets the Entity ID of the service.
      * 
-     * @return entity ID of the PEP daemon
+     * @return entity ID of the service
      */
     public String getEntityId() {
         return entityId;
     }
 
     /**
-     * Gets the host to which the PEP daemon will bind.
+     * Gets the host to which the service will bind.
      * 
-     * @return host to which the PEP daemon will bind
+     * @return host to which the sevice will bind
      */
     public String getHost() {
         return hostname;
@@ -124,21 +128,30 @@ public abstract class AbstractServiceConfigurationBuilder<ConfigType extends Abs
     }
 
     /**
-     * Gets the port number upon which the PDP shutdown service listens.
+     * Gets the port number upon which the shutdown service listens.
      * 
-     * @return port number upon which the PDP shutdown service listens
+     * @return port number upon which the shutdown service listens
      */
     public int getShutdownPort() {
         return shutdownPort;
     }
 
     /**
-     * Gets the SOAP client used by the daemon to communicate with PDPs.
+     * Gets the SOAP client used by the service to communicate with other services.
      * 
-     * @return SOAP client used by the daemon to communicate with PDPs
+     * @return SOAP client used by the service to communicate with other services
      */
     public SOAPClient getSOAPClient() {
         return soapClient;
+    }
+
+    /**
+     * Gets whether SSL is enabled on the service port.
+     * 
+     * @return whether SSL is enabled on the service port
+     */
+    public boolean isSslEnabled() {
+        return sslEnabled;
     }
 
     /** {@inheritDoc} */
@@ -147,6 +160,7 @@ public abstract class AbstractServiceConfigurationBuilder<ConfigType extends Abs
         config.setEntityId(entityId);
         config.setHostname(hostname);
         config.setPort(port);
+        config.setSslEnabled(sslEnabled);
         config.setShutdownPort(shutdownPort);
         config.setMaxRequestQueueSize(maxRequestQueueSize);
         config.setSOAPClient(soapClient);
@@ -154,18 +168,18 @@ public abstract class AbstractServiceConfigurationBuilder<ConfigType extends Abs
     }
 
     /**
-     * Sets the Entity ID of the PEP daemon.
+     * Sets the Entity ID of the service.
      * 
-     * @param id Entity ID of the PEP daemon
+     * @param id Entity ID of the service
      */
     public void setEntityId(String id) {
         entityId = Strings.safeTrimOrNullString(id);
     }
 
     /**
-     * Sets the hostname or IP address upon which the daemon will listen.
+     * Sets the hostname or IP address upon which the service will listen.
      * 
-     * @param newHost hostname or IP address upon which the daemon will listen
+     * @param newHost hostname or IP address upon which the service will listen
      */
     public void setHost(String newHost) {
         if (Strings.isEmpty(newHost)) {
@@ -175,9 +189,9 @@ public abstract class AbstractServiceConfigurationBuilder<ConfigType extends Abs
     }
 
     /**
-     * Sets the max number of requests the daemon will enqueue.
+     * Sets the max number of requests the service will enqueue.
      * 
-     * @param max max number of requests the daemon will enqueue
+     * @param max max number of requests the service will enqueue
      */
     public void setMaxRequestQueueSize(int max) {
         maxRequestQueueSize = max;
@@ -193,32 +207,41 @@ public abstract class AbstractServiceConfigurationBuilder<ConfigType extends Abs
     }
 
     /**
-     * Sets the port upon which the daemon will listen.
+     * Sets the port upon which the service will listen.
      * 
-     * @param newPort port upon which the daemon will listen
+     * @param newPort port upon which the service will listen
      */
     public void setPort(int newPort) {
         port = newPort;
     }
 
     /**
-     * Sets the port number upon which the PDP shutdown service listens.
+     * Sets the port number upon which the shutdown service listens.
      * 
-     * @param port port number upon which the PDP shutdown service listens
+     * @param port port number upon which the shutdown service listens
      */
     public void setShutdownPort(int port) {
         shutdownPort = port;
     }
-
+    
     /**
-     * Sets the SOAP client used by the daemon to communicate with PDPs.
+     * Sets the SOAP client used by the service to communicate with other services.
      * 
-     * @param client SOAP client used by the daemon to communicate with PDPs
+     * @param client SOAP client used by the service to communicate with other services
      */
     public void setSoapClient(SOAPClient client) {
         if (client == null) {
             throw new IllegalArgumentException("SOAP client may not be null");
         }
         soapClient = client;
+    }
+    
+    /**
+     * Sets whether SSL is enabled on the service port.
+     * 
+     * @param enabled whether SSL is enabled on the service port
+     */
+    public void setSslEnabled(boolean enabled) {
+        sslEnabled = enabled;
     }
 }

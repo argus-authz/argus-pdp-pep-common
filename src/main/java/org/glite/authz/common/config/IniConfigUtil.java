@@ -41,7 +41,7 @@ public class IniConfigUtil {
      * @throws ConfigurationException thrown if the value does not exist
      */
     public static boolean getBoolean(Section configSection, String propName, boolean defaultValue) {
-        String value = getString(configSection, propName, "true");
+        String value = getString(configSection, propName, null);
 
         if ("true".equalsIgnoreCase(value) || "yes".equalsIgnoreCase(value) || "1".equalsIgnoreCase(value)) {
             return true;
