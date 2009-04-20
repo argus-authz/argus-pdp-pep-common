@@ -39,7 +39,7 @@ public class X509PIPIniConfigurationParser implements IniPIPConfigurationParser 
         if (vomsInfoDir != null) {
             log.info("voms info directory: {}", vomsInfoDir);
             try {
-                Files.getReadableFile(vomsInfoDir);
+                Files.getFile(vomsInfoDir, false, true, true, false);
                 acTrustMaterial = new PKIStore(vomsInfoDir, PKIStore.TYPE_VOMSDIR);
             } catch (Exception e) {
                 throw new ConfigurationException("Unable to read VOMS AC validation information", e);
