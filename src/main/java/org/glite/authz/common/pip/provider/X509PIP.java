@@ -358,68 +358,61 @@ public class X509PIP implements PolicyInformationPoint {
 
         log.debug("Extracting VOMS attribute certificate attributes");
         VOMSValidator vomsValidator = null;
-        try {
-            vomsValidator = new VOMSValidator(certChain, new ACValidator(certVerifier));
-            vomsValidator.validate();
+        vomsValidator = new VOMSValidator(certChain, new ACValidator(certVerifier));
+        vomsValidator.validate();
 
-            // get attribute certificates
-            List<VOMSAttribute> attributeCertificates = (List<VOMSAttribute>) vomsValidator.getVOMSAttributes();
-            if (attributeCertificates == null || attributeCertificates.isEmpty()) {
-                return null;
-            }
-
-            if (attributeCertificates.size() > 1) {
-                String errorMsg = "End entity certificate for subject"
-                        + endEntityCert.getSubjectX500Principal().getName(X500Principal.RFC2253)
-                        + " contains more than one attribute certificate";
-                log.error(errorMsg);
-                throw new AuthorizationServiceException(errorMsg);
-            }
-
-            VOMSAttribute attributeCertificate = attributeCertificates.get(0);
-            if (attributeCertificate == null) {
-                return null;
-            }
-
-            HashSet<Attribute> vomsAttributes = new HashSet<Attribute>();
-
-            Attribute voAttribute = new Attribute();
-            voAttribute.setId(VOMS_VO);
-            voAttribute.setDataType(Attribute.DT_STRING);
-            voAttribute.setIssuer(attributeCertificate.getIssuerX509());
-            voAttribute.getValues().add(attributeCertificate.getVO());
-            log.debug("Extracted attribute: {}", voAttribute);
-            vomsAttributes.add(voAttribute);
-
-            List<FQAN> fqans = attributeCertificate.getListOfFQAN();
-            if (fqans != null && !fqans.isEmpty()) {
-                Attribute primaryFqanAttribute = new Attribute();
-                primaryFqanAttribute.setId(VOMS_PRIMARY_FQAN);
-                primaryFqanAttribute.setDataType(Attribute.DT_STRING);
-                primaryFqanAttribute.setIssuer(attributeCertificate.getIssuerX509());
-                primaryFqanAttribute.getValues().add(fqans.get(0).getFQAN());
-                log.debug("Extracted attribute: {}", primaryFqanAttribute);
-                vomsAttributes.add(primaryFqanAttribute);
-
-                // handle rest of the fqans
-                Attribute fqanAttribute = new Attribute();
-                fqanAttribute.setId(VOMS_FQAN);
-                fqanAttribute.setDataType(Attribute.DT_STRING);
-                fqanAttribute.setIssuer(attributeCertificate.getIssuerX509());
-                for (FQAN fqan : fqans) {
-                    fqanAttribute.getValues().add(fqan.getFQAN());
-                }
-                log.debug("Extracted attribute: {}", fqanAttribute);
-                vomsAttributes.add(fqanAttribute);
-            }
-
-            return vomsAttributes;
-        } finally {
-            if (vomsValidator != null) {
-                log.debug("cleaning up VOMS validator");
-                vomsValidator.cleanup();
-            }
+        // get attribute certificates
+        List<VOMSAttribute> attributeCertificates = (List<VOMSAttribute>) vomsValidator.getVOMSAttributes();
+        if (attributeCertificates == null || attributeCertificates.isEmpty()) {
+            return null;
         }
+
+        if (attributeCertificates.size() > 1) {
+            String errorMsg = "End entity certificate for subject"
+                    + endEntityCert.getSubjectX500Principal().getName(X500Principal.RFC2253)
+                    + " contains more than one attribute certificate";
+            log.error(errorMsg);
+            throw new AuthorizationServiceException(errorMsg);
+        }
+
+        VOMSAttribute attributeCertificate = attributeCertificates.get(0);
+        if (attributeCertificate == null) {
+            return null;
+        }
+
+        HashSet<Attribute> vomsAttributes = new HashSet<Attribute>();
+
+        Attribute voAttribute = new Attribute();
+        voAttribute.setId(VOMS_VO);
+        voAttribute.setDataType(Attribute.DT_STRING);
+        voAttribute.setIssuer(attributeCertificate.getIssuerX509());
+        voAttribute.getValues().add(attributeCertificate.getVO());
+        log.debug("Extracted attribute: {}", voAttribute);
+        vomsAttributes.add(voAttribute);
+
+        List<FQAN> fqans = attributeCertificate.getListOfFQAN();
+        if (fqans != null && !fqans.isEmpty()) {
+            Attribute primaryFqanAttribute = new Attribute();
+            primaryFqanAttribute.setId(VOMS_PRIMARY_FQAN);
+            primaryFqanAttribute.setDataType(Attribute.DT_STRING);
+            primaryFqanAttribute.setIssuer(attributeCertificate.getIssuerX509());
+            primaryFqanAttribute.getValues().add(fqans.get(0).getFQAN());
+            log.debug("Extracted attribute: {}", primaryFqanAttribute);
+            vomsAttributes.add(primaryFqanAttribute);
+
+            // handle rest of the fqans
+            Attribute fqanAttribute = new Attribute();
+            fqanAttribute.setId(VOMS_FQAN);
+            fqanAttribute.setDataType(Attribute.DT_STRING);
+            fqanAttribute.setIssuer(attributeCertificate.getIssuerX509());
+            for (FQAN fqan : fqans) {
+                fqanAttribute.getValues().add(fqan.getFQAN());
+            }
+            log.debug("Extracted attribute: {}", fqanAttribute);
+            vomsAttributes.add(fqanAttribute);
+        }
+
+        return vomsAttributes;
     }
 
     /**
