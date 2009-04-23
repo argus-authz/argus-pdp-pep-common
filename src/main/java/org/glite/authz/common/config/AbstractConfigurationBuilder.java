@@ -279,7 +279,7 @@ public abstract class AbstractConfigurationBuilder<ConfigType extends AbstractCo
      * 
      * @param material store containing the trust material used to validate X509 certificates
      */
-    protected void setX509TrustMaterial(PKIStore material) {
+    public void setX509TrustMaterial(PKIStore material) {
         trustMaterialStore = material;
     }
 }
