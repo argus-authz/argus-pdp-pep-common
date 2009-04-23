@@ -181,6 +181,11 @@ public class LazyList<ElementType> implements List<ElementType>, Serializable {
 
         return new ArrayList<ElementType>(delegate);
     }
+    
+    /** {@inheritDoc} */
+    public String toString() {
+        return delegate.toString();
+    }
 
     /** {@inheritDoc} */
     public int hashCode() {

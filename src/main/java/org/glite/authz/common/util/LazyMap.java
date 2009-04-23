@@ -120,6 +120,11 @@ public class LazyMap<KeyType, ValueType> implements Map<KeyType, ValueType>, Ser
 
         return new HashMap<KeyType, ValueType>(delegate);
     }
+    
+    /** {@inheritDoc} */
+    public String toString() {
+        return delegate.toString();
+    }
 
     /** {@inheritDoc} */
     public int hashCode() {
