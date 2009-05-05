@@ -1,5 +1,5 @@
 /*
- * Copyright 2008 EGEE Collaboration
+ * Copyright 2009 EGEE Collaboration
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,18 +13,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.glite.authz.common.obligation.provider.gridmap;
 
-import org.opensaml.util.storage.StorageService;
+import java.util.List;
 
 /**
- *
+ * Maps a subject, described by a set of {@link GridMapKey} objects, to an account.
+ * 
+ * @param <AccountType> an object describing a type of account meaningful to the invoking system
  */
-public class AccountMapper {
+public interface AccountMapper<AccountType> {
 
-    public AccountMapper(String gridmapFilePath, int pollingFrequency, StorageService<String, String> mappingStore, int mappingLifetime){
-        
-    }
-    
-    
+    /** Maps a set of grid map keys to a PosixAccount. */
+    public AccountType mapToAccount(String subjectid, List<? extends GridMapKey> keys);
 }

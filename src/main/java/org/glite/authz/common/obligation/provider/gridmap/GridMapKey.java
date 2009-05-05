@@ -16,7 +16,7 @@
 
 package org.glite.authz.common.obligation.provider.gridmap;
 
-/** A marker interface identified a type of fully qualified name. */
-public interface FullyQualifiedName {
+/** A marker interface identifying a key to a list of IDs within a grid map. */
+public interface GridMapKey {
 
 }

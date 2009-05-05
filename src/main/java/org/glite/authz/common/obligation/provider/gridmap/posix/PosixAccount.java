@@ -14,57 +14,58 @@
  * limitations under the License.
  */
 
-package org.glite.authz.common.obligation.provider.gridmap;
+package org.glite.authz.common.obligation.provider.gridmap.posix;
 
 import java.io.Serializable;
-import java.security.Principal;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import org.glite.authz.common.util.Strings;
 
 /** Representation of a POSIX user account. */
-public class PosixAccount implements Principal, Serializable {
+public class PosixAccount implements Serializable {
 
     /** Serial version UID. */
-    private static final long serialVersionUID = 7986675291837206475L;
+    private static final long serialVersionUID = -4015669522137044854L;
 
     /** Human readable name of the account. */
     private String username;
 
     /** UID of the account. */
-    private String uid;
+    private long uid;
 
     /** GIDs for the account with the primary GID listed first. */
-    private List<String> gids;
+    private List<Long> gids;
+    
+    /** Precomputed string representation of this object. */
+    private String stringRepresentation;
 
     /**
      * Constructor.
      * 
      * @param username user name of the account
      * @param uid uid of the account
-     * @param gids GIDs of the account with the primnary GID listed first
+     * @param gids GIDs of the account with the primary GID listed first
      */
-    public PosixAccount(String username, String uid, List<String> gids) {
+    public PosixAccount(String username, long uid, List<Long> gids) {
         this.username = Strings.safeTrimOrNullString(username);
         if (this.username == null) {
             throw new IllegalArgumentException("Username may not be empty");
         }
 
-        this.uid = Strings.safeTrimOrNullString(uid);
-        if (this.uid == null) {
-            throw new IllegalArgumentException("User UID may not be empty");
+        this.uid = uid;
+        if (gids == null) {
+            this.gids = Collections.EMPTY_LIST;
+        } else {
+            this.gids = Collections.unmodifiableList(new ArrayList<Long>(gids));
         }
-
-        if (gids == null || gids.isEmpty()) {
-            throw new IllegalArgumentException("User GIDs may not be empty");
-        }
-        this.gids = new ArrayList<String>();
-        this.gids.addAll(gids);
+        
+        computeString();
     }
 
     /** {@inheritDoc} */
-    public String getName() {
+    public String getUsername() {
         return username;
     }
 
@@ -73,7 +74,7 @@ public class PosixAccount implements Principal, Serializable {
      * 
      * @return UID for the user
      */
-    public String getUID() {
+    public long getUID() {
         return uid;
     }
 
@@ -82,13 +83,13 @@ public class PosixAccount implements Principal, Serializable {
      * 
      * @return GIDs for the user
      */
-    public List<String> getGIDs() {
+    public List<Long> getGIDs() {
         return gids;
     }
 
     /** {@inheritDoc} */
     public int hashCode() {
-        return uid.hashCode();
+        return username.hashCode();
     }
 
     /** {@inheritDoc} */
@@ -102,7 +103,7 @@ public class PosixAccount implements Principal, Serializable {
         }
 
         if (obj instanceof PosixAccount) {
-            return uid.equals(((PosixAccount) obj).getUID());
+            return uid == ((PosixAccount) obj).getUID();
         }
 
         return false;
@@ -110,7 +111,17 @@ public class PosixAccount implements Principal, Serializable {
 
     /** {@inheritDoc} */
     public String toString() {
-        // TODO Auto-generated method stub
-        return super.toString();
+        return stringRepresentation;
+    }
+    
+    /** Precomputes a string representation of this object. */
+    private void computeString(){
+        StringBuilder string = new StringBuilder("PosixAccount");
+        string.append("{");
+        string.append("name:").append(username).append(", ");
+        string.append("uid:").append(uid).append(", ");
+        string.append("gid:").append(gids);
+        string.append("}");
+        stringRepresentation = string.toString(); 
     }
 }
