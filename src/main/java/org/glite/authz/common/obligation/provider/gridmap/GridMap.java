@@ -25,11 +25,6 @@ import net.jcip.annotations.ThreadSafe;
  * A grid map maps a given target to a set of IDs. It consists of an ordered list of {@link Entry} objects and a
  * collection of {@link GridMapKeyMatchFunction}. The {@link GridMapKeyMatchFunction} are indexed by the class types of
  * the {@link Entry#key} types.
- * 
- * A given target activates a mapping if the {@link GridMapKeyMatchFunction} associate with an {@link Entry} indicates
- * that the target matches the {@link Entry#key}. A mapping can stop at the first match, at which point only the IDs
- * associated with that particular entry are returned, or can continue through all entries. In the later case the list
- * of returned IDs are is the concatenated list of IDs from each match. Duplicates IDs are not removed.
  */
 @ThreadSafe
 public interface GridMap {
@@ -48,16 +43,6 @@ public interface GridMap {
      * @return registered {@link GridMapKeyMatchFunction}
      */
     public Map<Class<? extends GridMapKey>, GridMapKeyMatchFunction> getKeyMatchFunctions();
-
-    /**
-     * Maps a given target to a set of IDs.
-     * 
-     * @param key the target to map
-     * @param matchMultiple whether to allow more than one match
-     * 
-     * @return the list of IDs to which the given target maps
-     */
-    public List<String> map(GridMapKey key, boolean matchMultiple);
 
     /** Represents an entry in a grid map file. */
     @ThreadSafe

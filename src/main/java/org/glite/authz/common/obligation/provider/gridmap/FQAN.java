@@ -22,6 +22,7 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import org.glite.authz.common.obligation.provider.gridmap.GridMap.GridMapKeyMatchFunction;
+import org.glite.authz.common.util.LazyList;
 import org.glite.authz.common.util.Strings;
 
 /** A FQAN (fully qualified attribute name). */
@@ -58,7 +59,7 @@ public class FQAN implements GridMapKey {
             }
             attributes = Collections.unmodifiableMap(modifiableAttributes);
         } else {
-            attributes = Collections.EMPTY_MAP;
+            attributes = Collections.emptyMap();
         }
     }
 
@@ -115,8 +116,8 @@ public class FQAN implements GridMapKey {
         if (obj == this) {
             return true;
         }
-        
-        if(obj == null){
+
+        if (obj == null) {
             return false;
         }
 
@@ -147,7 +148,7 @@ public class FQAN implements GridMapKey {
          * @param attributeId ID of the attribute
          * @param attributeValue value of the attribute
          */
-        private Attribute(String attributeId, String attributeValue) {
+        public Attribute(String attributeId, String attributeValue) {
             id = attributeId;
             value = attributeValue;
         }
@@ -226,16 +227,22 @@ public class FQAN implements GridMapKey {
                 FQAN targetFQAN = (FQAN) target;
                 FQAN candidateFQAN = (FQAN) candidate;
 
-                String targetGroupIDRegex = targetFQAN.getAttributeGroupId().replace("*", ".+");
-                if (!candidateFQAN.getAttributeGroupId().matches(targetGroupIDRegex)) {
-                    return false;
+                if(targetFQAN.getAttributeGroupId().endsWith("*")){
+                    String targetGroupIDRegex = targetFQAN.getAttributeGroupId().replace("*", ".+");
+                    if (!candidateFQAN.getAttributeGroupId().matches(targetGroupIDRegex)) {
+                        return false;
+                    }
+                }else{
+                    if(!candidateFQAN.getAttributeGroupId().startsWith(targetFQAN.getAttributeGroupId())){
+                        return false;
+                    }
                 }
 
                 Attribute candidateAttribute;
                 for (Attribute requiredAttribute : targetFQAN.getAttributes()) {
                     candidateAttribute = candidateFQAN.getAttributeById(requiredAttribute.getId());
-                    if(candidateAttribute == null){
-                        if(requiredAttribute.getValue().equals(Attribute.NULL_VALUE)){
+                    if (candidateAttribute == null) {
+                        if (requiredAttribute.getValue().equals(Attribute.NULL_VALUE)) {
                             return true;
                         }
                         return false;
@@ -272,5 +279,51 @@ public class FQAN implements GridMapKey {
             String valueMatch = target.getValue().replace("*", ".+");
             return candidate.getValue().matches(valueMatch);
         }
+    }
+    
+    /**
+     * Parses an FQAN.
+     * 
+     * @param fqanString the FQAN string to parse
+     * 
+     * @return the FQAN
+     * 
+     * @throws IllegalKeyFormatException thrown if the FQAN is not valid either because its format is wrong or one of
+     *             its components contains invalid characters
+     */
+    public static FQAN parseFQAN(String fqanString) throws IllegalKeyFormatException {
+        String trimmedStr = Strings.safeTrimOrNullString(fqanString);
+        if (trimmedStr == null) {
+            throw new NullPointerException("FQAN string may not be null or empty");
+        }
+
+        if (!trimmedStr.startsWith("/")) {
+            throw new IllegalKeyFormatException("FQAN " + trimmedStr + " does not start with a '/'");
+        }
+
+        String[] components = fqanString.split("/");
+        String component;
+        boolean encounteredAttribute = false;
+        StringBuilder groupIdBuilder = new StringBuilder();
+        LazyList<Attribute> attributes = new LazyList<Attribute>();
+        // we start with 1 since nothing precedes the first '/' in a FQAN
+        for (int i = 1; i < components.length; i++) {
+            component = components[i];
+            if (!encounteredAttribute && component.contains("=")) {
+                encounteredAttribute = true;
+            }
+
+            if (!encounteredAttribute) {
+                if (!component.matches(FQAN.fqanComponentCharactersRegex)) {
+                    throw new IllegalKeyFormatException("FQAN" + fqanString
+                            + " contains an invalid character in the group ID component " + component);
+                }
+                groupIdBuilder.append("/").append(component);
+            } else {
+                attributes.add(Attribute.parse(component));
+            }
+        }
+
+        return new FQAN(groupIdBuilder.toString(), attributes);
     }
 }

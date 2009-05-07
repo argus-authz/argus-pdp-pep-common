@@ -103,13 +103,14 @@ public abstract class AbstractIniConfigurationParser<ConfigurationType extends A
      * Processes each individual Obligation Handler configuration section.
      * 
      * @param ohConfig the obligation handler configuration section
+     * @param configBuilder configuration builder currently being populated
      * 
      * @return the obligation handler configured with the information provided in the configuration section
      * 
      * @throws ConfigurationException throw if a obligation handler can not be instantiated
      */
     @SuppressWarnings("unchecked")
-    private AbstractObligationHandler buildObligationHandler(Section ohConfig) throws ConfigurationException {
+    private AbstractObligationHandler buildObligationHandler(Section ohConfig, AbstractConfigurationBuilder<?> configBuilder) throws ConfigurationException {
         String parserClassName = IniConfigUtil.getString(ohConfig, IniOHConfigurationParser.PARSER_CLASS_PROP);
         if (parserClassName == null) {
             String errorMsg = "Obligation configuration section " + ohConfig.getName() + " does not contain a valid "
@@ -122,7 +123,7 @@ public abstract class AbstractIniConfigurationParser<ConfigurationType extends A
             Class<IniOHConfigurationParser> parserClass = (Class<IniOHConfigurationParser>) AbstractIniServiceConfigurationParser.class
                     .getClassLoader().loadClass(parserClassName);
             IniOHConfigurationParser parser = parserClass.getConstructor().newInstance();
-            return parser.parse(ohConfig);
+            return parser.parse(ohConfig, configBuilder);
         } catch (Exception e) {
             throw new ConfigurationException("Unable to configure Obligation Handler " + ohConfig.getName(), e);
         }
@@ -333,7 +334,7 @@ public abstract class AbstractIniConfigurationParser<ConfigurationType extends A
                 }
                 if (obligationHandlerName != null) {
                     configBuilder.getObligationService().addObligationhandler(
-                            buildObligationHandler(iniFile.get(obligationHandlerName)));
+                            buildObligationHandler(iniFile.get(obligationHandlerName), configBuilder));
                     log.info("Added obligation handler: {}", obligationHandlerName);
                 }
             }

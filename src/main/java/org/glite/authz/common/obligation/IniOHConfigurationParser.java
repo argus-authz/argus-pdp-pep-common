@@ -18,6 +18,7 @@ package org.glite.authz.common.obligation;
 
 import net.jcip.annotations.ThreadSafe;
 
+import org.glite.authz.common.config.AbstractConfigurationBuilder;
 import org.glite.authz.common.config.ConfigurationException;
 import org.ini4j.Ini.Section;
 
@@ -25,21 +26,22 @@ import org.ini4j.Ini.Section;
 @ThreadSafe
 public interface IniOHConfigurationParser {
 
-    /** "parserClass" configuration property name. */
+    /** The name of the {@value} property which gives the fully qualified class name of the obligation handler configuration parser. */
     public static final String PARSER_CLASS_PROP = "parserClass";
-
-    /** "id" configuration property name. */
-    public static final String ID_PROP = "id";
+    
+    /** The name of the {@value} property which gives the positive integer precedence of the handler. */
+    public static final String PRECEDENCE_PROP = "precedence";
 
     /**
      * Creates a {@link AbstractObligationHandler} from the information within the {@link Section}.
      * 
      * @param iniConfig the INI configuration for the obligation handler
+     * @param configBuilder the configuration builder currently being populated
      * 
      * @return the obligation handler
      * 
      * @throws ConfigurationException thrown if there is a problem creating the obligation handler from the given
      *             information
      */
-    public AbstractObligationHandler parse(Section iniConfig) throws ConfigurationException;
+    public AbstractObligationHandler parse(Section iniConfig, AbstractConfigurationBuilder<?> configBuilder) throws ConfigurationException;
 }

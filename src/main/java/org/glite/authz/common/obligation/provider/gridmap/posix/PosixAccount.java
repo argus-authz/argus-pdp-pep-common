@@ -56,7 +56,7 @@ public class PosixAccount implements Serializable {
 
         this.uid = uid;
         if (gids == null) {
-            this.gids = Collections.EMPTY_LIST;
+            this.gids = Collections.emptyList();
         } else {
             this.gids = Collections.unmodifiableList(new ArrayList<Long>(gids));
         }

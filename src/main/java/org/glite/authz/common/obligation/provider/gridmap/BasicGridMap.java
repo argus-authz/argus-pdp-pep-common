@@ -16,22 +16,15 @@
 
 package org.glite.authz.common.obligation.provider.gridmap;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
 import net.jcip.annotations.ThreadSafe;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 /** A very basic implementation of a {@link GridMap}. */
 @ThreadSafe
 public class BasicGridMap implements GridMap {
-
-    /** Class logger. */
-    private static Logger log = LoggerFactory.getLogger(BasicGridMap.class);
 
     /** An unmodifiable list of entries representing a grid map. */
     private List<Entry> mapEntries;
@@ -68,37 +61,5 @@ public class BasicGridMap implements GridMap {
      */
     public Map<Class<? extends GridMapKey>, GridMapKeyMatchFunction> getKeyMatchFunctions() {
         return keyMatchFunctions;
-    }
-
-    /**
-     * Maps a given target to a set of IDs.
-     * 
-     * @param key the target to map
-     * @param matchMultiple whether to allow more than one match
-     * 
-     * @return the list of IDs to which the given target maps
-     */
-    public List<String> map(GridMapKey key, boolean matchMultiple) {
-        ArrayList<String> ids = new ArrayList<String>();
-
-        boolean matchedOne = false;
-        GridMapKeyMatchFunction matchFunction;
-        for (Entry mapEntry : mapEntries) {
-            if (matchedOne && !matchMultiple) {
-                break;
-            }
-            matchFunction = keyMatchFunctions.get(mapEntry.getKey().getClass());
-            if (matchFunction == null) {
-                log.warn("No grid map key matching function for key of type " + mapEntry.getKey().getClass());
-                continue;
-            }
-
-            if (matchFunction.matches(mapEntry.getKey(), key)) {
-                ids.addAll(mapEntry.getIds());
-                matchedOne = true;
-            }
-        }
-
-        return ids;
     }
 }

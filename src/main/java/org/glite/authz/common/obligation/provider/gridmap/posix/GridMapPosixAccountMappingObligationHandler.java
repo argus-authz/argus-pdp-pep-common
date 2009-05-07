@@ -16,21 +16,25 @@
 
 package org.glite.authz.common.obligation.provider.gridmap.posix;
 
-import java.io.File;
-import java.io.IOException;
-import java.util.Vector;
-import java.util.concurrent.ConcurrentMap;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
 
+import org.glite.authz.common.model.Attribute;
 import org.glite.authz.common.model.AttributeAssignment;
 import org.glite.authz.common.model.Obligation;
 import org.glite.authz.common.model.Request;
 import org.glite.authz.common.model.Result;
+import org.glite.authz.common.model.Subject;
 import org.glite.authz.common.obligation.AbstractObligationHandler;
 import org.glite.authz.common.obligation.ObligationProcessingException;
+import org.glite.authz.common.obligation.provider.gridmap.AccountMapper;
+import org.glite.authz.common.obligation.provider.gridmap.FQAN;
 import org.glite.authz.common.obligation.provider.gridmap.GridMapKey;
-import org.glite.authz.common.util.Files;
+import org.glite.authz.common.pip.provider.X509PIP;
 import org.glite.authz.common.util.Strings;
-import org.opensaml.util.storage.StorageService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * An obligation handler that creates a mapping between the subject ID of the request and a POSIX account (UID/GIDs).
@@ -58,24 +62,21 @@ public class GridMapPosixAccountMappingObligationHandler extends AbstractObligat
 
     /** The URI, {@value}, of the GID obligation attribute. */
     public static final String GID_ATTRIB_ID = "http://authz-interop.org/xacml/attribute/posix-gid";
-
     
-    private StorageService<String, String> storageService;
+    /** Class logger. */
+    private final Logger log = LoggerFactory.getLogger(GridMapPosixAccountMappingObligationHandler.class);
 
-    private File gridmapFile;
-
-    private ConcurrentMap<GridMapKey, Vector<String>> gridmap;
+    /** Service used to map subject information in to a {@link PosixAccount}. */
+    private AccountMapper<PosixAccount> accountMapper;
 
     /**
      * Constructor. Obligation has the lowest precedence
      * 
      * @param obligationId ID of the handled obligation
-     * @param gridMapFilePath the path to the gridmap file
-     * @param store the backing store for the subject to POSIX account mapping
+     * @param mapper service used to map subject information in to a {@link PosixAccount}
      */
-    protected GridMapPosixAccountMappingObligationHandler(String obligationId, String gridMapFilePath,
-            StorageService<String, String> store) {
-        this(obligationId, Integer.MIN_VALUE, gridMapFilePath, store);
+    public GridMapPosixAccountMappingObligationHandler(String obligationId, AccountMapper<PosixAccount> mapper) {
+        this(obligationId, Integer.MIN_VALUE, mapper);
     }
 
     /**
@@ -83,32 +84,88 @@ public class GridMapPosixAccountMappingObligationHandler extends AbstractObligat
      * 
      * @param obligationId ID of the handled obligation
      * @param handlerPrecedence precedence of this handler
-     * @param gridMapFilePath the path to the gridmap file
-     * @param store the backing store for the subject to POSIX account mapping
+     * @param mapper service used to map subject information in to a {@link PosixAccount}
      */
-    protected GridMapPosixAccountMappingObligationHandler(String obligationId, int handlerPrecedence,
-            String gridMapFilePath, StorageService<String, String> store) {
+    public GridMapPosixAccountMappingObligationHandler(String obligationId, int handlerPrecedence,
+            AccountMapper<PosixAccount> mapper) {
         super(obligationId, handlerPrecedence);
 
-        try {
-            gridmapFile = Files.getReadableFile(gridMapFilePath);
-        } catch (IOException e) {
-            throw new IllegalArgumentException(e.getMessage());
+        if(mapper == null){
+            throw new IllegalArgumentException("Account mapper may not be null");
         }
-
-        if (store == null) {
-            throw new IllegalArgumentException("Storage service may not be null");
-        }
-        storageService = store;
+        accountMapper = mapper;
     }
 
     /** {@inheritDoc} */
     public void evaluateObligation(Request request, Result result) throws ObligationProcessingException {
-
-        
-        
+        List<GridMapKey> mappingKeys = getMappingKeys(request);
+        String subjectId = mappingKeys.get(0).toString();
+        PosixAccount mappedAccount = accountMapper.mapToAccount(subjectId, mappingKeys);
+        if(mappedAccount != null){
+            addUIDGIDObligations(result, mappedAccount);
+        }
     }
 
+    /**
+     * Extracts the subject ID, primary FQAN, and second FQANs from the request's Subject.
+     * 
+     * @param request the current request
+     * 
+     * @return the list of keys to be mapped to a UID or GID
+     */
+    private List<GridMapKey> getMappingKeys(Request request) {
+        ArrayList<GridMapKey> mappingKeys = new ArrayList<GridMapKey>();
+        
+        Set<Subject> subjects = request.getSubjects();
+        if(subjects.size() != 1){
+            log.warn("This obligation only operates on requests containing a single subject, this request contained {} subjects", subjects.size());
+            return mappingKeys;
+        }
+        
+        Attribute subjectId = null;
+        Attribute primaryFQAN = null;
+        Attribute secondaryFQANs = null;
+        for(Attribute attribute : subjects.iterator().next().getAttributes()){
+            if(attribute.getId().equals(Attribute.ID_SUB_ID)){
+                if(subjectId != null){
+                    log.warn("More than one {} attribute present in Subject, only the first will be used", Attribute.ID_SUB_ID);
+                    continue;
+                }
+                subjectId = attribute;
+            }else if(attribute.getId().equals(X509PIP.VOMS_PRIMARY_FQAN)){
+                if(subjectId != null){
+                    log.warn("More than one {} attribute present in Subject, only the first will be used", X509PIP.VOMS_PRIMARY_FQAN);
+                    continue;
+                }
+                primaryFQAN = attribute;
+            }else if(attribute.getId().equals(X509PIP.VOMS_FQAN)){
+                if(subjectId != null){
+                    log.warn("More than one {} attribute present in Subject, only the first will be used", X509PIP.VOMS_FQAN);
+                    continue;
+                }
+                secondaryFQANs = attribute;
+            }
+        }
+        
+        if(primaryFQAN != null && primaryFQAN.getValues().size() > 0){
+            mappingKeys.add(FQAN.parseFQAN((String)primaryFQAN.getValues().iterator().next()));
+        }
+        
+        if(secondaryFQANs != null && secondaryFQANs.getValues().size() > 0){
+            for(Object value : secondaryFQANs.getValues()){
+                mappingKeys.add(FQAN.parseFQAN((String) value));
+            }
+        }
+        
+        return mappingKeys;
+    }
+    
+    /**
+     * Adds the UID/GID and username obligations to a result.
+     * 
+     * @param result current result
+     * @param account account whose information will be added as obligations
+     */
     protected void addUIDGIDObligations(Result result, PosixAccount account) {
         Obligation mappingOb = null;
         for (Obligation ob : result.getObligations()) {

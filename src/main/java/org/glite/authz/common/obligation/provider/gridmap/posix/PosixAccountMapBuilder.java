@@ -27,10 +27,10 @@ import java.util.TimerTask;
 import net.jcip.annotations.NotThreadSafe;
 
 import org.glite.authz.common.obligation.provider.gridmap.BasicGridMap;
-import org.glite.authz.common.obligation.provider.gridmap.X509DNFQANGridMapParser;
 import org.glite.authz.common.obligation.provider.gridmap.GridMap;
 import org.glite.authz.common.obligation.provider.gridmap.GridMapKey;
 import org.glite.authz.common.obligation.provider.gridmap.GridmapParser;
+import org.glite.authz.common.obligation.provider.gridmap.X509DNFQANGridMapParser;
 import org.glite.authz.common.util.Files;
 import org.opensaml.util.storage.StorageService;
 import org.slf4j.Logger;
@@ -58,8 +58,8 @@ public class PosixAccountMapBuilder {
     /** Parser used to parse the GID grid map file. */
     private GridmapParser gidGridmapParser;
 
-    /** Service used to store mappings to a posix account. */
-    private StorageService<String, PosixAccount> storageService;
+    /** Service used to store mappings to a POSIX account. */
+    private StorageService storageService;
 
     /**
      * Lifetime, in minutes, of account mappings. Defaults to a value of zero, meaning the account mappings do not
@@ -97,6 +97,24 @@ public class PosixAccountMapBuilder {
         return mapper;
     }
 
+    /**
+     * Gets the lifetime, in minutes, of account mappings.
+     * 
+     * @return the lifetime, in minutes, of account mappings.
+     */
+    public int getAccountMappingLifetime() {
+        return accountMappingLifetime;
+    }
+    
+    /**
+     * Sets the the lifetime, in minutes, of account mappings. A value of zero means that an account never expires.
+     * 
+     * @param lifetime the lifetime, in minutes, of account mappings.
+     */
+    public void setAccountMappingLifetime(int lifetime) {
+        accountMappingLifetime = lifetime;
+    }
+    
     /**
      * Gets the period, in minutes, that grid map files are checked for updates.
      * 
@@ -156,7 +174,7 @@ public class PosixAccountMapBuilder {
      * 
      * @return parser used to parse the UID grid map file
      */
-    public GridmapParser getUidGridMapParse() {
+    public GridmapParser getUidGridMapParser() {
         return uidGridmapParser;
     }
 
@@ -165,7 +183,7 @@ public class PosixAccountMapBuilder {
      * 
      * @param parser parser used to parse the UID grid map file
      */
-    public void setUidGridMapParse(GridmapParser parser) {
+    public void setUidGridMapParser(GridmapParser parser) {
         uidGridmapParser = parser;
     }
 
@@ -210,7 +228,7 @@ public class PosixAccountMapBuilder {
      * 
      * @return service used to store account mappings
      */
-    public StorageService<String, PosixAccount> getStorageService() {
+    public StorageService getStorageService() {
         return storageService;
     }
 
@@ -219,7 +237,7 @@ public class PosixAccountMapBuilder {
      * 
      * @param service service used to store account mappings
      */
-    public void setStorageService(StorageService<String, PosixAccount> service) {
+    public void setStorageService(StorageService service) {
         storageService = service;
     }
 
@@ -282,12 +300,6 @@ public class PosixAccountMapBuilder {
         public List<Entry> getMapEntries() {
             return delegate.getMapEntries();
         }
-
-        /** {@inheritDoc} */
-        public List<String> map(GridMapKey key, boolean matchMultiple) {
-            return delegate.map(key, matchMultiple);
-        }
-
     }
 
     /** A task that refreshes a grid map file if it has been updated since the last time. */

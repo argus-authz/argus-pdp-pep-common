@@ -27,10 +27,8 @@ import java.util.Vector;
 
 import javax.security.auth.x500.X500Principal;
 
-import org.glite.authz.common.obligation.provider.gridmap.FQAN.Attribute;
 import org.glite.authz.common.obligation.provider.gridmap.GridMap.Entry;
 import org.glite.authz.common.obligation.provider.gridmap.GridMap.GridMapKeyMatchFunction;
-import org.glite.authz.common.util.LazyList;
 import org.glite.authz.common.util.Strings;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -92,7 +90,7 @@ public class X509DNFQANGridMapParser implements GridmapParser {
 
         GridMapKey key;
         if (isFQAN(name)) {
-            key = parseFQAN(name);
+            key = FQAN.parseFQAN(name);
         } else {
             if (name.startsWith("/")) {
                 key = parseGridDN(name);
@@ -125,52 +123,6 @@ public class X509DNFQANGridMapParser implements GridmapParser {
         return false;
     }
 
-    /**
-     * Parses an FQAN.
-     * 
-     * @param fqanString the FQAN string to parse
-     * 
-     * @return the FQAN
-     * 
-     * @throws IllegalKeyFormatException thrown if the FQAN is not valid either because its format is wrong or one of
-     *             its components contains invalid characters
-     */
-    private FQAN parseFQAN(String fqanString) throws IllegalKeyFormatException {
-        String trimmedStr = Strings.safeTrimOrNullString(fqanString);
-        if (trimmedStr == null) {
-            throw new NullPointerException("FQAN string may not be null or empty");
-        }
-
-        if (!trimmedStr.startsWith("/")) {
-            throw new IllegalKeyFormatException("FQAN " + trimmedStr + " does not start with a '/'");
-        }
-
-        String[] components = fqanString.split("/");
-        String component;
-        boolean encounteredAttribute = false;
-        StringBuilder groupIdBuilder = new StringBuilder();
-        LazyList<Attribute> attributes = new LazyList<Attribute>();
-        // we start with 1 since nothing precedes the first '/' in a FQAN
-        for (int i = 1; i < components.length; i++) {
-            component = components[i];
-            if (!encounteredAttribute && component.contains("=")) {
-                encounteredAttribute = true;
-            }
-
-            if (!encounteredAttribute) {
-                if (!component.matches(FQAN.fqanComponentCharactersRegex)) {
-                    throw new IllegalKeyFormatException("FQAN" + fqanString
-                            + " contains an invalid character in the group ID component " + component);
-                }
-                groupIdBuilder.append("/").append(component);
-            } else {
-                attributes.add(Attribute.parse(component));
-            }
-        }
-
-        return new FQAN(groupIdBuilder.toString(), attributes);
-    }
-
     private X509DistinguishedName parseGridDN(String dnString) {
         String[] components = dnString.split("/");
         
@@ -193,7 +145,7 @@ public class X509DNFQANGridMapParser implements GridmapParser {
      * 
      * @return the unescaped string
      * 
-     * @throws UnknownFormatConversionException thrown if an unsuported escape sequence is found
+     * @throws UnknownFormatConversionException thrown if an unsupported escape sequence is found
      */
     private String unescapeString(String string) throws UnknownFormatConversionException {
         char[] stringChars = string.toCharArray();
@@ -257,7 +209,7 @@ public class X509DNFQANGridMapParser implements GridmapParser {
                     break;
                 default:
                     throw new UnknownFormatConversionException("Escape sequence '\\" + stringChars[i + 1]
-                            + " is not supported");
+                            + " in string '" + string + "' is not supported");
             }
         }
 
