@@ -60,7 +60,7 @@ public abstract class AbstractServiceConfigurationBuilder<ConfigType extends Abs
         shutdownPort = 0;
         maxRequestQueueSize = 0;
         soapClient = null;
-        obligationService = null;
+        obligationService = new ObligationService();
     }
     
     /**

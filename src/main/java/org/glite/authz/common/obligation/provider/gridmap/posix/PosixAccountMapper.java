@@ -107,7 +107,7 @@ public class PosixAccountMapper implements AccountMapper<PosixAccount> {
             // First key determines the account to which we map
             Passwd account = mapToPosixAccount(subjectid, keys);
             if (account == null) {
-                log.debug("Unable to map subject {} to a POSIX account");
+                log.debug("Unable to map subject {} to a POSIX account", subjectid);
                 return null;
             }
 

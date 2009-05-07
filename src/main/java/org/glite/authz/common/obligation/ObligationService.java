@@ -33,10 +33,16 @@ import net.jcip.annotations.ThreadSafe;
 import org.glite.authz.common.model.Obligation;
 import org.glite.authz.common.model.Request;
 import org.glite.authz.common.model.Result;
+import org.mortbay.log.Log;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /** A service for evaluating the obligations within a context. */
 @ThreadSafe
 public class ObligationService {
+    
+    /** Class logger. */
+    private final Logger log = LoggerFactory.getLogger(ObligationService.class);
 
     /** Read/write lock around the registered obligation handlers. */
     private ReentrantReadWriteLock rwLock;
@@ -138,11 +144,13 @@ public class ObligationService {
         try {
             Iterator<AbstractObligationHandler> handlerItr = obligationHandlers.iterator();
             Map<String, Obligation> effectiveObligations = preprocessObligations(result);
+            log.debug("Obligations in effect for this result: {}", effectiveObligations.keySet());
 
             AbstractObligationHandler handler;
             while (handlerItr.hasNext()) {
                 handler = handlerItr.next();
                 if (effectiveObligations.containsKey(handler.getObligationId())) {
+                    log.debug("Processing obligation {}", handler.getObligationId());
                     handler.evaluateObligation(request, result);
                 }
             }

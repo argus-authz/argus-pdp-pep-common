@@ -79,7 +79,7 @@ public class IniGridMapPosixAccountMappingOHConfigurationParser implements IniOH
         accountMapperBuilder.setUidGridMapParser(gridMapParser);
 
         try {
-            return new GridMapPosixAccountMappingObligationHandler(iniConfig.getName(), precendence,
+            return new GridMapPosixAccountMappingObligationHandler(GridMapPosixAccountMappingObligationHandler.MAPPING_OB_ID, precendence,
                     accountMapperBuilder.build());
         } catch (IOException e) {
             throw new ConfigurationException("Process grid map files", e);

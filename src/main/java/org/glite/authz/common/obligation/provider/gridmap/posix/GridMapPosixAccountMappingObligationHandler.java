@@ -17,8 +17,11 @@
 package org.glite.authz.common.obligation.provider.gridmap.posix;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
+
+import javax.security.auth.x500.X500Principal;
 
 import org.glite.authz.common.model.Attribute;
 import org.glite.authz.common.model.AttributeAssignment;
@@ -31,6 +34,7 @@ import org.glite.authz.common.obligation.ObligationProcessingException;
 import org.glite.authz.common.obligation.provider.gridmap.AccountMapper;
 import org.glite.authz.common.obligation.provider.gridmap.FQAN;
 import org.glite.authz.common.obligation.provider.gridmap.GridMapKey;
+import org.glite.authz.common.obligation.provider.gridmap.X509DistinguishedName;
 import org.glite.authz.common.pip.provider.X509PIP;
 import org.glite.authz.common.util.Strings;
 import org.slf4j.Logger;
@@ -99,10 +103,20 @@ public class GridMapPosixAccountMappingObligationHandler extends AbstractObligat
     /** {@inheritDoc} */
     public void evaluateObligation(Request request, Result result) throws ObligationProcessingException {
         List<GridMapKey> mappingKeys = getMappingKeys(request);
+        if(mappingKeys == null || mappingKeys.isEmpty()){
+            log.warn("Unable to evaluate obligation, request did not contain appropriate information");
+        }
         String subjectId = mappingKeys.get(0).toString();
         PosixAccount mappedAccount = accountMapper.mapToAccount(subjectId, mappingKeys);
         if(mappedAccount != null){
             addUIDGIDObligations(result, mappedAccount);
+        }
+        
+        Iterator<Obligation> obligationItr = result.getObligations().iterator();
+        while(obligationItr.hasNext()){
+            if(obligationItr.next().getId().equals(GridMapPosixAccountMappingObligationHandler.MAPPING_OB_ID)){
+                obligationItr.remove();
+            }
         }
     }
 
@@ -145,6 +159,10 @@ public class GridMapPosixAccountMappingObligationHandler extends AbstractObligat
                 }
                 secondaryFQANs = attribute;
             }
+        }
+        
+        if(subjectId != null && subjectId.getValues().size() > 0){
+            mappingKeys.add(new X509DistinguishedName(new X500Principal((String)subjectId.getValues().iterator().next())));
         }
         
         if(primaryFQAN != null && primaryFQAN.getValues().size() > 0){

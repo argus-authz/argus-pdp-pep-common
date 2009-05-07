@@ -85,14 +85,17 @@ public class PosixAccountMapBuilder {
 
         PosixAccountMapper mapper;
         if (accountMappingLifetime > 1) {
-            mapper = new PosixAccountMapper(uidGridMap, gidGridMap, storageService, accountMappingLifetime * 60 * 1000);
+            taskScheduler = new Timer(true);
+            GridMapProxy uidGridMapProxy = new GridMapProxy(parser, uidGridMap);
+            GridMapProxy gidGridMapProxy = new GridMapProxy(parser, gidGridMap);
+            
+            RefreshGridMapTask refreshTask = new RefreshGridMapTask(uidGridMapFilePath, uidGridMapProxy, gidGridMapFilePath, gidGridMapProxy);
+            taskScheduler.scheduleAtFixedRate(refreshTask, refreshPeriod, refreshPeriod);
+            
+            mapper = new PosixAccountMapper(uidGridMapProxy, gidGridMapProxy, storageService, accountMappingLifetime * 60 * 1000);
         } else {
             mapper = new PosixAccountMapper(uidGridMap, gidGridMap, storageService);
         }
-
-        RefreshGridMapTask refreshTask = new RefreshGridMapTask(new GridMapProxy(parser, uidGridMap), new GridMapProxy(
-                parser, gidGridMap));
-        taskScheduler.scheduleAtFixedRate(refreshTask, refreshPeriod, refreshPeriod);
 
         return mapper;
     }
@@ -325,8 +328,11 @@ public class PosixAccountMapBuilder {
 
         private GridMapProxy gidGridMap;
 
-        public RefreshGridMapTask(GridMapProxy uidGridMapProxy, GridMapProxy gidGridMapProxy) {
+        public RefreshGridMapTask(String uidGridMapFilePath, GridMapProxy uidGridMapProxy, String gidGridMapFilePath, GridMapProxy gidGridMapProxy) {
+            this.uidGridMapFilePath = uidGridMapFilePath;
             uidGridMap = uidGridMapProxy;
+            
+            this.gidGridMapFilePath = gidGridMapFilePath;
             gidGridMap = gidGridMapProxy;
         }
 

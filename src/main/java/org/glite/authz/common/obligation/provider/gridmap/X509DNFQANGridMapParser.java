@@ -116,7 +116,7 @@ public class X509DNFQANGridMapParser implements GridmapParser {
         String[] components = name.split("/");
         // both DNs and FQANs must begin with a / so there is an empty
         // component preceding the first real component
-        if (!components[1].contains("=")) {
+        if (components.length > 1 && !components[1].contains("=")) {
             return true;
         }
 
