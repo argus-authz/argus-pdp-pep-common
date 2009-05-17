@@ -105,6 +105,7 @@ public class GridMapPosixAccountMappingObligationHandler extends AbstractObligat
         List<GridMapKey> mappingKeys = getMappingKeys(request);
         if(mappingKeys == null || mappingKeys.isEmpty()){
             log.warn("Unable to evaluate obligation, request did not contain appropriate information");
+            throw new ObligationProcessingException("Unable to evaluate obligation, request did not contain appropriate information");
         }
         String subjectId = mappingKeys.get(0).toString();
         PosixAccount mappedAccount = accountMapper.mapToAccount(subjectId, mappingKeys);
