@@ -101,10 +101,11 @@ public class PosixAccountMapper implements AccountMapper<PosixAccount> {
         PosixAccount posixAccount = null;
         if (mapping != null && !mapping.isExpired()) {
             posixAccount = mapping.getAccount();
+            log.debug("An existing account mapping maps subject {} to an account, using it.", subjectid);
         }
 
         if (posixAccount == null) {
-            // First key determines the account to which we map
+            log.debug("No existing account mapping for subject {}, attempting to create a new one", subjectid);
             Passwd account = mapToPosixAccount(subjectid, keys);
             if (account == null) {
                 log.debug("Unable to map subject {} to a POSIX account", subjectid);

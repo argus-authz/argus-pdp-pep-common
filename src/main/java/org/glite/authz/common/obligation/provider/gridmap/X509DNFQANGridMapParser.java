@@ -65,7 +65,7 @@ public class X509DNFQANGridMapParser implements GridmapParser {
             if (mapEntry != null) {
                 gridMap.add(mapEntry);
             }
-            line = Strings.safeTrim(bufferedReader.readLine());
+            line = Strings.safeTrimOrNullString(bufferedReader.readLine());
         } while (line != null);
 
         return gridMap;

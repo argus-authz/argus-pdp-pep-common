@@ -110,13 +110,19 @@ public class GridMapPosixAccountMappingObligationHandler extends AbstractObligat
         PosixAccount mappedAccount = accountMapper.mapToAccount(subjectId, mappingKeys);
         if(mappedAccount != null){
             addUIDGIDObligations(result, mappedAccount);
-        }
-        
-        Iterator<Obligation> obligationItr = result.getObligations().iterator();
-        while(obligationItr.hasNext()){
-            if(obligationItr.next().getId().equals(GridMapPosixAccountMappingObligationHandler.MAPPING_OB_ID)){
-                obligationItr.remove();
+            
+            // Remove the mapping obligation (even if it appears multiple times) 
+            // since we've handled it and replaced it with the username and uid/gid obligations
+            Iterator<Obligation> obligationItr = result.getObligations().iterator();
+            Obligation obligation;
+            List<Obligation> removedObligations = new ArrayList<Obligation>();
+            while(obligationItr.hasNext()){
+                obligation = obligationItr.next();
+                if(obligation.getId().equals(GridMapPosixAccountMappingObligationHandler.MAPPING_OB_ID)){
+                    removedObligations.add(obligation);
+                }
             }
+            result.getObligations().removeAll(removedObligations);
         }
     }
 
