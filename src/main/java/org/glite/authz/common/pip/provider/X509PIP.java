@@ -32,6 +32,7 @@ import org.glite.authz.common.config.ConfigurationException;
 import org.glite.authz.common.model.Attribute;
 import org.glite.authz.common.model.Request;
 import org.glite.authz.common.model.Subject;
+import org.glite.authz.common.pip.PIPProcessingException;
 import org.glite.authz.common.pip.PolicyInformationPoint;
 import org.glite.authz.common.util.Strings;
 import org.glite.security.util.CertUtil;
@@ -185,7 +186,7 @@ public class X509PIP implements PolicyInformationPoint {
     }
 
     /** {@inheritDoc} */
-    public boolean populateRequest(Request request) throws AuthorizationServiceException {
+    public boolean populateRequest(Request request) throws PIPProcessingException {
         boolean pipApplied = false;
 
         X509Certificate[] certChain;
@@ -202,7 +203,7 @@ public class X509PIP implements PolicyInformationPoint {
             if (performPKIXValidation && !certVerifier.verify(certChain)) {
                 String errorMsg = "Certificate with subject DN " + endEntitySubjectDN + " failed PKIX validation";
                 log.error(errorMsg);
-                throw new AuthorizationServiceException(errorMsg);
+                throw new PIPProcessingException(errorMsg);
             }
 
             log.debug("Extracting subject attributes from certificate with subject DN {}", endEntitySubjectDN);
@@ -226,10 +227,10 @@ public class X509PIP implements PolicyInformationPoint {
      * @return the extracted certificate chain or null if the subject did not contain a chain of X.509 version 3
      *         certificates
      * 
-     * @throws AuthorizationServiceException thrown if the subject contained more than one certificate chain or if the
+     * @throws PIPProcessingException thrown if the subject contained more than one certificate chain or if the
      *             chain was not properly PEM encoded
      */
-    private X509Certificate[] getCertificateChain(Subject subject) throws AuthorizationServiceException {
+    private X509Certificate[] getCertificateChain(Subject subject) throws PIPProcessingException {
         String pemCertChain = null;
 
         for (Attribute attribute : subject.getAttributes()) {
@@ -237,7 +238,7 @@ public class X509PIP implements PolicyInformationPoint {
                 if (pemCertChain != null || attribute.getValues().size() < 1) {
                     String errorMsg = "Subject contains more than one X509 certificate chain.";
                     log.error(errorMsg);
-                    throw new AuthorizationServiceException(errorMsg);
+                    throw new PIPProcessingException(errorMsg);
                 }
 
                 if (attribute.getValues().size() == 1) {
@@ -256,7 +257,7 @@ public class X509PIP implements PolicyInformationPoint {
             chainVector = certReader.readCertChain(bis);
         } catch (IOException e) {
             log.error("Unable to parse subject cert chain", e);
-            throw new AuthorizationServiceException("Unable to parse subject cert chain", e);
+            throw new PIPProcessingException("Unable to parse subject cert chain", e);
         } finally {
             try {
                 bis.close();
@@ -285,7 +286,7 @@ public class X509PIP implements PolicyInformationPoint {
      *            extracted
      */
     private Collection<Attribute> processCertChain(X509Certificate endEntityCertificate, X509Certificate[] certChain)
-            throws AuthorizationServiceException {
+            throws PIPProcessingException {
         if (endEntityCertificate == null || certChain == null || certChain.length == 0) {
             return null;
         }
@@ -349,12 +350,12 @@ public class X509PIP implements PolicyInformationPoint {
      * 
      * @return the attributes extracted from the VOMS attribute certificate
      * 
-     * @throws AuthorizationServiceException thrown if the end entity certificate contains more than one attribute
+     * @throws PIPProcessingException thrown if the end entity certificate contains more than one attribute
      *             certificate
      */
     @SuppressWarnings("unchecked")
     private Collection<Attribute> processVOMS(X509Certificate endEntityCert, X509Certificate[] certChain)
-            throws AuthorizationServiceException {
+            throws PIPProcessingException {
 
         log.debug("Extracting VOMS attribute certificate attributes");
         VOMSValidator vomsValidator = null;
@@ -372,7 +373,7 @@ public class X509PIP implements PolicyInformationPoint {
                     + endEntityCert.getSubjectX500Principal().getName(X500Principal.RFC2253)
                     + " contains more than one attribute certificate";
             log.error(errorMsg);
-            throw new AuthorizationServiceException(errorMsg);
+            throw new PIPProcessingException(errorMsg);
         }
 
         VOMSAttribute attributeCertificate = attributeCertificates.get(0);

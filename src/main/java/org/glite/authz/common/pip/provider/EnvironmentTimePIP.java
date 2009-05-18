@@ -26,10 +26,10 @@ import javax.xml.datatype.XMLGregorianCalendar;
 
 import net.jcip.annotations.ThreadSafe;
 
-import org.glite.authz.common.AuthorizationServiceException;
 import org.glite.authz.common.model.Attribute;
 import org.glite.authz.common.model.Environment;
 import org.glite.authz.common.model.Request;
+import org.glite.authz.common.pip.PIPProcessingException;
 import org.glite.authz.common.util.Strings;
 
 /**
@@ -78,7 +78,7 @@ public class EnvironmentTimePIP extends AbstractPolicyInformationPoint {
     }
 
     /** {@inheritDoc} */
-    public boolean populateRequest(Request request) throws AuthorizationServiceException {
+    public boolean populateRequest(Request request) throws PIPProcessingException {
         Environment environment = request.getEnvironment();
         if(environment == null){
             environment = new Environment();

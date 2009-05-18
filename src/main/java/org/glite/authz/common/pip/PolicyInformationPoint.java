@@ -56,10 +56,10 @@ public interface PolicyInformationPoint {
      * 
      * @return true if this PIP applies to this request, false if not
      * 
-     * @throws AuthorizationServiceException thrown if there is a problem executing this information point
+     * @throws PIPProcessingException thrown if there is a problem executing this information point
      * @throws IllegalStateException thrown if this method is called before {@link #start()} or after {@link #stop()}.
      */
-    public boolean populateRequest(Request request) throws AuthorizationServiceException, IllegalStateException;
+    public boolean populateRequest(Request request) throws PIPProcessingException, IllegalStateException;
 
     /**
      * Stars the PIP. This is called so that the PIP may initialize itself before its first invocation.

@@ -21,13 +21,13 @@ import java.util.Set;
 
 import net.jcip.annotations.ThreadSafe;
 
-import org.glite.authz.common.AuthorizationServiceException;
 import org.glite.authz.common.model.Action;
 import org.glite.authz.common.model.Attribute;
 import org.glite.authz.common.model.Environment;
 import org.glite.authz.common.model.Request;
 import org.glite.authz.common.model.Resource;
 import org.glite.authz.common.model.Subject;
+import org.glite.authz.common.pip.PIPProcessingException;
 import org.glite.authz.common.util.Strings;
 
 /** A PIP that provides a static set of attributes to a {@link Request}. */
@@ -130,7 +130,7 @@ public class StaticPIP extends AbstractPolicyInformationPoint {
     }
 
     /** {@inheritDoc} */
-    public boolean populateRequest(Request request) throws AuthorizationServiceException {
+    public boolean populateRequest(Request request) throws PIPProcessingException {
         if (actionAttributes != null && !actionAttributes.isEmpty()) {
             Action action = request.getAction();
             if (action == null) {
@@ -152,7 +152,7 @@ public class StaticPIP extends AbstractPolicyInformationPoint {
         if (resourceAttributes != null && !resourceAttributes.isEmpty()) {
             Set<Resource> resources = request.getResources();
             if (resources.size() > 1 && !addAttributesToAllResources) {
-                throw new AuthorizationServiceException(
+                throw new PIPProcessingException(
                         "More than one Resource present in request and PIP configured to only add attribues to a single Resource");
             }
 
@@ -168,7 +168,7 @@ public class StaticPIP extends AbstractPolicyInformationPoint {
         if (subjectAttributes != null && !subjectAttributes.isEmpty()) {
             Set<Subject> subjects = request.getSubjects();
             if (subjects.size() > 1 && !addAttributesToAllSubjects) {
-                throw new AuthorizationServiceException(
+                throw new PIPProcessingException(
                         "More than one Subject present in request and PIP configured to only add attribues to a single Subject");
             }
 
