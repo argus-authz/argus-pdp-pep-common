@@ -110,7 +110,8 @@ public abstract class AbstractIniConfigurationParser<ConfigurationType extends A
      * @throws ConfigurationException throw if a obligation handler can not be instantiated
      */
     @SuppressWarnings("unchecked")
-    private AbstractObligationHandler buildObligationHandler(Section ohConfig, AbstractConfigurationBuilder<?> configBuilder) throws ConfigurationException {
+    private AbstractObligationHandler buildObligationHandler(Section ohConfig,
+            AbstractConfigurationBuilder<?> configBuilder) throws ConfigurationException {
         String parserClassName = IniConfigUtil.getString(ohConfig, IniOHConfigurationParser.PARSER_CLASS_PROP);
         if (parserClassName == null) {
             String errorMsg = "Obligation configuration section " + ohConfig.getName() + " does not contain a valid "
@@ -125,7 +126,8 @@ public abstract class AbstractIniConfigurationParser<ConfigurationType extends A
             IniOHConfigurationParser parser = parserClass.getConstructor().newInstance();
             return parser.parse(ohConfig, configBuilder);
         } catch (Exception e) {
-            throw new ConfigurationException("Unable to configure Obligation Handler " + ohConfig.getName(), e);
+            throw new ConfigurationException("Unable to configure Obligation Handler " + ohConfig.getName()
+                    + ". The following error was reported: " + e.getMessage(), e);
         }
     }
 
@@ -158,7 +160,8 @@ public abstract class AbstractIniConfigurationParser<ConfigurationType extends A
             IniPIPConfigurationParser parser = parserClass.getConstructor().newInstance();
             return parser.parse(pipConfig, configBuilder);
         } catch (Exception e) {
-            throw new ConfigurationException("Unable to configure PIP " + pipConfig.getName(), e);
+            throw new ConfigurationException("Unable to configure PIP " + pipConfig.getName()
+                    + ". The following error was reported: " + e.getMessage(), e);
         }
     }
 
@@ -296,7 +299,7 @@ public abstract class AbstractIniConfigurationParser<ConfigurationType extends A
             throw new ConfigurationException(e.getMessage());
         }
         log.info("X.509 trusted information directory: {}", trustStoreDir);
-        
+
         int refreshInterval = getTrustMaterialRefreshInterval(configSection) * 60 * 1000;
         log.info("trust information refresh interval: {}ms", refreshInterval);
 
