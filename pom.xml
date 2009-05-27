@@ -57,7 +57,8 @@
         <repository>
             <id>INFN</id>
             <name>INFN</name>
-            <url>http://pcceccanti.cnaf.infn.it:11250/archiva/repository/internal</url>
+            <url>http://pcceccanti.cnaf.infn.it:11250/archiva/repository/internal
+            </url>
             <snapshots>
                 <enabled>false</enabled>
             </snapshots>
@@ -75,6 +76,16 @@
             <groupId>net.sourceforge</groupId>
             <artifactId>ini4j</artifactId>
             <version>0.4.0</version>
+        </dependency>
+        <dependency>
+            <groupId>org.jruby.ext.posix</groupId>
+            <artifactId>jna-posix</artifactId>
+            <version>1.0</version>
+        </dependency>
+        <dependency>
+            <groupId>net.java.dev.jna</groupId>
+            <artifactId>jna</artifactId>
+            <version>3.0.9</version>
         </dependency>
         <dependency>
             <groupId>org.glite</groupId>
@@ -250,7 +261,7 @@
             </plugin>
         </plugins>
     </reporting>
-    
+
     <distributionManagement>
         <repository>
             <id>release-repo</id>
