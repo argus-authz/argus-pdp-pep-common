@@ -14,19 +14,18 @@
  * limitations under the License.
  */
 
-package org.glite.authz.common.obligation.provider.gridmap;
+package org.glite.authz.common.obligation.provider.dfpmap;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Map;
 import java.util.TreeMap;
 
-import org.glite.authz.common.obligation.provider.gridmap.GridMap.GridMapKeyMatchFunction;
-import org.glite.authz.common.util.LazyList;
 import org.glite.authz.common.util.Strings;
 
 /** A FQAN (fully qualified attribute name). */
-public class FQAN implements GridMapKey {
+public class FQAN {
 
     /** The allowed characters in the components of an FQAN (group component ID, attribute ID, and attribute value). */
     public final static String fqanComponentCharactersRegex = "[_\\w\\.\\-\\*]+";
@@ -57,7 +56,7 @@ public class FQAN implements GridMapKey {
             for (Attribute attribute : groupAttributes) {
                 modifiableAttributes.put(attribute.getId(), attribute);
             }
-            attributes = Collections.unmodifiableMap(modifiableAttributes);
+            attributes = modifiableAttributes;
         } else {
             attributes = Collections.emptyMap();
         }
@@ -79,6 +78,15 @@ public class FQAN implements GridMapKey {
      */
     public Collection<Attribute> getAttributes() {
         return attributes.values();
+    }
+
+    /**
+     * Gets the IDs of the attributes.
+     * 
+     * @return IDs of the attributes
+     */
+    public Collection<String> getAttributeIds() {
+        return attributes.keySet();
     }
 
     /**
@@ -123,8 +131,11 @@ public class FQAN implements GridMapKey {
 
         if (obj instanceof FQAN) {
             FQAN otherFQAN = (FQAN) obj;
-            return getAttributeGroupId().equals(otherFQAN.getAttributeGroupId())
-                    && getAttributes().equals(otherFQAN.getAttributes());
+
+            boolean equalIds = attributeGroupId.equals(otherFQAN.attributeGroupId);
+            boolean equalAttributes = attributes.equals(otherFQAN.attributes);
+
+            return equalIds && equalAttributes;
         }
 
         return false;
@@ -167,9 +178,9 @@ public class FQAN implements GridMapKey {
          * @throws IllegalKeyFormatException thrown if the FQAN contains illegal characters or is not in the proper
          *             {@literal <id>=<value>} format
          */
-        public static Attribute parse(String attributeString) throws IllegalKeyFormatException {
+        public static Attribute parse(String attributeString) throws IllegalArgumentException {
             if (!attributeString.contains("=")) {
-                throw new IllegalKeyFormatException("FQAN attribute " + attributeString
+                throw new IllegalArgumentException("FQAN attribute " + attributeString
                         + " does not contain an equals sign");
             }
 
@@ -177,7 +188,7 @@ public class FQAN implements GridMapKey {
 
             String id = Strings.safeTrim(components[0]);
             if (!id.matches(fqanComponentCharactersRegex)) {
-                throw new IllegalKeyFormatException("FQAN attribute " + attributeString
+                throw new IllegalArgumentException("FQAN attribute " + attributeString
                         + " contains illegal characters within its id");
             }
 
@@ -190,7 +201,7 @@ public class FQAN implements GridMapKey {
                     value = NULL_VALUE;
                 } else {
                     if (!value.matches(fqanComponentCharactersRegex)) {
-                        throw new IllegalKeyFormatException("FQAN attribute " + attributeString
+                        throw new IllegalArgumentException("FQAN attribute " + attributeString
                                 + " contains illegal characters within its value");
                     }
                 }
@@ -216,71 +227,41 @@ public class FQAN implements GridMapKey {
         public String getValue() {
             return value;
         }
-    }
-
-    /** A {@link GridMapKeyMatchFunction} for {@link FQAN} objects. */
-    public static class MatchFunction implements GridMapKeyMatchFunction {
 
         /** {@inheritDoc} */
-        public boolean matches(GridMapKey target, GridMapKey candidate) {
-            if (target instanceof FQAN && candidate instanceof FQAN) {
-                FQAN targetFQAN = (FQAN) target;
-                FQAN candidateFQAN = (FQAN) candidate;
+        public String toString() {
+            return "Attribute { id: " + id + ", value: " + value + "}";
+        }
 
-                if(targetFQAN.getAttributeGroupId().endsWith("*")){
-                    String targetGroupIDRegex = targetFQAN.getAttributeGroupId().replace("*", ".+");
-                    if (!candidateFQAN.getAttributeGroupId().matches(targetGroupIDRegex)) {
-                        return false;
-                    }
-                }else{
-                    if(!candidateFQAN.getAttributeGroupId().startsWith(targetFQAN.getAttributeGroupId())){
-                        return false;
-                    }
-                }
+        /** {@inheritDoc} */
+        public int hashCode() {
+            int hash = 13;
 
-                Attribute candidateAttribute;
-                for (Attribute requiredAttribute : targetFQAN.getAttributes()) {
-                    candidateAttribute = candidateFQAN.getAttributeById(requiredAttribute.getId());
-                    if (candidateAttribute == null) {
-                        if (requiredAttribute.getValue().equals(Attribute.NULL_VALUE)) {
-                            return true;
-                        }
-                        return false;
-                    }
+            hash = 31 * hash + (null == id ? 0 : id.hashCode());
+            hash = 31 * hash + (null == value ? 0 : value.hashCode());
 
-                    if (!attributeMatches(requiredAttribute, candidateAttribute)) {
-                        return false;
-                    }
-                }
+            return hash;
+        }
 
+        /** {@inheritDoc} */
+        public boolean equals(Object obj) {
+            if (this == obj) {
                 return true;
             }
 
-            return false;
-        }
-
-        /**
-         * Checks whether an attribute matches another attribute.
-         * 
-         * @param target the attribute the candidate is checked against
-         * @param candidate the attribute checked against the target
-         * 
-         * @return true if the candidate matches the target, false if not
-         */
-        private boolean attributeMatches(Attribute target, Attribute candidate) {
-            if (!target.getId().equals(candidate.getId())) {
+            if (obj == null || !(obj instanceof FQAN.Attribute)) {
                 return false;
             }
 
-            if (target.getValue().equals(Attribute.NULL_VALUE)) {
-                return true;
-            }
+            FQAN.Attribute otherAttribute = (FQAN.Attribute) obj;
 
-            String valueMatch = target.getValue().replace("*", ".+");
-            return candidate.getValue().matches(valueMatch);
+            boolean equalIds = Strings.safeEquals(id, otherAttribute.getId());
+            boolean equalValues = Strings.safeEquals(value, otherAttribute.getValue());
+
+            return equalIds && equalValues;
         }
     }
-    
+
     /**
      * Parses an FQAN.
      * 
@@ -291,21 +272,21 @@ public class FQAN implements GridMapKey {
      * @throws IllegalKeyFormatException thrown if the FQAN is not valid either because its format is wrong or one of
      *             its components contains invalid characters
      */
-    public static FQAN parseFQAN(String fqanString) throws IllegalKeyFormatException {
+    public static FQAN parseFQAN(String fqanString) throws IllegalArgumentException {
         String trimmedStr = Strings.safeTrimOrNullString(fqanString);
         if (trimmedStr == null) {
             throw new NullPointerException("FQAN string may not be null or empty");
         }
 
         if (!trimmedStr.startsWith("/")) {
-            throw new IllegalKeyFormatException("FQAN " + trimmedStr + " does not start with a '/'");
+            throw new IllegalArgumentException("FQAN " + trimmedStr + " does not start with a '/'");
         }
 
         String[] components = fqanString.split("/");
         String component;
         boolean encounteredAttribute = false;
         StringBuilder groupIdBuilder = new StringBuilder();
-        LazyList<Attribute> attributes = new LazyList<Attribute>();
+        ArrayList<Attribute> attributes = new ArrayList<Attribute>();
         // we start with 1 since nothing precedes the first '/' in a FQAN
         for (int i = 1; i < components.length; i++) {
             component = components[i];
@@ -315,7 +296,7 @@ public class FQAN implements GridMapKey {
 
             if (!encounteredAttribute) {
                 if (!component.matches(FQAN.fqanComponentCharactersRegex)) {
-                    throw new IllegalKeyFormatException("FQAN" + fqanString
+                    throw new IllegalArgumentException("FQAN" + fqanString
                             + " contains an invalid character in the group ID component " + component);
                 }
                 groupIdBuilder.append("/").append(component);

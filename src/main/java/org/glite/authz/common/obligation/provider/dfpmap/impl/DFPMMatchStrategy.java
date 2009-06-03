@@ -13,9 +13,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package org.glite.authz.common.obligation.provider.dfpmap.impl;
 
-/** 
- * An obligation handler that maps a user, based on X.509 DN or VOMS FQAN (fully qualified attribute name) 
- * to a Unix UID and set of GIDs.  
- */
-package org.glite.authz.common.obligation.provider.gridmap;
+import org.glite.authz.common.obligation.provider.dfpmap.DFPM;
+
+/** A function that determines if a particular candidate is a match to {@link DFPM} key. */
+public interface DFPMMatchStrategy<CandidateType>{
+
+    /**
+     * Determines if a candidate if a match to a {@link DFPM} key.
+     * 
+     * @param dfpmKey the {@link DFPM} key
+     * @param candidate the possible match candidate
+     * 
+     * @return true if the candidate is a match, false if not
+     */
+    public boolean isMatch(String dfpmKey, CandidateType candidate);
+}

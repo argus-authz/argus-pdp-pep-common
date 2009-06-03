@@ -14,12 +14,13 @@
  * limitations under the License.
  */
 
-package org.glite.authz.common.obligation.provider.gridmap.posix;
+package org.glite.authz.common.obligation.provider.dfpmap.impl;
 
 import java.io.File;
 import java.io.InputStream;
 import java.io.PrintStream;
 
+import org.jruby.ext.posix.FileStat;
 import org.jruby.ext.posix.Group;
 import org.jruby.ext.posix.POSIX;
 import org.jruby.ext.posix.POSIXFactory;
@@ -70,7 +71,7 @@ public class PosixUtil {
     public static Group getGroupByName(String name) {
         return posix.getgrnam(name);
     }
-    
+
     /**
      * Gets the Group with a given GID.
      * 
@@ -78,8 +79,34 @@ public class PosixUtil {
      * 
      * @return the group or null if no group exists with the given GID
      */
-    public static Group getGroupByID(int gid){
+    public static Group getGroupByID(int gid) {
         return posix.getgrgid(gid);
+    }
+
+    /**
+     * Gets the stats about the given file.
+     * 
+     * @param file the file to stat
+     * 
+     * @return the stats on the file
+     */
+    public static FileStat getFileStat(String file) {
+        return posix.stat(file);
+    }
+
+    /**
+     * Creates a link such that the new path points to the same thing as the old path.
+     * 
+     * @param currenPath current path
+     * @param newPath new path that will point to the current path
+     * @param symbolic true if the link should be a symbolic or false if it should be a hard link
+     */
+    public static void createLink(String currenPath, String newPath, boolean symbolic) {
+        if (symbolic) {
+            posix.symlink(currenPath, newPath);
+        } else {
+            posix.link(currenPath, newPath);
+        }
     }
 
     /** A basic handler for logging and stream handling. */

@@ -1,5 +1,5 @@
 /*
- * Copyright 2008 EGEE Collaboration
+ * Copyright 2009 EGEE Collaboration
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,9 +14,5 @@
  * limitations under the License.
  */
 
-package org.glite.authz.common.obligation.provider.gridmap;
-
-/** A marker interface identifying a key to a list of IDs within a grid map. */
-public interface GridMapKey {
-
-}
+/** Implementations of various DFPM interface implementations. */
+package org.glite.authz.common.obligation.provider.dfpmap.impl;

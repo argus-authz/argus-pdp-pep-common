@@ -1,0 +1,22 @@
+"cn=usera, dc=example, dc=org"  .testa
+# "cn=userb, dc=example, dc=org" glite
+"/DC=org/DC=example/CN=userc"  .testb
+
+
+"/switch/Role=lcgadmin/Capability=NULL" glite
+"/switch/Role=lcgadmin" glite
+
+"/switch/Role=production/Capability=NULL" .testb
+"/switch/Role=production" .testb
+
+"/switch/Role=pilot/Capability=NULL" glite
+"/switch/Role=pilot" glite
+
+"/switch/Role=NULL/Capability=NULL" .testa
+
+"/switch"           .testa
+"/switch/group1"        .testb
+"/switch/group1/subgroup1"  .testc
+"/switch/group1/Role=production" user1
+
+"/smscg"             .testc

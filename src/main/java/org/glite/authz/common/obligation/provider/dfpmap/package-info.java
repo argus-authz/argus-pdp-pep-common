@@ -14,17 +14,12 @@
  * limitations under the License.
  */
 
-package org.glite.authz.common.obligation.provider.gridmap;
-
-import java.util.List;
-
-/**
- * Maps a subject, described by a set of {@link GridMapKey} objects, to an account.
+/** 
+ * An obligation handler that maps a subject to a POSIX account.
  * 
- * @param <AccountType> an object describing a type of account meaningful to the invoking system
+ * Currently this package supports the mapping of a subject to an account based on an X.509 subject ID, a primary FQAN,
+ * and a set of secondary FQANs.
+ * 
+ * DFPM stands for DN/FQAN to POSIX Mapping.
  */
-public interface AccountMapper<AccountType> {
-
-    /** Maps a set of grid map keys to a PosixAccount. */
-    public AccountType mapToAccount(String subjectid, List<? extends GridMapKey> keys);
-}
+package org.glite.authz.common.obligation.provider.dfpmap;
