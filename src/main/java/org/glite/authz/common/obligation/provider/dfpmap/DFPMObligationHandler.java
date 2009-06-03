@@ -148,7 +148,7 @@ public class DFPMObligationHandler extends AbstractObligationHandler {
     /**
      * Gets the subject's DN from the subject DN attribute.
      * 
-     * @param dnAttribute subject DN attribute
+     * @param subject the subject of the request
      * 
      * @return the subject DN
      * 
@@ -193,6 +193,15 @@ public class DFPMObligationHandler extends AbstractObligationHandler {
         }
     }
     
+    /**
+     * Gets the primary FQAN from the request subject.
+     * 
+     * @param subject the subject of the request
+     * 
+     * @return the primary FQAN
+     * 
+     * @throws ObligationProcessingException thrown if the given attribute contains no values, is not of the right data type, or its value is not a valid FQAN
+     */
     private FQAN getPrimaryFQAN(Subject subject) throws ObligationProcessingException {
         Attribute primaryFQANAttribute = null;
         
@@ -205,8 +214,8 @@ public class DFPMObligationHandler extends AbstractObligationHandler {
         }
         
         if(primaryFQANAttribute == null){
-            log.error("Subject of the authorization request did not contain a subject primary FQAN attribute");
-            throw new ObligationProcessingException("Invalid request, missing subject attribute");
+            log.debug("Subject of the authorization request did not contain a subject primary FQAN attribute");
+            return null;
         }
         
         if(!primaryFQANAttribute.getDataType().equals(Attribute.DT_STRING)){
@@ -232,6 +241,15 @@ public class DFPMObligationHandler extends AbstractObligationHandler {
         }
     }
     
+    /**
+     * Gets the secondary FQANs from the request subject.
+     * 
+     * @param subject the subject of the request
+     * 
+     * @return the secondary FQANs
+     * 
+     * @throws ObligationProcessingException thrown if the given attribute contains no values, is not of the right data type, or its value is not a valid FQAN
+     */
     private List<FQAN> getSecondaryFQANs(Subject subject) throws ObligationProcessingException {
         Attribute secondaryFQANsAttribute = null;
         
@@ -244,8 +262,8 @@ public class DFPMObligationHandler extends AbstractObligationHandler {
         }
         
         if(secondaryFQANsAttribute == null){
-            log.error("Subject of the authorization request did not contain a subject secondary FQAN attribute");
-            throw new ObligationProcessingException("Invalid request, missing subject attribute");
+            log.debug("Subject of the authorization request did not contain a subject secondary FQAN attribute");
+            return null;
         }
         
         if(!secondaryFQANsAttribute.getDataType().equals(Attribute.DT_STRING)){
