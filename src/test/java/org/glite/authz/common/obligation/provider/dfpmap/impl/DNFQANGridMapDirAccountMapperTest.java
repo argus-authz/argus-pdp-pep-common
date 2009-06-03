@@ -113,10 +113,10 @@ public class DNFQANGridMapDirAccountMapperTest extends TestCase {
     protected void tearDown() throws Exception {
         super.tearDown();
 
-//        File gridMapDir = new File(getClass().getResource("/00gridMapDir").toURI());
-//        for (File file : gridMapDir.listFiles()) {
-//            file.delete();
-//        }
+        File gridMapDir = new File(getClass().getResource("/00gridMapDir").toURI());
+        for (File file : gridMapDir.listFiles()) {
+            file.delete();
+        }
     }
 
     public void testWithoutSecondaryFQANs() throws Exception {
