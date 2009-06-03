@@ -66,6 +66,11 @@ public class FQANGroupNameMappingStrategy implements GroupNameMappingStrategy {
         log.debug("Starting to map subject {} with primary FQAN {} and second FQANs {} to group names", new Object[] {
                 subjectDN.getName(X500Principal.RFC2253), primaryFQAN, secondaryFQANs });
 
+        if(primaryFQAN == null){
+            log.error("Primary FQAN for subject " + subjectDN.getName() + " is null, group mapping can not be performed");
+            throw new ObligationProcessingException("Primary FQAN is null, group mapping can not be performed");
+        }
+        
         ArrayList<String> groups = new ArrayList<String>();
 
         String firstGroupFromFQAN = null;

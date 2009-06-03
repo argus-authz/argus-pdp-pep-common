@@ -154,17 +154,18 @@ public class AccountMapper {
      */
     private List<String> mapToGroupNames(X500Principal subjectDN, FQAN primaryFQAN, List<FQAN> secondaryFQANs,
             String accountIndicator, boolean indicatorIsPoolAccountPrefix) throws ObligationProcessingException {
+        
         List<String> groupNames;
-        if (indicatorIsPoolAccountPrefix) {
+        if (primaryFQAN != null) {
             groupNames = groupNameMappingStrategy.mapToGroupNames(subjectDN, primaryFQAN, secondaryFQANs);
         } else {
-            if (primaryFQAN != null) {
-                groupNames = groupNameMappingStrategy.mapToGroupNames(subjectDN, primaryFQAN, secondaryFQANs);
-            } else {
-                groupNames = mapToGroupNames(accountIndicator);
-            }
+            groupNames = mapToGroupNames(accountIndicator);
         }
 
+        if(groupNames == null || groupNames.size() < 1){
+            log.error("Subject " + subjectDN.getName() + " could not be mapped to a primary group");
+            throw new ObligationProcessingException("Subject " + subjectDN.getName() + " could not be mapped to a primary group");
+        }
         return groupNames;
     }
 
@@ -176,14 +177,19 @@ public class AccountMapper {
      * @return the name of the primary group, or null if the account is null, its primary group does not exist or does
      *         not have a name
      */
-    private List<String> mapToGroupNames(String loginName) {
+    private List<String> mapToGroupNames(String loginName) throws ObligationProcessingException{
         ArrayList<String> names = new ArrayList<String>();
         Passwd accountInfo = PosixUtil.getAccountByName(loginName);
         if (accountInfo == null) {
-            return null;
+            log.error("POSIX account with login name " + loginName + " is not configured, unable to determine primary group");
+            throw new ObligationProcessingException("Unable to determine primary group");
         }
 
         Group groupInfo = PosixUtil.getGroupByID((int) accountInfo.getGID());
+        if(groupInfo == null){
+            log.error("POSIX group with GID " + accountInfo.getGID() + " is not configured, unable to determine primary group");
+            throw new ObligationProcessingException("Unable to determine primary group");
+        }
         names.add(groupInfo.getName());
         return names;
     }
