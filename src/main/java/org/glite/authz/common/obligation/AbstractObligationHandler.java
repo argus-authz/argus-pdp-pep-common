@@ -41,19 +41,19 @@ public abstract class AbstractObligationHandler {
     private int precedence;
 
     /**
-     * Constructor. Obligation has the lowest precedence
+     * Constructor. Obligation has the lowest precedence, zero.
      * 
      * @param obligationId ID of the handled obligation
      */
     protected AbstractObligationHandler(String obligationId) {
-        this(obligationId, Integer.MIN_VALUE);
+        this(obligationId, 0);
     }
 
     /**
      * Constructor.
      * 
      * @param obligationId ID of the handled obligation
-     * @param handlerPrecedence precedence of this handler
+     * @param handlerPrecedence precedence of this handler, must be 0 or greater
      */
     protected AbstractObligationHandler(String obligationId, int handlerPrecedence) {
         id = Strings.safeTrimOrNullString(obligationId);
@@ -62,7 +62,7 @@ public abstract class AbstractObligationHandler {
         }
 
         if (handlerPrecedence < 0) {
-            throw new IllegalArgumentException("Handler precedence must be greater than 0");
+            throw new IllegalArgumentException("Handler precedence must be 0 or greater");
         }
         precedence = handlerPrecedence;
     }

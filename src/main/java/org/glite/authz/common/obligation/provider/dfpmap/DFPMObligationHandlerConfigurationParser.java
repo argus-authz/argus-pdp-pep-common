@@ -17,8 +17,8 @@
 package org.glite.authz.common.obligation.provider.dfpmap;
 
 import java.io.File;
+import java.io.FileReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
 
 import javax.security.auth.x500.X500Principal;
 
@@ -112,7 +112,7 @@ public class DFPMObligationHandlerConfigurationParser implements IniOHConfigurat
         String gridMapDir = IniConfigUtil.getString(iniConfig, GRID_MAP_DIR_PROP);
         log.debug("grid mapping directory: {}", gridMapDir);
 
-        AccountMapper accountMapper = buildAccountMapper(accountMapFile, preferDNForLoginName, gridMapDir,
+        AccountMapper accountMapper = buildAccountMapper(accountMapFile, preferDNForLoginName, groupMapFile,
                 mapRefreshPeriod, gridMapDir);
         return new DFPMObligationHandler(iniConfig.getName(), accountMapper);
     }
@@ -153,25 +153,32 @@ public class DFPMObligationHandlerConfigurationParser implements IniOHConfigurat
     /**
      * Builds an mapping set that refreshes with the given period.
      * 
-     * @param mappingFile file containing the mapping information
+     * @param mappingFilePath file containing the mapping information
      * @param refreshPeriod period between refresh of the mapping from the mapping file
      * 
      * @return the built mapping
      * 
      * @throws ConfigurationException thrown if the is a problem reading the mapping file
      */
-    private DFPM buildMapping(String mappingFile, int refreshPeriod) throws ConfigurationException {
+    private DFPM buildMapping(String mappingFilePath, int refreshPeriod) throws ConfigurationException {
+        File mappingFile = null;
         try {
-            Files.getReadableFile(mappingFile);
+            mappingFile = Files.getReadableFile(mappingFilePath);
         } catch (IOException e) {
-            log.error("Unable to read map file " + mappingFile, e);
-            throw new ConfigurationException("Unable to read map file " + mappingFile, e);
+            log.error("Unable to read map file " + mappingFilePath, e);
+            throw new ConfigurationException("Unable to read map file " + mappingFilePath, e);
         }
 
+        log.debug("Parsing mapping file: {}", mappingFile.getAbsolutePath());
         DFPMFileParser fileParser = new DFPMFileParser();
         OrderedDFPM map = new OrderedDFPM();
-        fileParser.parse(map, new InputStreamReader(this.getClass().getResourceAsStream(mappingFile)));
-        return map;
+        try {
+            fileParser.parse(map, new FileReader(mappingFile));
+            return map;
+        } catch (IOException e) {
+            log.error("Unable to read map file " + mappingFile.getAbsolutePath(), e);
+            throw new ConfigurationException("Unable to read map file " + mappingFile.getAbsolutePath(), e);
+        }
     }
 
     /**
@@ -187,15 +194,18 @@ public class DFPMObligationHandlerConfigurationParser implements IniOHConfigurat
     private PoolAccountManager buildPoolAccountManager(String gridMapDirPath) throws ConfigurationException {
         File gridMapDir = new File(gridMapDirPath);
         if (!gridMapDir.exists()) {
+            log.error("Grid map directory " + gridMapDir.getAbsolutePath() + " does not exist");
             throw new ConfigurationException("Grid map directory " + gridMapDir.getAbsolutePath() + " does not exist");
         }
 
         if (!gridMapDir.canRead()) {
+            log.error("Grid map directory " + gridMapDir.getAbsolutePath() + " is not readable by this process");
             throw new ConfigurationException("Grid map directory " + gridMapDir.getAbsolutePath()
                     + " is not readable by this process");
         }
 
         if (!gridMapDir.canWrite()) {
+            log.error("Grid map directory " + gridMapDir.getAbsolutePath() + " is not writable by this process");
             throw new ConfigurationException("Grid map directory " + gridMapDir.getAbsolutePath()
                     + " is not writable by this process");
         }

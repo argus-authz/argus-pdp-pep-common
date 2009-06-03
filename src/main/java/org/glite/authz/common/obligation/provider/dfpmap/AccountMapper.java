@@ -43,10 +43,10 @@ public class AccountMapper {
 
     /** Manager used to track and access pool accounts. */
     private final PoolAccountManager poolAccountManager;
-    
+
     /** Strategy used to map a POSIX login name to a UID. */
     private final IDMappingStrategy uidMappingStrategy;
-    
+
     /** Strategy used to map a POSIX group name to a GID. */
     private final IDMappingStrategy gidMappingStrategy;
 
@@ -73,13 +73,13 @@ public class AccountMapper {
             throw new IllegalArgumentException("Pool account manager may not be null");
         }
         poolAccountManager = pam;
-        
-        if(uidStategy == null){
+
+        if (uidStategy == null) {
             throw new IllegalArgumentException("UID mapping strategy may not be null");
         }
         uidMappingStrategy = uidStategy;
-        
-        if(gidStrategy == null){
+
+        if (gidStrategy == null) {
             throw new IllegalArgumentException("GID mapping strategy may not null");
         }
         gidMappingStrategy = gidStrategy;
@@ -98,6 +98,8 @@ public class AccountMapper {
      */
     public PosixAccount mapToAccount(X500Principal subjectDN, FQAN primaryFQAN, List<FQAN> secondaryFQANs)
             throws ObligationProcessingException {
+        log.debug("Attempting to map subject {} with primary FQAN {} and secondary FQANs {} to a POSIX account",
+                new Object[] { subjectDN.getName(), primaryFQAN, secondaryFQANs });
         String accountIndicator = accountIndicatorMappingStrategy.mapToAccountIndicator(subjectDN, primaryFQAN,
                 secondaryFQANs);
         if (accountIndicator == null) {
@@ -105,9 +107,9 @@ public class AccountMapper {
                     + " and secondary FQANs " + secondaryFQANs + " to a POSIX account indicator.");
             throw new ObligationProcessingException("Unable to map subject to a POSIX account");
         }
-        
+
         boolean indicatorIsPoolAccountPrefix = false;
-        if(poolAccountManager.isPoolAccountPrefix(accountIndicator)){
+        if (poolAccountManager.isPoolAccountPrefix(accountIndicator)) {
             indicatorIsPoolAccountPrefix = true;
             accountIndicator = poolAccountManager.getPoolAccountPrefix(accountIndicator);
         }
@@ -118,19 +120,20 @@ public class AccountMapper {
         String loginName;
         String primaryGroupName = groupNames.get(0);
         List<String> secondaryGroupNames;
-        if (groupNames.size() > 1){
+        if (groupNames.size() > 1) {
             secondaryGroupNames = groupNames.subList(1, groupNames.size());
-        }else{
+        } else {
             secondaryGroupNames = Collections.emptyList();
         }
 
         if (indicatorIsPoolAccountPrefix) {
-            loginName = poolAccountManager.mapToAccount(accountIndicator, subjectDN, primaryGroupName, secondaryGroupNames);
+            loginName = poolAccountManager.mapToAccount(accountIndicator, subjectDN, primaryGroupName,
+                    secondaryGroupNames);
         } else {
             loginName = accountIndicator;
         }
 
-        if(loginName == null){
+        if (loginName == null) {
             return null;
         }
         return buildPosixAccount(loginName, primaryGroupName, secondaryGroupNames);
@@ -184,9 +187,10 @@ public class AccountMapper {
         names.add(groupInfo.getName());
         return names;
     }
-    
+
     /**
-     * Creates a POSIX account from the given information.  The registered {@link IDMappingStrategy} objects are used to convert the login name and group names in to their respective IDs.
+     * Creates a POSIX account from the given information. The registered {@link IDMappingStrategy} objects are used to
+     * convert the login name and group names in to their respective IDs.
      * 
      * @param loginName login name of the account
      * @param primaryGroupName name of the primary group
@@ -196,19 +200,21 @@ public class AccountMapper {
      * 
      * @throws ObligationProcessingException thrown if a name can not be resolved to an ID
      */
-    private PosixAccount buildPosixAccount(String loginName, String primaryGroupName, List<String> secondaryGroupNames) throws ObligationProcessingException{
+    private PosixAccount buildPosixAccount(String loginName, String primaryGroupName, List<String> secondaryGroupNames)
+            throws ObligationProcessingException {
         int uid = uidMappingStrategy.mapToID(loginName);
 
-        PosixAccount.Group primaryGroup = new PosixAccount.Group(primaryGroupName, gidMappingStrategy.mapToID(primaryGroupName));
-        
+        PosixAccount.Group primaryGroup = new PosixAccount.Group(primaryGroupName, gidMappingStrategy
+                .mapToID(primaryGroupName));
+
         ArrayList<PosixAccount.Group> secondaryGroups = null;
-        if(secondaryGroupNames != null && !secondaryGroupNames.isEmpty()){
+        if (secondaryGroupNames != null && !secondaryGroupNames.isEmpty()) {
             secondaryGroups = new ArrayList<PosixAccount.Group>();
-            for(String name : secondaryGroupNames){
+            for (String name : secondaryGroupNames) {
                 secondaryGroups.add(new PosixAccount.Group(name, gidMappingStrategy.mapToID(name)));
             }
         }
-        
+
         return new PosixAccount(loginName, uid, primaryGroup, secondaryGroups);
     }
 }

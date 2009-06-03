@@ -17,7 +17,7 @@
 package org.glite.authz.common.obligation.provider.dfpmap.impl;
 
 import java.io.File;
-import java.io.InputStreamReader;
+import java.io.FileReader;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -51,7 +51,8 @@ public class DNFQANGridMapDirAccountMapperTest extends TestCase {
     protected void setUp() throws Exception {
         super.setUp();
 
-        File gridMapDir = new File(getClass().getResource("/00gridMapDir").toURI());
+        File gridMapDir = new File("/temp/gridmapdir");
+        gridMapDir.mkdirs();
 
         ArrayList<String> poolAccountNames = new ArrayList<String>();
         for (String group : Arrays.asList("a", "b", "c")) {
@@ -84,10 +85,12 @@ public class DNFQANGridMapDirAccountMapperTest extends TestCase {
         DFPMFileParser fileParser = new DFPMFileParser();
 
         OrderedDFPM accountMap = new OrderedDFPM();
-        fileParser.parse(accountMap, new InputStreamReader(this.getClass().getResourceAsStream("/00accountMap.txt")));
+        File accountMapFile = new File(this.getClass().getResource("/00accountMap.txt").toURI());
+        fileParser.parse(accountMap, new FileReader(accountMapFile));
 
         OrderedDFPM groupMap = new OrderedDFPM();
-        fileParser.parse(groupMap, new InputStreamReader(this.getClass().getResourceAsStream("/00groupMap.txt")));
+        File groupMapFile = new File(this.getClass().getResource("/00groupMap.txt").toURI());
+        fileParser.parse(groupMap, new FileReader(groupMapFile));
 
         DFPMMatchStrategy<X500Principal> dnMatchStrategy = new X509MatchStrategy();
         DFPMMatchStrategy<FQAN> fqanMatchStrategy = new FQANMatchStrategy();
@@ -113,10 +116,11 @@ public class DNFQANGridMapDirAccountMapperTest extends TestCase {
     protected void tearDown() throws Exception {
         super.tearDown();
 
-        File gridMapDir = new File(getClass().getResource("/00gridMapDir").toURI());
+        File gridMapDir = new File("/temp/gridmapdir");
         for (File file : gridMapDir.listFiles()) {
             file.delete();
         }
+        gridMapDir.delete();
     }
 
     public void testWithoutSecondaryFQANs() throws Exception {

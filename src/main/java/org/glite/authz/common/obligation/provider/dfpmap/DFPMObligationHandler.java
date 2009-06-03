@@ -74,7 +74,7 @@ public class DFPMObligationHandler extends AbstractObligationHandler {
      * @param mapper mapper used to map a subject to a POSIX account
      */
     public DFPMObligationHandler(String obligationId, AccountMapper mapper){
-        super(obligationId);
+        super(MAPPING_OB_ID);
         
         if(mapper == null){
             throw new IllegalArgumentException("Account mapper may not be null");
@@ -90,7 +90,7 @@ public class DFPMObligationHandler extends AbstractObligationHandler {
      * @param mapper mapper used to map a subject to a POSIX account
      */
     public DFPMObligationHandler(String obligationId, int precedence, AccountMapper mapper){
-        super(obligationId, precedence);
+        super(MAPPING_OB_ID, precedence);
         
         if(mapper == null){
             throw new IllegalArgumentException("Account mapper may not be null");
@@ -101,12 +101,10 @@ public class DFPMObligationHandler extends AbstractObligationHandler {
     /** {@inheritDoc} */
     public void evaluateObligation(Request request, Result result) throws ObligationProcessingException {
         Subject subject = getSubject(request);
-        Attribute subjectDNttribute = null, primaryFQANAttribute = null, secondaryFQANAttribute = null;
-        extractAttributes(subject, subjectDNttribute, primaryFQANAttribute, secondaryFQANAttribute);
         
-        X500Principal subjectDN = getDN(subjectDNttribute);
-        FQAN primaryFQAN = getPrimaryFQAN(primaryFQANAttribute);
-        List<FQAN> secondaryFQANs = getSecondaryFQANs(secondaryFQANAttribute);
+        X500Principal subjectDN = getDN(subject);
+        FQAN primaryFQAN = getPrimaryFQAN(subject);
+        List<FQAN> secondaryFQANs = getSecondaryFQANs(subject);
         
         PosixAccount mappedAccount = accountMapper.mapToAccount(subjectDN, primaryFQAN, secondaryFQANs);
         if(mappedAccount != null){
@@ -148,38 +146,6 @@ public class DFPMObligationHandler extends AbstractObligationHandler {
     }
     
     /**
-     * Extracts the subject ID, primary FQAN, and secondary FQANs from the given subject.
-     * 
-     * @param subject the request subject
-     * @param subjectId will be set to the subject's DN
-     * @param primaryFQAN will be set to the subject's primary FQAN
-     * @param secondaryFQANs will be set to the subject's secondary FQAN
-     */
-    private void extractAttributes(Subject subject, Attribute subjectId, Attribute primaryFQAN, Attribute secondaryFQANs){
-        for(Attribute attribute : subject.getAttributes()){
-            if(attribute.getId().equals(Attribute.ID_SUB_ID)){
-                if(subjectId != null){
-                    log.warn("More than one {} attribute present in Subject, only the first will be used", Attribute.ID_SUB_ID);
-                    continue;
-                }
-                subjectId = attribute;
-            }else if(attribute.getId().equals(X509PIP.VOMS_PRIMARY_FQAN)){
-                if(primaryFQAN != null){
-                    log.warn("More than one {} attribute present in Subject, only the first will be used", X509PIP.VOMS_PRIMARY_FQAN);
-                    continue;
-                }
-                primaryFQAN = attribute;
-            }else if(attribute.getId().equals(X509PIP.VOMS_FQAN)){
-                if(secondaryFQANs != null){
-                    log.warn("More than one {} attribute present in Subject, only the first will be used", X509PIP.VOMS_FQAN);
-                    continue;
-                }
-                secondaryFQANs = attribute;
-            }
-        }
-    }
-    
-    /**
      * Gets the subject's DN from the subject DN attribute.
      * 
      * @param dnAttribute subject DN attribute
@@ -188,7 +154,17 @@ public class DFPMObligationHandler extends AbstractObligationHandler {
      * 
      * @throws ObligationProcessingException thrown if the given attribute contains no values, is not of the right data type, or its value is not a valid DN
      */
-    private X500Principal getDN(Attribute dnAttribute) throws ObligationProcessingException{
+    private X500Principal getDN(Subject subject) throws ObligationProcessingException{
+        Attribute dnAttribute = null;
+        
+        for(Attribute attribute : subject.getAttributes()){
+            if(attribute.getId().equals(Attribute.ID_SUB_ID)){
+                log.debug("Extracted subject attribute from request: {}", attribute);
+                dnAttribute = attribute;
+                break;
+            }
+        }
+        
         if(dnAttribute == null){
             log.error("Subject of the authorization request did not contain a subject ID attribute");
             throw new ObligationProcessingException("Invalid request, missing subject attribute");
@@ -217,7 +193,17 @@ public class DFPMObligationHandler extends AbstractObligationHandler {
         }
     }
     
-    private FQAN getPrimaryFQAN(Attribute primaryFQANAttribute) throws ObligationProcessingException {
+    private FQAN getPrimaryFQAN(Subject subject) throws ObligationProcessingException {
+        Attribute primaryFQANAttribute = null;
+        
+        for(Attribute attribute : subject.getAttributes()){
+            if(attribute.getId().equals(X509PIP.VOMS_PRIMARY_FQAN)){
+                log.debug("Extracted primary FQAN attribute from request: {}", attribute);
+                primaryFQANAttribute = attribute;
+                break;
+            }
+        }
+        
         if(primaryFQANAttribute == null){
             log.error("Subject of the authorization request did not contain a subject primary FQAN attribute");
             throw new ObligationProcessingException("Invalid request, missing subject attribute");
@@ -246,7 +232,17 @@ public class DFPMObligationHandler extends AbstractObligationHandler {
         }
     }
     
-    private List<FQAN> getSecondaryFQANs(Attribute secondaryFQANsAttribute) throws ObligationProcessingException {
+    private List<FQAN> getSecondaryFQANs(Subject subject) throws ObligationProcessingException {
+        Attribute secondaryFQANsAttribute = null;
+        
+        for(Attribute attribute : subject.getAttributes()){
+            if(attribute.getId().equals(X509PIP.VOMS_FQAN)){
+                log.debug("Extracted secondary FQAN attribute from request: {}", attribute);
+                secondaryFQANsAttribute = attribute;
+                break;
+            }
+        }
+        
         if(secondaryFQANsAttribute == null){
             log.error("Subject of the authorization request did not contain a subject secondary FQAN attribute");
             throw new ObligationProcessingException("Invalid request, missing subject attribute");
