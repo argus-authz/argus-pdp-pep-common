@@ -384,7 +384,7 @@ public class DFPMObligationHandler extends AbstractObligationHandler {
         if (primaryGroup != null) {
             attributeAssignment = new AttributeAssignment();
             attributeAssignment.setAttributeId(GID_ATTRIB_ID);
-            attributeAssignment.getValues().add(primaryGroup.getName());
+            attributeAssignment.getValues().add(Integer.toString(primaryGroup.getGID()));
             obligation.getAttributeAssignments().add(attributeAssignment);
         }
 
@@ -400,7 +400,7 @@ public class DFPMObligationHandler extends AbstractObligationHandler {
      */
     protected Obligation buildSecondaryGIDsObligation(PosixAccount account) {
         List<PosixAccount.Group> secondaryGroups = account.getSecondaryGroups();
-        if (secondaryGroups == null) {
+        if (secondaryGroups == null || secondaryGroups.isEmpty()) {
             return null;
         }
 
@@ -412,7 +412,7 @@ public class DFPMObligationHandler extends AbstractObligationHandler {
         for (PosixAccount.Group secondaryGroup : secondaryGroups) {
             attributeAssignment = new AttributeAssignment();
             attributeAssignment.setAttributeId(GID_ATTRIB_ID);
-            attributeAssignment.getValues().add(secondaryGroup.getName());
+            attributeAssignment.getValues().add(Integer.toString(secondaryGroup.getGID()));
             obligation.getAttributeAssignments().add(attributeAssignment);
         }
 
