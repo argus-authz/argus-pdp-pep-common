@@ -45,7 +45,7 @@ public class FQANMatchStrategy implements DFPMMatchStrategy<FQAN> {
 
         ArrayList<String> attributeIds = new ArrayList<String>();
         attributeIds.addAll(target.getAttributeIds());
-        attributeIds.addAll(target.getAttributeIds());
+        attributeIds.addAll(candidate.getAttributeIds());
 
         for (String id : attributeIds) {
             if (!attributeMatches(target.getAttributeById(id), candidate.getAttributeById(id))) {
