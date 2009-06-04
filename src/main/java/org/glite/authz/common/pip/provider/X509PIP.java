@@ -36,7 +36,6 @@ import org.glite.authz.common.pip.PIPProcessingException;
 import org.glite.authz.common.pip.PolicyInformationPoint;
 import org.glite.authz.common.util.Strings;
 import org.glite.security.util.CertUtil;
-import org.glite.security.util.DNHandler;
 import org.glite.security.util.FileCertReader;
 import org.glite.voms.FQAN;
 import org.glite.voms.PKIStore;
@@ -302,14 +301,6 @@ public class X509PIP implements PolicyInformationPoint {
         attribute.setDataType(Attribute.DT_X500_NAME);
         attribute.setIssuer(endEntityIssuerDn);
         attribute.getValues().add(endEntitySubjectDN);
-        log.debug("Extracted attribute: {}", attribute);
-        subjectAttributes.add(attribute);
-
-        attribute = new Attribute();
-        attribute.setId(SUBJECT_X509_ID);
-        attribute.setDataType(Attribute.DT_STRING);
-        attribute.setIssuer(endEntityIssuerDn);
-        attribute.getValues().add(DNHandler.getSubject(endEntityCertificate).getX500());
         log.debug("Extracted attribute: {}", attribute);
         subjectAttributes.add(attribute);
 

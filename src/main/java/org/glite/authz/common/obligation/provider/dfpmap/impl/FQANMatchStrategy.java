@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.glite.authz.common.obligation.provider.dfpmap.impl;
 
 import java.util.ArrayList;
@@ -24,37 +25,35 @@ public class FQANMatchStrategy implements DFPMMatchStrategy<FQAN> {
 
     /** {@inheritDoc} */
     public boolean isMatch(String dfpmKey, FQAN candidate) {
-        FQAN target = FQAN.parseFQAN(dfpmKey);
-        
-        if (target instanceof FQAN && candidate instanceof FQAN) {
-            FQAN targetFQAN = (FQAN) target;
-            FQAN candidateFQAN = (FQAN) candidate;
-
-            if (targetFQAN.getAttributeGroupId().endsWith("*")) {
-                String targetGroupIDRegex = targetFQAN.getAttributeGroupId().replace("*", ".+");
-                if (!candidateFQAN.getAttributeGroupId().matches(targetGroupIDRegex)) {
-                    return false;
-                }
-            } else {
-                if (!candidateFQAN.getAttributeGroupId().equals(targetFQAN.getAttributeGroupId())) {
-                    return false;
-                }
-            }
-
-            ArrayList<String> attributeIds = new ArrayList<String>();
-            attributeIds.addAll(targetFQAN.getAttributeIds());
-            attributeIds.addAll(candidateFQAN.getAttributeIds());
-            
-            for(String id : attributeIds){
-                if (!attributeMatches(targetFQAN.getAttributeById(id), candidateFQAN.getAttributeById(id))) {
-                    return false;
-                }
-            }
-
-            return true;
+        FQAN target= null;
+        try {
+            target = FQAN.parseFQAN(dfpmKey);
+        } catch (IllegalArgumentException e) {
+            return false;
         }
 
-        return false;
+        if (target.getAttributeGroupId().endsWith("*")) {
+            String targetGroupIDRegex = target.getAttributeGroupId().replace("*", ".+");
+            if (!candidate.getAttributeGroupId().matches(targetGroupIDRegex)) {
+                return false;
+            }
+        } else {
+            if (!candidate.getAttributeGroupId().equals(target.getAttributeGroupId())) {
+                return false;
+            }
+        }
+
+        ArrayList<String> attributeIds = new ArrayList<String>();
+        attributeIds.addAll(target.getAttributeIds());
+        attributeIds.addAll(target.getAttributeIds());
+
+        for (String id : attributeIds) {
+            if (!attributeMatches(target.getAttributeById(id), candidate.getAttributeById(id))) {
+                return false;
+            }
+        }
+
+        return true;
     }
 
     /**
@@ -66,19 +65,19 @@ public class FQANMatchStrategy implements DFPMMatchStrategy<FQAN> {
      * @return true if the candidate matches the target, false if not
      */
     private boolean attributeMatches(FQAN.Attribute target, FQAN.Attribute candidate) {
-        if(target == null && candidate == null){
+        if (target == null && candidate == null) {
             return true;
         }
-        
+
         if (candidate == null) {
             if (target.getValue().equals(FQAN.Attribute.NULL_VALUE)) {
                 return true;
             }
             return false;
         }
-        
-        if(target == null){
-            if(candidate.getValue().equals(FQAN.Attribute.NULL_VALUE)){
+
+        if (target == null) {
+            if (candidate.getValue().equals(FQAN.Attribute.NULL_VALUE)) {
                 return true;
             }
             return false;
