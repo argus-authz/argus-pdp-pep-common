@@ -110,12 +110,7 @@ public final class Strings {
             return null;
         }
         
-        String effectiveDelimiter = safeTrimOrNullString(delimiter);
-        if(effectiveDelimiter == null){
-            effectiveDelimiter = ",";
-        }
-        
-        StringTokenizer valueTokens = new StringTokenizer(trimmedValueStr, effectiveDelimiter);
+        StringTokenizer valueTokens = new StringTokenizer(trimmedValueStr, delimiter);
         LazyList<String> values = new LazyList<String>();
         String value;
         
