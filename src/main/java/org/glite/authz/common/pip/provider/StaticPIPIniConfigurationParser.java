@@ -26,6 +26,7 @@ import net.jcip.annotations.ThreadSafe;
 
 import org.glite.authz.common.config.AbstractConfigurationBuilder;
 import org.glite.authz.common.config.ConfigurationException;
+import org.glite.authz.common.config.IniConfigUtil;
 import org.glite.authz.common.model.Attribute;
 import org.glite.authz.common.pip.IniPIPConfigurationParser;
 import org.glite.authz.common.pip.PolicyInformationPoint;
@@ -94,6 +95,15 @@ public class StaticPIPIniConfigurationParser implements IniPIPConfigurationParse
     /** The default value of the {@value #ATTRIBUTE_VALUE_DELIM_PROP} property: {@value} */
     public static final String DEFAULT_VALUE_DELIM = ",";
 
+    /** The default value of the {@value #RESOURCE_ATTRIBUTES_IN_ALL_PROP} property: {@value} . */
+    public static final boolean DEFAULT_RESOURCE_ATTRIBUTES_IN_ALL = false;
+
+    /** The default value of the {@value #SUBJECT_ATTRIBUTES_IN_ALL_PROP} property: {@value} . */
+    public static final boolean DEFAULT_SUBJECT_ATTRIBUTES_IN_ALL = false;
+
+    /** The default value of the {@value #ATTRIBUTE_DT_PROP} property: {@value} . */
+    public static final String DEFAULT_ATTRIBUTE_DT = Attribute.DT_STRING;
+
     /** Class logger. */
     private Logger log = LoggerFactory.getLogger(StaticPIPIniConfigurationParser.class);
 
@@ -104,41 +114,36 @@ public class StaticPIPIniConfigurationParser implements IniPIPConfigurationParse
 
         String pipId = Strings.safeTrimOrNullString(iniConfig.getName());
 
-        String defaultAttributeIssuer = Strings.safeTrimOrNullString(iniConfig.get(DEFAULT_ATTRIBUTE_ISSUER_PROP));
+        String defaultAttributeIssuer = Strings.safeTrimOrNullString(IniConfigUtil.getString(iniConfig,
+                DEFAULT_ATTRIBUTE_ISSUER_PROP, null));
         log.info("default attribute issuer: {}", (defaultAttributeIssuer == null) ? "none" : defaultAttributeIssuer);
 
-        List<Attribute> actionAttributes = parseAttributes(iniFile, iniConfig.get(ACTION_ATTRIBS_PROP),
-                defaultAttributeIssuer);
-        log.info("Static PIP {} loaded action attributes {}", pipId, actionAttributes);
+        List<Attribute> actionAttributes = parseAttributes(iniFile, IniConfigUtil.getString(iniConfig,
+                ACTION_ATTRIBS_PROP, null), defaultAttributeIssuer);
+        log.info("action attributes: {} ", pipId, actionAttributes);
 
-        List<Attribute> environmentAttributes = parseAttributes(iniFile, iniConfig.get(ENVIRONMENT_ATTRIBS_PROP),
-                defaultAttributeIssuer);
-        log.info("Static PIP {} loaded envrionment attributes {}", pipId, environmentAttributes);
+        List<Attribute> environmentAttributes = parseAttributes(iniFile, IniConfigUtil.getString(iniConfig,
+                ENVIRONMENT_ATTRIBS_PROP, null), defaultAttributeIssuer);
+        log.info("envrionment attributes: {}", pipId, environmentAttributes);
 
-        List<Attribute> resourceAttributes = parseAttributes(iniFile, iniConfig.get(RESOURCE_ATTRIBS_PROP),
-                defaultAttributeIssuer);
-        log.info("Static PIP {} loaded resource attributes {}", pipId, resourceAttributes);
+        List<Attribute> resourceAttributes = parseAttributes(iniFile, IniConfigUtil.getString(iniConfig,
+                RESOURCE_ATTRIBS_PROP, null), defaultAttributeIssuer);
+        log.info("resource attributes: {}", pipId, resourceAttributes);
 
-        List<Attribute> subjectAttributes = parseAttributes(iniFile, iniConfig.get(SUBJECT_ATTRIBS_PROP),
-                defaultAttributeIssuer);
-        log.info("Static PIP {} loaded subject attributes {}", pipId, subjectAttributes);
+        List<Attribute> subjectAttributes = parseAttributes(iniFile, IniConfigUtil.getString(iniConfig,
+                SUBJECT_ATTRIBS_PROP, null), defaultAttributeIssuer);
+        log.info("subject attributes: {}", pipId, subjectAttributes);
 
         StaticPIP pip = new StaticPIP(pipId, actionAttributes, environmentAttributes, resourceAttributes,
                 subjectAttributes);
 
-        boolean resourceAttributesInAllResource = false;
-        if (iniConfig.containsKey(RESOURCE_ATTRIBUTES_IN_ALL_PROP)) {
-            resourceAttributesInAllResource = Boolean.parseBoolean(iniConfig.get(RESOURCE_ATTRIBUTES_IN_ALL_PROP));
-        }
-        log
-                .info("resource attributes will be applied to all resources in request: {}",
-                        resourceAttributesInAllResource);
+        boolean resourceAttributesInAllResource = IniConfigUtil.getBoolean(iniConfig, RESOURCE_ATTRIBUTES_IN_ALL_PROP,
+                DEFAULT_RESOURCE_ATTRIBUTES_IN_ALL);
+        log.info("resource attributes will be applied to all resources in request: {}", resourceAttributesInAllResource);
         pip.setAddAttributesToAllResources(resourceAttributesInAllResource);
 
-        boolean subjectAttributesInAllSubject = false;
-        if (iniConfig.containsKey(SUBJECT_ATTRIBUTES_IN_ALL_PROP)) {
-            subjectAttributesInAllSubject = Boolean.parseBoolean(iniConfig.get(SUBJECT_ATTRIBUTES_IN_ALL_PROP));
-        }
+        boolean subjectAttributesInAllSubject = IniConfigUtil.getBoolean(iniConfig, SUBJECT_ATTRIBUTES_IN_ALL_PROP,
+                DEFAULT_SUBJECT_ATTRIBUTES_IN_ALL);
         log.info("subject attributes will be applied to all subject in request: {}", subjectAttributesInAllSubject);
         pip.setAddAttributesToAllSubjects(subjectAttributesInAllSubject);
 
@@ -236,37 +241,13 @@ public class StaticPIPIniConfigurationParser implements IniPIPConfigurationParse
             return null;
         }
 
-        String id = Strings.safeTrimOrNullString(configSection.get(ATTRIBUTE_ID_PROP));
-        if (id == null) {
-            String errorMsg = ATTRIBUTE_ID_PROP + " property in INI section " + configSection.getName()
-                    + " may not be null or empty";
-            log.error(errorMsg);
-            throw new ConfigurationException(errorMsg);
-        }
-
-        String datatype = Strings.safeTrimOrNullString(configSection.get(ATTRIBUTE_DT_PROP));
-        if (datatype == null) {
-            datatype = Attribute.DT_STRING;
-        }
-
-        String issuer = Strings.safeTrimOrNullString(configSection.get(ATTRIBUTE_ISSUER_PROP));
-        if (issuer == null) {
-            issuer = defaultAttributeIssuer;
-        }
-
-        List<String> values = Strings.toList(configSection.get(ATTRIBUTE_VALUE_PROP), configSection
-                .get(ATTRIBUTE_VALUE_DELIM_PROP));
-        if (values == null) {
-            String errorMsg = ATTRIBUTE_VALUE_PROP + " property in INI section " + configSection.getName()
-                    + " may not be null or empty";
-            log.error(errorMsg);
-            throw new ConfigurationException(errorMsg);
-        }
-
         Attribute attribute = new Attribute();
-        attribute.setId(id);
-        attribute.setDataType(datatype);
-        attribute.setIssuer(issuer);
+        attribute.setId(IniConfigUtil.getString(configSection, ATTRIBUTE_ID_PROP));
+        attribute.setDataType(IniConfigUtil.getString(configSection, ATTRIBUTE_DT_PROP, DEFAULT_ATTRIBUTE_DT));
+        attribute.setIssuer(IniConfigUtil.getString(configSection, ATTRIBUTE_ISSUER_PROP, defaultAttributeIssuer));
+
+        List<String> values = Strings.toList(IniConfigUtil.getString(configSection, ATTRIBUTE_VALUE_PROP),
+                IniConfigUtil.getString(configSection, ATTRIBUTE_VALUE_DELIM_PROP, DEFAULT_VALUE_DELIM));
         attribute.getValues().addAll(values);
 
         log.debug("Created the following attribute definition from INI section {}: {}", configSection.getName(),
