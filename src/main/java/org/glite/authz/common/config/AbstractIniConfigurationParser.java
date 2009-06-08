@@ -85,16 +85,16 @@ public abstract class AbstractIniConfigurationParser<ConfigurationType extends A
     public static final int DEFAULT_TRUST_INFO_REFRESH = 60;
 
     /** Default value of the {@value #MAX_REQUESTS_PROP} property, {@value} . */
-    public static final int DEFAULT_MAX_REQS = 50;
+    public static final int DEFAULT_MAX_REQS = 200;
 
     /** Default value of the {@value #CONN_TIMEOUT_PROP} property, {@value} seconds. */
     public static final int DEFAULT_CONN_TIMEOUT = 30;
 
     /** Default value of the {@value #REC_BUFF_SIZE_PROP} property, {@value} kilobytes. */
-    public static final int DEFAULT_REC_BUFF_SIZE = 4096;
+    public static final int DEFAULT_REC_BUFF_SIZE = 16384;
 
     /** Default value of the {@value #SEND_BUFF_SIZE_PROP} property, {@value} kilobytes. */
-    public static final int DEFAULT_SEND_BUFF_SIZE = 4096;
+    public static final int DEFAULT_SEND_BUFF_SIZE = 16384;
 
     /** Class logger. */
     private final Logger log = LoggerFactory.getLogger(AbstractIniConfigurationParser.class);
@@ -112,13 +112,8 @@ public abstract class AbstractIniConfigurationParser<ConfigurationType extends A
     @SuppressWarnings("unchecked")
     private AbstractObligationHandler buildObligationHandler(Section ohConfig,
             AbstractConfigurationBuilder<?> configBuilder) throws ConfigurationException {
+        log.info("Loading Obligation Handler {}", ohConfig.getName());
         String parserClassName = IniConfigUtil.getString(ohConfig, IniOHConfigurationParser.PARSER_CLASS_PROP);
-        if (parserClassName == null) {
-            String errorMsg = "Obligation configuration section " + ohConfig.getName() + " does not contain a valid "
-                    + IniOHConfigurationParser.PARSER_CLASS_PROP + " configuration property.";
-            log.error(errorMsg);
-            throw new ConfigurationException(errorMsg);
-        }
 
         try {
             Class<IniOHConfigurationParser> parserClass = (Class<IniOHConfigurationParser>) AbstractIniServiceConfigurationParser.class
@@ -144,17 +139,10 @@ public abstract class AbstractIniConfigurationParser<ConfigurationType extends A
     @SuppressWarnings("unchecked")
     private PolicyInformationPoint buildPolicyInformationPoint(Section pipConfig,
             AbstractConfigurationBuilder<?> configBuilder) throws ConfigurationException {
+        log.info("Loading Policy Information Point {}", pipConfig.getName());
         String parserClassName = IniConfigUtil.getString(pipConfig, IniPIPConfigurationParser.PARSER_CLASS_PROP);
-        if (parserClassName == null) {
-            String errorMsg = "PIP configuration section " + pipConfig.getName() + " does not contain a valid "
-                    + IniPIPConfigurationParser.PARSER_CLASS_PROP + " configuration property.";
-            log.error(errorMsg);
-            throw new ConfigurationException(errorMsg);
-        }
 
         try {
-            log.info("Loading PIP {}", pipConfig.getName());
-            log.debug("Creating INI PIP parser class {}", parserClassName);
             Class<IniPIPConfigurationParser> parserClass = (Class<IniPIPConfigurationParser>) AbstractIniConfigurationParser.class
                     .getClassLoader().loadClass(parserClassName);
             IniPIPConfigurationParser parser = parserClass.getConstructor().newInstance();

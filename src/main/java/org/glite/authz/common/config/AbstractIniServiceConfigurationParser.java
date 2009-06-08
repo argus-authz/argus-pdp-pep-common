@@ -59,7 +59,7 @@ public abstract class AbstractIniServiceConfigurationParser<ConfigurationType ex
     public static final boolean DEFAULT_SSL_ON_PORT = false;
     
     /** Default value of the {@value #REQUEST_QUEUE_PROP} property, {@value} . */
-    public static final int DEFAULT_REQUEST_QUEUE = 50;
+    public static final int DEFAULT_REQUEST_QUEUE = 500;
 
     /** Class logger. */
     private final Logger log = LoggerFactory.getLogger(AbstractIniServiceConfigurationParser.class);
