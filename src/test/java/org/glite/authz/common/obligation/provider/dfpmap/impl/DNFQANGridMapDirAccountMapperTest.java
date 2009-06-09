@@ -53,7 +53,7 @@ public class DNFQANGridMapDirAccountMapperTest extends TestCase {
     protected void setUp() throws Exception {
         super.setUp();
 
-        gridMapDir = new File(System.getProperty("user.home") + File.separator + "gridmapdir");
+        gridMapDir = new File(System.getProperty("java.io.tmpdir") + File.separator + "gridmapdir");
         gridMapDir.mkdirs();
 
         ArrayList<String> poolAccountNames = new ArrayList<String>();
