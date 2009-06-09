@@ -41,6 +41,8 @@ import org.glite.authz.common.obligation.provider.dfpmap.PosixAccount;
  */
 public class DNFQANGridMapDirAccountMapperTest extends TestCase {
 
+    File gridMapDir;
+    
     private AccountMapper accountMapper;
 
     private X500Principal dn1, dn2, dn3;
@@ -51,7 +53,8 @@ public class DNFQANGridMapDirAccountMapperTest extends TestCase {
     protected void setUp() throws Exception {
         super.setUp();
 
-        File gridMapDir = new File("/temp/gridmapdir");
+        gridMapDir = new File(System.getProperty("user.home") + File.separator + "tmp" + File.separator
+                + "gridmapdir");
         gridMapDir.mkdirs();
 
         ArrayList<String> poolAccountNames = new ArrayList<String>();
@@ -116,7 +119,6 @@ public class DNFQANGridMapDirAccountMapperTest extends TestCase {
     protected void tearDown() throws Exception {
         super.tearDown();
 
-        File gridMapDir = new File("/temp/gridmapdir");
         for (File file : gridMapDir.listFiles()) {
             file.delete();
         }
@@ -157,10 +159,10 @@ public class DNFQANGridMapDirAccountMapperTest extends TestCase {
             // this is supposed to happen
         }
     }
-    
-    public void testWithSecondaryFQANs() throws Exception{
+
+    public void testWithSecondaryFQANs() throws Exception {
         PosixAccount account;
-        
+
         account = accountMapper.mapToAccount(dn1, switch0, Arrays.asList(switch1));
         assertNotNull(account);
         assertEquals("testa0", account.getLoginName());
@@ -170,7 +172,7 @@ public class DNFQANGridMapDirAccountMapperTest extends TestCase {
         assertEquals(1, account.getSecondaryGroups().size());
         assertEquals("testb", account.getSecondaryGroups().get(0).getName());
         assertEquals(4, account.getSecondaryGroups().get(0).getGID());
-        
+
         account = accountMapper.mapToAccount(dn1, switch0, Arrays.asList(switch1, switch2));
         assertNotNull(account);
         assertEquals("testa1", account.getLoginName());
@@ -182,7 +184,7 @@ public class DNFQANGridMapDirAccountMapperTest extends TestCase {
         assertEquals(4, account.getSecondaryGroups().get(0).getGID());
         assertEquals("testc", account.getSecondaryGroups().get(1).getName());
         assertEquals(5, account.getSecondaryGroups().get(1).getGID());
-        
+
         account = accountMapper.mapToAccount(dn1, switch2, Arrays.asList(switch0, switch1));
         assertNotNull(account);
         assertEquals("testc0", account.getLoginName());
@@ -194,7 +196,7 @@ public class DNFQANGridMapDirAccountMapperTest extends TestCase {
         assertEquals(3, account.getSecondaryGroups().get(0).getGID());
         assertEquals("testb", account.getSecondaryGroups().get(1).getName());
         assertEquals(4, account.getSecondaryGroups().get(1).getGID());
-        
+
         account = accountMapper.mapToAccount(dn1, switch2, Arrays.asList(switch0, FQAN.parseFQAN("/group99"), switch1));
         assertNotNull(account);
         assertEquals("testc0", account.getLoginName());
@@ -206,7 +208,7 @@ public class DNFQANGridMapDirAccountMapperTest extends TestCase {
         assertEquals(3, account.getSecondaryGroups().get(0).getGID());
         assertEquals("testb", account.getSecondaryGroups().get(1).getName());
         assertEquals(4, account.getSecondaryGroups().get(1).getGID());
-        
+
         account = accountMapper.mapToAccount(dn1, switch2, Arrays.asList(FQAN.parseFQAN("/group99"), switch1, switch0));
         assertNotNull(account);
         assertEquals("testc0", account.getLoginName());
@@ -218,8 +220,9 @@ public class DNFQANGridMapDirAccountMapperTest extends TestCase {
         assertEquals(3, account.getSecondaryGroups().get(0).getGID());
         assertEquals("testb", account.getSecondaryGroups().get(1).getName());
         assertEquals(4, account.getSecondaryGroups().get(1).getGID());
-        
-        account = accountMapper.mapToAccount(dn1, FQAN.parseFQAN(switch0.toString() + "/Role=production"), Arrays.asList(switch1, switch2));
+
+        account = accountMapper.mapToAccount(dn1, FQAN.parseFQAN(switch0.toString() + "/Role=production"), Arrays
+                .asList(switch1, switch2));
         assertNotNull(account);
         assertEquals("testb0", account.getLoginName());
         assertEquals(13, account.getUid());
@@ -228,8 +231,9 @@ public class DNFQANGridMapDirAccountMapperTest extends TestCase {
         assertEquals(1, account.getSecondaryGroups().size());
         assertEquals("testc", account.getSecondaryGroups().get(0).getName());
         assertEquals(5, account.getSecondaryGroups().get(0).getGID());
-        
-        account = accountMapper.mapToAccount(dn1, FQAN.parseFQAN(switch1.toString() + "/Role=production"), Arrays.asList(switch0, switch2));
+
+        account = accountMapper.mapToAccount(dn1, FQAN.parseFQAN(switch1.toString() + "/Role=production"), Arrays
+                .asList(switch0, switch2));
         assertNotNull(account);
         assertEquals("user1", account.getLoginName());
         assertEquals(2, account.getUid());
@@ -240,8 +244,9 @@ public class DNFQANGridMapDirAccountMapperTest extends TestCase {
         assertEquals(3, account.getSecondaryGroups().get(0).getGID());
         assertEquals("testc", account.getSecondaryGroups().get(1).getName());
         assertEquals(5, account.getSecondaryGroups().get(1).getGID());
-        
-        account = accountMapper.mapToAccount(dn1, switch2, Arrays.asList(FQAN.parseFQAN(switch1.toString() + "/Role=pilot"), switch0));
+
+        account = accountMapper.mapToAccount(dn1, switch2, Arrays.asList(FQAN.parseFQAN(switch1.toString()
+                + "/Role=pilot"), switch0));
         assertNotNull(account);
         assertEquals("testc1", account.getLoginName());
         assertEquals(24, account.getUid());
@@ -253,7 +258,8 @@ public class DNFQANGridMapDirAccountMapperTest extends TestCase {
         assertEquals("glite", account.getSecondaryGroups().get(1).getName());
         assertEquals(1, account.getSecondaryGroups().get(1).getGID());
 
-        account = accountMapper.mapToAccount(dn1, FQAN.parseFQAN(switch0.toString() + "/Role=pilot"), Arrays.asList(FQAN.parseFQAN(switch1.toString() + "/Role=production")));
+        account = accountMapper.mapToAccount(dn1, FQAN.parseFQAN(switch0.toString() + "/Role=pilot"), Arrays
+                .asList(FQAN.parseFQAN(switch1.toString() + "/Role=production")));
         assertNotNull(account);
         assertEquals("glite", account.getLoginName());
         assertEquals(1, account.getUid());
