@@ -42,7 +42,7 @@ import org.glite.authz.common.obligation.provider.dfpmap.PosixAccount;
 public class DNFQANGridMapDirAccountMapperTest extends TestCase {
 
     File gridMapDir;
-    
+
     private AccountMapper accountMapper;
 
     private X500Principal dn1, dn2, dn3;
@@ -53,8 +53,7 @@ public class DNFQANGridMapDirAccountMapperTest extends TestCase {
     protected void setUp() throws Exception {
         super.setUp();
 
-        gridMapDir = new File(System.getProperty("user.home") + File.separator + "tmp" + File.separator
-                + "gridmapdir");
+        gridMapDir = new File(System.getProperty("user.home") + File.separator + "gridmapdir");
         gridMapDir.mkdirs();
 
         ArrayList<String> poolAccountNames = new ArrayList<String>();
