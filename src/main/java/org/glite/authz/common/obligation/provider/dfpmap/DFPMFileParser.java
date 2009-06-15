@@ -16,8 +16,8 @@
 
 package org.glite.authz.common.obligation.provider.dfpmap;
 
-import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.LineNumberReader;
 import java.io.Reader;
 import java.util.List;
 import java.util.UnknownFormatConversionException;
@@ -40,19 +40,17 @@ public class DFPMFileParser {
      * @param mapFileReader reader of the map file
      */
     public void parse(final DFPM map, final Reader mapFileReader) throws ConfigurationException {
-        BufferedReader bufferedReader = new BufferedReader(mapFileReader);
-        int lineNumber = 0;
+        LineNumberReader reader = new LineNumberReader(mapFileReader);
+
         try {
-            String line = bufferedReader.readLine();
+            String line = reader.readLine();
             do {
-                lineNumber++;
-                parseLine(map, line, lineNumber);
-                line = bufferedReader.readLine();
+                parseLine(map, line, reader.getLineNumber());
+                line = reader.readLine();
             } while (line != null);
         } catch (IOException e) {
-            String msg = "Unable to read map file";
-            log.error(msg, e);
-            throw new ConfigurationException(msg, e);
+            log.error("Unable to read map file", e);
+            throw new ConfigurationException("Unable to read map file", e);
         }
     }
 
