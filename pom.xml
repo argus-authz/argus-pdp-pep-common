@@ -279,4 +279,21 @@
         <url>http://www.eu-egee.org/</url>
     </organization>
 
+    <profiles>
+        <profile>
+            <id>etics</id>
+            <reporting>
+                <outputDirectory>${etics.reportsDir}</outputDirectory>
+                <plugins>
+                    <plugin>
+                        <artifactId>maven-surefire-report-plugin</artifactId>
+                        <configuration>
+                            <outputName>index-custom-SureFire</outputName>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </reporting>
+        </profile>
+    </profiles>
+
 </project>
