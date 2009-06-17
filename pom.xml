@@ -288,7 +288,7 @@
                     <plugin>
                         <artifactId>maven-surefire-report-plugin</artifactId>
                         <configuration>
-                            <outputName>index-custom-SureFire</outputName>
+                            <outputName>index-custom-SureFire-${project.artifactId}</outputName>
                             <linkXRef>false</linkXRef>
                         </configuration>
                     </plugin>
