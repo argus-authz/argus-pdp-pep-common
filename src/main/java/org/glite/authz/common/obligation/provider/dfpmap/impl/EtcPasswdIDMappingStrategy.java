@@ -61,6 +61,7 @@ public class EtcPasswdIDMappingStrategy implements IDMappingStrategy {
         
         try {
             LineNumberReader etcPasswdReader = new LineNumberReader(new FileReader(etcPasswdFile));
+            log.debug("Reading /etc/passwd file");
 
             String line = etcPasswdReader.readLine();
             String trimmedLine;
@@ -69,10 +70,10 @@ public class EtcPasswdIDMappingStrategy implements IDMappingStrategy {
                 trimmedLine = Strings.safeTrimOrNullString(line);
                 if (trimmedLine != null && !trimmedLine.startsWith("#")) {
                     entry = trimmedLine.split(":");
-                    log.debug("/etc/passwd line {} maps login name {} to GID {}", new Object[] {etcPasswdReader.getLineNumber(), entry[0], entry[2]});
+                    log.trace("/etc/passwd line {} maps login name {} to GID {}", new Object[] {etcPasswdReader.getLineNumber(), entry[0], entry[2]});
                     map.put(entry[0], new Integer(entry[2]));
                 }else{
-                    log.debug("Ignoring /etc/passwd line {} because it empty or a comment", etcPasswdReader.getLineNumber());
+                    log.trace("Ignoring /etc/passwd line {} because it empty or a comment", etcPasswdReader.getLineNumber());
                 }
                 line = etcPasswdReader.readLine();
             }

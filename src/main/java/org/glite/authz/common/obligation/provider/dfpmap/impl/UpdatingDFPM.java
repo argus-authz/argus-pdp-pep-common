@@ -16,24 +16,77 @@
 
 package org.glite.authz.common.obligation.provider.dfpmap.impl;
 
+import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.Timer;
+import java.util.TimerTask;
 
+import org.glite.authz.common.config.ConfigurationException;
 import org.glite.authz.common.obligation.provider.dfpmap.DFPM;
+import org.glite.authz.common.obligation.provider.dfpmap.DFPMFileParser;
+import org.glite.authz.common.util.Files;
+import org.glite.authz.common.util.Strings;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * A {@link DFPM} implementation that periodically re-reads a mapping file and, if changes have occurred, updates the
- * mapping.  Such an update does not effect any 
+ * mapping. Such an update does not effect any
  */
 public class UpdatingDFPM implements DFPM {
+
+    /** Class logger. */
+    private final Logger log = LoggerFactory.getLogger(UpdatingDFPM.class);
 
     /** Delegate that is refreshed every period. */
     private DFPM delegate;
 
-    public UpdatingDFPM(DFPMFactory factory, String mappingFile, int refreshPeriod) {
+    /** Timer used to run the background mapping file refresh. */
+    private Timer taskTimer;
+    
+    /** Factory used to create empty {@link DFPM}s. */
+    private final DFPMFactory dfpmFactory;
 
+    /** Path to the mapping file that will be periodically reloaded. */
+    private final String mappingFilePath;
+
+    /**
+     * Constructor.
+     * 
+     * @param factory factory that produces an empty {@link DFPM} into which data will be loaded
+     * @param mappingFile mapping file that will be periodically read and loaded in to the created {@link DFPM}
+     * @param refreshPeriod {@link DFPM} refresh period in milliseconds
+     */
+    public UpdatingDFPM(DFPMFactory factory, String mappingFile, long refreshPeriod) {
+        if(factory == null){
+            throw new IllegalArgumentException("mapping factory may not be null");
+        }
+        dfpmFactory = factory;
+        
+        mappingFilePath = Strings.safeTrimOrNullString(mappingFile);
+        if(mappingFile == null){
+            throw new IllegalArgumentException("mapping file may not be null");
+        }
+        try {
+            Files.getReadableFile(mappingFilePath);
+        } catch (IOException e) {
+            log.error("Unable to read map file " + mappingFilePath, e);
+            throw new IllegalArgumentException("Unable to read map file " + mappingFilePath, e);
+        }
+        
+        if(refreshPeriod < 1){
+            throw new IllegalArgumentException("Refresh period must be 1 or greater");
+        }
+        
+        UpdateDFPMTask updateTask = new UpdateDFPMTask();
+        updateTask.run();
+        taskTimer = new Timer(true);
+        taskTimer.scheduleAtFixedRate(updateTask, refreshPeriod, refreshPeriod);
     }
 
     /** {@inheritDoc} */
@@ -105,9 +158,48 @@ public class UpdatingDFPM implements DFPM {
     public Collection<List<String>> values() {
         return delegate.values();
     }
-    
-    public static interface DFPMFactory{
+
+    /** Background task for updating a {@link DFPM}. */
+    private class UpdateDFPMTask extends TimerTask {
         
-        public DFPM build();
+        /** Local time the mapping file was last modified. */
+        private long mappingFileLastModified = 0;
+        
+        /** {@inheritDoc} */
+        public void run() {
+            try {
+                log.trace("Refreshing mapping file: {}", mappingFilePath);
+                File mappingFile = Files.getReadableFile(mappingFilePath);
+                if(mappingFile.lastModified() <= mappingFileLastModified){
+                    log.trace("Mapping file has not changed since last refresh, nothing need to be done.");
+                    return;
+                }
+                
+                DFPM dfpm = dfpmFactory.newInstance();
+
+                DFPMFileParser mappingFileParser = new DFPMFileParser();
+                mappingFileParser.parse(dfpm, new FileReader(mappingFile));
+                mappingFileLastModified = mappingFile.lastModified();
+                delegate = dfpm;
+            } catch (IOException e) {
+                log.error("Unable to read mapping file " + mappingFilePath
+                        + " due to the following error.  DN/FQAN mapping will not be updated.", e);
+            } catch (ConfigurationException e) {
+                log.error(
+                        "Unable to parse mapping file " + mappingFilePath + ".  DN/FQAN mapping will not be updated.",
+                        e);
+            }
+        }
+    }
+
+    /** Factory used to create a new instance of a {@link DFPM}. */
+    public static interface DFPMFactory {
+
+        /**
+         * Creates a new, empty {@link DFPM} instance.
+         * 
+         * @return new, empty {@link DFPM} instance
+         */
+        public DFPM newInstance();
     }
 }

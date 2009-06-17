@@ -17,8 +17,6 @@
 package org.glite.authz.common.obligation.provider.dfpmap;
 
 import java.io.File;
-import java.io.FileReader;
-import java.io.IOException;
 
 import javax.security.auth.x500.X500Principal;
 
@@ -35,8 +33,9 @@ import org.glite.authz.common.obligation.provider.dfpmap.impl.FQANGroupNameMappi
 import org.glite.authz.common.obligation.provider.dfpmap.impl.FQANMatchStrategy;
 import org.glite.authz.common.obligation.provider.dfpmap.impl.GridMapDirPoolAccountManager;
 import org.glite.authz.common.obligation.provider.dfpmap.impl.OrderedDFPM;
+import org.glite.authz.common.obligation.provider.dfpmap.impl.UpdatingDFPM;
 import org.glite.authz.common.obligation.provider.dfpmap.impl.X509MatchStrategy;
-import org.glite.authz.common.util.Files;
+import org.glite.authz.common.obligation.provider.dfpmap.impl.UpdatingDFPM.DFPMFactory;
 import org.ini4j.Ini.Section;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -113,18 +112,18 @@ public class DFPMObligationHandlerConfigurationParser implements IniOHConfigurat
         log.debug("grid mapping directory: {}", gridMapDir);
 
         AccountMapper accountMapper = buildAccountMapper(accountMapFile, preferDNForLoginName, groupMapFile,
-                mapRefreshPeriod, gridMapDir);
+                mapRefreshPeriod * 60 * 1000, gridMapDir);
         return new DFPMObligationHandler(iniConfig.getName(), accountMapper);
     }
 
     /**
-     * Builds an account mapper for the obligaton handler.
+     * Builds an account mapper for the obligation handler.
      * 
      * @param accountMapFile file containing mappings to account indicators
      * @param preferDNMappingForAccountIndicator whether account indicators derived from DN mappings should be preferred
      *            over those derived from FQAN mappings
      * @param groupMapFile file containing mappings to groups
-     * @param mapRefreshPeriod mapping file re-read and refresh period
+     * @param mapRefreshPeriod mapping file re-read and refresh period in milliseconds
      * @param gridMapDir directory used as backing store for mappings
      * 
      * @return the constructed account mapper
@@ -154,31 +153,21 @@ public class DFPMObligationHandlerConfigurationParser implements IniOHConfigurat
      * Builds an mapping set that refreshes with the given period.
      * 
      * @param mappingFilePath file containing the mapping information
-     * @param refreshPeriod period between refresh of the mapping from the mapping file
+     * @param refreshPeriod period between refresh of the mapping from the mapping file in milliseconds
      * 
      * @return the built mapping
      * 
      * @throws ConfigurationException thrown if the is a problem reading the mapping file
      */
     private DFPM buildMapping(String mappingFilePath, int refreshPeriod) throws ConfigurationException {
-        File mappingFile = null;
-        try {
-            mappingFile = Files.getReadableFile(mappingFilePath);
-        } catch (IOException e) {
-            log.error("Unable to read map file " + mappingFilePath, e);
-            throw new ConfigurationException("Unable to read map file " + mappingFilePath, e);
-        }
-
-        log.debug("Parsing mapping file: {}", mappingFile.getAbsolutePath());
-        DFPMFileParser fileParser = new DFPMFileParser();
-        OrderedDFPM map = new OrderedDFPM();
-        try {
-            fileParser.parse(map, new FileReader(mappingFile));
-            return map;
-        } catch (IOException e) {
-            log.error("Unable to read map file " + mappingFile.getAbsolutePath(), e);
-            throw new ConfigurationException("Unable to read map file " + mappingFile.getAbsolutePath(), e);
-        }
+        DFPMFactory dfpmFactory = new DFPMFactory(){
+            /** {@inheritDoc} */
+            public DFPM newInstance() {
+                return new OrderedDFPM();
+            }
+        };
+        
+        return new UpdatingDFPM(dfpmFactory, mappingFilePath, refreshPeriod);
     }
 
     /**
@@ -188,7 +177,7 @@ public class DFPMObligationHandlerConfigurationParser implements IniOHConfigurat
      * 
      * @return the pool account manager
      * 
-     * @throws ConfigurationException thrown fi the given grid map directory is not a directory, can not be read, or can
+     * @throws ConfigurationException thrown if the given grid map directory is not a directory, can not be read, or can
      *             not be written to
      */
     private PoolAccountManager buildPoolAccountManager(String gridMapDirPath) throws ConfigurationException {
