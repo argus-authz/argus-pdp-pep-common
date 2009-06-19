@@ -62,7 +62,7 @@ public class EtcGroupIDMappingStrategy implements IDMappingStrategy {
         try {
             LineNumberReader etcGroupReader = new LineNumberReader(new FileReader(etcGroupFile));
             log.debug("Reading /etc/group file");
-            
+
             String line = etcGroupReader.readLine();
             String trimmedLine;
             String[] entry;
@@ -70,10 +70,17 @@ public class EtcGroupIDMappingStrategy implements IDMappingStrategy {
                 trimmedLine = Strings.safeTrimOrNullString(line);
                 if (trimmedLine != null && !trimmedLine.startsWith("#")) {
                     entry = trimmedLine.split(":");
-                    log.trace("/etc/group line {} maps group name {} to GID {}", new Object[] {etcGroupReader.getLineNumber(), entry[0], entry[2]});
-                    map.put(entry[0], new Integer(entry[2]));
-                }else{
-                    log.trace("Ignoring /etc/group line {} because it empty or a comment", etcGroupReader.getLineNumber());
+                    log.trace("/etc/group line {} maps group name {} to GID {}", new Object[] {
+                            etcGroupReader.getLineNumber(), entry[0], entry[2] });
+                    try {
+                        map.put(entry[0], new Integer(entry[2]));
+                    } catch (NumberFormatException e) {
+                        log.warn("The GID {} is not a valid, the /etc/group entry on line {} is being ignored",
+                                entry[2], etcGroupReader.getLineNumber());
+                    }
+                } else {
+                    log.trace("Ignoring /etc/group line {} because it empty or a comment", etcGroupReader
+                            .getLineNumber());
                 }
                 line = etcGroupReader.readLine();
             }
