@@ -58,7 +58,7 @@ public class EtcPasswdIDMappingStrategy implements IDMappingStrategy {
             log.error(e.getMessage());
             return;
         }
-        
+
         try {
             LineNumberReader etcPasswdReader = new LineNumberReader(new FileReader(etcPasswdFile));
             log.debug("Reading /etc/passwd file");
@@ -70,10 +70,17 @@ public class EtcPasswdIDMappingStrategy implements IDMappingStrategy {
                 trimmedLine = Strings.safeTrimOrNullString(line);
                 if (trimmedLine != null && !trimmedLine.startsWith("#")) {
                     entry = trimmedLine.split(":");
-                    log.trace("/etc/passwd line {} maps login name {} to GID {}", new Object[] {etcPasswdReader.getLineNumber(), entry[0], entry[2]});
-                    map.put(entry[0], new Integer(entry[2]));
-                }else{
-                    log.trace("Ignoring /etc/passwd line {} because it empty or a comment", etcPasswdReader.getLineNumber());
+                    log.trace("/etc/passwd line {} maps login name {} to GID {}", new Object[] {
+                            etcPasswdReader.getLineNumber(), entry[0], entry[2] });
+                    try {
+                        map.put(entry[0], new Integer(entry[2]));
+                    } catch (NumberFormatException e) {
+                        log.warn("The UID {} is not a valid, the /etc/passwd entry on line {} is being ignored",
+                                entry[2], etcPasswdReader.getLineNumber());
+                    }
+                } else {
+                    log.trace("Ignoring /etc/passwd line {} because it empty or a comment", etcPasswdReader
+                            .getLineNumber());
                 }
                 line = etcPasswdReader.readLine();
             }
