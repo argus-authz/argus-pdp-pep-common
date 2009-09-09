@@ -377,7 +377,7 @@ public class X509PIP implements PolicyInformationPoint {
         Attribute voAttribute = new Attribute();
         voAttribute.setId(VOMS_VO);
         voAttribute.setDataType(Attribute.DT_STRING);
-        voAttribute.setIssuer(attributeCertificate.getIssuerX509());
+        voAttribute.setIssuer(attributeCertificate.getIssuer());
         voAttribute.getValues().add(attributeCertificate.getVO());
         log.debug("Extracted attribute: {}", voAttribute);
         vomsAttributes.add(voAttribute);
@@ -387,7 +387,7 @@ public class X509PIP implements PolicyInformationPoint {
             Attribute primaryFqanAttribute = new Attribute();
             primaryFqanAttribute.setId(VOMS_PRIMARY_FQAN);
             primaryFqanAttribute.setDataType(Attribute.DT_STRING);
-            primaryFqanAttribute.setIssuer(attributeCertificate.getIssuerX509());
+            primaryFqanAttribute.setIssuer(attributeCertificate.getIssuer());
             primaryFqanAttribute.getValues().add(fqans.get(0).getFQAN());
             log.debug("Extracted attribute: {}", primaryFqanAttribute);
             vomsAttributes.add(primaryFqanAttribute);
@@ -396,7 +396,7 @@ public class X509PIP implements PolicyInformationPoint {
             Attribute fqanAttribute = new Attribute();
             fqanAttribute.setId(VOMS_FQAN);
             fqanAttribute.setDataType(Attribute.DT_STRING);
-            fqanAttribute.setIssuer(attributeCertificate.getIssuerX509());
+            fqanAttribute.setIssuer(attributeCertificate.getIssuer());
             for (FQAN fqan : fqans) {
                 fqanAttribute.getValues().add(fqan.getFQAN());
             }
