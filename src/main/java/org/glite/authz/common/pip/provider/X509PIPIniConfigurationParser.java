@@ -24,6 +24,12 @@ public class X509PIPIniConfigurationParser implements IniPIPConfigurationParser 
     /** The name of the {@value} property which gives the absolute path to the 'vomsdir' directory. */
     public final static String VOMS_INFO_DIR_PROP = "vomsInfoDir";
 
+    /** The name of the {@value} which gives the refresh period, in minutes, for 'vomsdir' information. */
+    public static final String VOMS_INFO_REFRESH_PROP = "vomsInfoRefresh";
+
+    /** Default value (1 hour in minutes) of the {@value #VOMS_INFO_REFRESH_PROP} property, {@value} . */
+    public static final int DEFAULT_VOMS_INFO_REFRESH = 60;
+
     /** Default value of {@value #PERFORM_PKIX_VALIDATION_PROP}, {@value} */
     public final static boolean DEFAULT_PERFORM_PKIX_VALIDATION = true;
 
@@ -38,9 +44,14 @@ public class X509PIPIniConfigurationParser implements IniPIPConfigurationParser 
         String vomsInfoDir = IniConfigUtil.getString(iniConfig, VOMS_INFO_DIR_PROP, null);
         if (vomsInfoDir != null) {
             log.info("voms info directory: {}", vomsInfoDir);
+            // get refresh interval: default 1h
+            int vomsInfoRefresh= IniConfigUtil.getInt(iniConfig, VOMS_INFO_REFRESH_PROP, DEFAULT_VOMS_INFO_REFRESH, 1, Integer.MAX_VALUE);
+            vomsInfoRefresh= vomsInfoRefresh * 60 * 1000; // minute -> millis
+            log.info("voms info refresh interval: {}ms", vomsInfoRefresh);
             try {
                 Files.getFile(vomsInfoDir, false, true, true, false);
                 acTrustMaterial = new PKIStore(vomsInfoDir, PKIStore.TYPE_VOMSDIR);
+                acTrustMaterial.rescheduleRefresh(vomsInfoRefresh);
             } catch (Exception e) {
                 throw new ConfigurationException("Unable to read VOMS AC validation information", e);
             }
