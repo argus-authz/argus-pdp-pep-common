@@ -37,17 +37,26 @@ public class EtcGroupIDMappingStrategy implements IDMappingStrategy {
     private final Logger log = LoggerFactory.getLogger(EtcPasswdIDMappingStrategy.class);
 
     /** Map from group name to ID. */
-    private HashMap<String, Integer> map;
+    private HashMap<String, Integer> nameToIdMap;
+
+    /** Map from group ID to group name. */
+    private HashMap<Integer, String> idToNameMap;
 
     /** Constructor. */
     public EtcGroupIDMappingStrategy() {
-        map = new HashMap<String, Integer>();
+        nameToIdMap = new HashMap<String, Integer>();
+        idToNameMap = new HashMap<Integer, String>();
         readEtcGroup();
     }
 
     /** {@inheritDoc} */
     public Integer mapToID(String name) throws ObligationProcessingException {
-        return map.get(name);
+        return nameToIdMap.get(name);
+    }
+
+    /** {@inheritDoc} */
+    public String mapToName(int id) throws ObligationProcessingException {
+        return idToNameMap.get(new Integer(id));
     }
 
     /** Reads the /etc/group file and loads it in to the map. */
@@ -63,23 +72,30 @@ public class EtcGroupIDMappingStrategy implements IDMappingStrategy {
         try {
             LineNumberReader etcGroupReader = new LineNumberReader(new FileReader(etcGroupFile));
             log.debug("Reading /etc/group file");
-            
+
             String line = etcGroupReader.readLine();
             String trimmedLine;
             String[] entry;
+            Integer gid;
+            String groupName;
             while (line != null) {
                 trimmedLine = Strings.safeTrimOrNullString(line);
                 if (trimmedLine != null && !trimmedLine.startsWith("#")) {
                     entry = trimmedLine.split(":");
-                    log.trace("/etc/group line {} maps group name {} to GID {}", new Object[] {etcGroupReader.getLineNumber(), entry[0], entry[2]});
-                    try{
-                    map.put(entry[0], new Integer(entry[2]));
-                    }catch(NumberFormatException e){
+                    log.trace("/etc/group line {} maps group name {} to GID {}", new Object[] {
+                            etcGroupReader.getLineNumber(), entry[0], entry[2] });
+                    try {
+                        gid = new Integer(entry[2]);
+                        groupName = Strings.safeTrimOrNullString(entry[0]);
+                        nameToIdMap.put(groupName, gid);
+                        idToNameMap.put(gid, groupName);
+                    } catch (NumberFormatException e) {
                         log.warn("The GID {} is not a valid, the /etc/group entry on line {} is being ignored",
                                 entry[2], etcGroupReader.getLineNumber());
                     }
-                }else{
-                    log.trace("Ignoring /etc/group line {} because it empty or a comment", etcGroupReader.getLineNumber());
+                } else {
+                    log.trace("Ignoring /etc/group line {} because it empty or a comment", etcGroupReader
+                            .getLineNumber());
                 }
                 line = etcGroupReader.readLine();
             }

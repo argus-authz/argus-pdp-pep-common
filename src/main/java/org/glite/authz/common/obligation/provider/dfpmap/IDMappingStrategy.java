@@ -28,7 +28,18 @@ public interface IDMappingStrategy {
      * 
      * @return corresponding ID or null if there was no mapping
      * 
-     * @return thrown if there is a problem mapping the name to the ID
+     * @throws ObligationProcessingException thrown if there is a problem mapping the name to the ID
      */
     public Integer mapToID(String name) throws ObligationProcessingException;
+    
+    /**
+     * Maps a given ID to its respective name.
+     * 
+     * @param id ID to map
+     * 
+     * @return corresponding name or null if there was no mapping
+     * 
+     * @throws ObligationProcessingException thrown if there is a problem mapping the name to the ID
+     */
+    public String mapToName(int id) throws ObligationProcessingException;
 }

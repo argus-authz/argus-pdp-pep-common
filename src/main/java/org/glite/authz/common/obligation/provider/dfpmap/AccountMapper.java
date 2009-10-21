@@ -25,7 +25,6 @@ import javax.security.auth.x500.X500Principal;
 
 import org.glite.authz.common.obligation.ObligationProcessingException;
 import org.glite.authz.common.obligation.provider.dfpmap.impl.PosixUtil;
-import org.jruby.ext.posix.Group;
 import org.jruby.ext.posix.Passwd;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -148,13 +147,13 @@ public class AccountMapper {
                     + " is not configured, unable to determine primary group");
             throw new ObligationProcessingException("Unable to determine primary group");
         }
-        Group groupInfo = PosixUtil.getGroupByID((int) accountInfo.getGID());
-        if (groupInfo == null) {
+        
+        String primaryGroupName = gidMappingStrategy.mapToName((int)accountInfo.getGID());
+        if (primaryGroupName == null) {
             log.error("POSIX group with GID " + accountInfo.getGID()
                     + " is not configured, unable to determine primary group");
             throw new ObligationProcessingException("Unable to determine primary group");
         }
-        String primaryGroupName = groupInfo.getName();
         
         return buildPosixAccount(loginName, primaryGroupName, null);
     }

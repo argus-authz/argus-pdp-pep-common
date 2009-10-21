@@ -37,17 +37,26 @@ public class EtcPasswdIDMappingStrategy implements IDMappingStrategy {
     private final Logger log = LoggerFactory.getLogger(EtcPasswdIDMappingStrategy.class);
 
     /** Map from login name to UID. */
-    private HashMap<String, Integer> map;
+    private HashMap<String, Integer> nameToIdMap;
+
+    /** Map from UID to login name. */
+    private HashMap<Integer, String> idToNameMap;
 
     /** Constructor. */
     public EtcPasswdIDMappingStrategy() {
-        map = new HashMap<String, Integer>();
+        nameToIdMap = new HashMap<String, Integer>();
+        idToNameMap = new HashMap<Integer, String>();
         readEtcPasswd();
     }
 
     /** {@inheritDoc} */
     public Integer mapToID(String name) throws ObligationProcessingException {
-        return map.get(name);
+        return nameToIdMap.get(name);
+    }
+
+    /** {@inheritDoc} */
+    public String mapToName(int id) throws ObligationProcessingException {
+        return idToNameMap.get(new Integer(id));
     }
 
     /** Reads the /etc/passwd file and loads it in to the map. */
@@ -67,6 +76,8 @@ public class EtcPasswdIDMappingStrategy implements IDMappingStrategy {
             String line = etcPasswdReader.readLine();
             String trimmedLine;
             String[] entry;
+            Integer uid;
+            String loginName;
             while (line != null) {
                 trimmedLine = Strings.safeTrimOrNullString(line);
                 if (trimmedLine != null && !trimmedLine.startsWith("#")) {
@@ -74,7 +85,10 @@ public class EtcPasswdIDMappingStrategy implements IDMappingStrategy {
                     log.trace("/etc/passwd line {} maps login name {} to GID {}", new Object[] {
                             etcPasswdReader.getLineNumber(), entry[0], entry[2] });
                     try {
-                        map.put(entry[0], new Integer(entry[2]));
+                        uid = new Integer(entry[2]);
+                        loginName = Strings.safeTrimOrNullString(entry[0]);
+                        nameToIdMap.put(loginName, uid);
+                        idToNameMap.put(uid, loginName);
                     } catch (NumberFormatException e) {
                         log.warn("The UID {} is not a valid, the /etc/passwd entry on line {} is being ignored",
                                 entry[2], etcPasswdReader.getLineNumber());
