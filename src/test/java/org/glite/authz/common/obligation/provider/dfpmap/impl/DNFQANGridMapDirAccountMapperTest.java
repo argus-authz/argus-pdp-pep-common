@@ -65,23 +65,23 @@ public class DNFQANGridMapDirAccountMapperTest extends TestCase {
 
         int count = 3;
         File poolAccountFile;
-        HashMap<String, Integer> uidMappings = new HashMap<String, Integer>();
+        HashMap<String, Long> uidMappings = new HashMap<String, Long>();
         for (String name : poolAccountNames) {
             poolAccountFile = new File(gridMapDir, name);
             poolAccountFile.createNewFile();
-            uidMappings.put(name, new Integer(count));
+            uidMappings.put(name, new Long(count));
             count++;
         }
-        uidMappings.put("glite", new Integer(1));
-        uidMappings.put("user1", new Integer(2));
+        uidMappings.put("glite", new Long(1));
+        uidMappings.put("user1", new Long(2));
         MemoryBackedIDMappingStrategy uidMappingStrategy = new MemoryBackedIDMappingStrategy(uidMappings);
 
-        HashMap<String, Integer> gidMappings = new HashMap<String, Integer>();
-        gidMappings.put("glite", new Integer(1));
-        gidMappings.put("user1", new Integer(2));
-        gidMappings.put("testa", new Integer(3));
-        gidMappings.put("testb", new Integer(4));
-        gidMappings.put("testc", new Integer(5));
+        HashMap<String, Long> gidMappings = new HashMap<String, Long>();
+        gidMappings.put("glite", new Long(1));
+        gidMappings.put("user1", new Long(2));
+        gidMappings.put("testa", new Long(3));
+        gidMappings.put("testb", new Long(4));
+        gidMappings.put("testc", new Long(5));
         MemoryBackedIDMappingStrategy gidMappingStrategy = new MemoryBackedIDMappingStrategy(gidMappings);
 
         DFPMFileParser fileParser = new DFPMFileParser();
