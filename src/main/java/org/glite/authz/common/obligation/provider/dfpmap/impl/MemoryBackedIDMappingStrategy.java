@@ -27,35 +27,35 @@ import org.glite.authz.common.obligation.provider.dfpmap.IDMappingStrategy;
 public class MemoryBackedIDMappingStrategy implements IDMappingStrategy {
 
     /** Map from name to ID. */
-    private HashMap<String, Integer> nameToIdMap;
+    private Map<String, Long> nameToIdMap;
 
     /** Map from ID to Name. */
-    private HashMap<Integer, String> idToNameMap;
+    private Map<Long, String> idToNameMap;
 
     /**
      * Constructor.
      * 
      * @param mappings name to ID mappings
      */
-    public MemoryBackedIDMappingStrategy(Map<String, Integer> mappings) {
+    public MemoryBackedIDMappingStrategy(Map<String, Long> mappings) {
         if (mappings == null) {
             throw new IllegalArgumentException("Name to ID map may not be null");
         }
-        nameToIdMap = new HashMap<String, Integer>(mappings);
-        idToNameMap = new HashMap<Integer, String>();
+        nameToIdMap = new HashMap<String, Long>(mappings);
+        idToNameMap = new HashMap<Long, String>();
 
-        for (Map.Entry<String, Integer> mappingEntry : nameToIdMap.entrySet()) {
+        for (Map.Entry<String, Long> mappingEntry : nameToIdMap.entrySet()) {
             idToNameMap.put(mappingEntry.getValue(), mappingEntry.getKey());
         }
     }
 
     /** {@inheritDoc} */
-    public Integer mapToID(String name) throws ObligationProcessingException {
+    public Long mapToID(String name) throws ObligationProcessingException {
         return nameToIdMap.get(name);
     }
 
     /** {@inheritDoc} */
-    public String mapToName(int id) throws ObligationProcessingException {
-        return idToNameMap.get(new Integer(id));
+    public String mapToName(long id) throws ObligationProcessingException {
+        return idToNameMap.get(id);
     }
 }

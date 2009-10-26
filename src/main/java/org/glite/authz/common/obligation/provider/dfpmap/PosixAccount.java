@@ -34,7 +34,7 @@ public class PosixAccount implements Serializable {
     private String loginName;
 
     /** UID for this account. */
-    private int uid;
+    private long uid;
 
     /** Primary group name for this account. */
     private Group primaryGroup;
@@ -52,7 +52,7 @@ public class PosixAccount implements Serializable {
      * @param uid uid of the account
      * @param gids GIDs of the account with the primary GID listed first
      */
-    public PosixAccount(String login, int uid, Group primaryGroup, List<Group> secondaryGroups) {
+    public PosixAccount(String login, long uid, Group primaryGroup, List<Group> secondaryGroups) {
         this.loginName = Strings.safeTrimOrNullString(login);
         if (this.loginName == null) {
             throw new IllegalArgumentException("Login name may not be empty or null");
@@ -88,7 +88,7 @@ public class PosixAccount implements Serializable {
      * 
      * @return UID for this account
      */
-    public int getUid() {
+    public long getUid() {
         return uid;
     }
 
@@ -114,7 +114,7 @@ public class PosixAccount implements Serializable {
     public int hashCode() {
         int hash = 13;
         hash = 31 * hash + loginName.hashCode();
-        hash = 31 * hash + uid;
+        hash = 31 * hash + (int)uid;
         hash = 31 * hash + primaryGroup.hashCode();
         hash = 31 * hash + secondaryGroups.hashCode();
         return hash;
@@ -166,7 +166,7 @@ public class PosixAccount implements Serializable {
         private String name;
 
         /** GID of the group. */
-        private int gid;
+        private long gid;
 
         /**
          * Constructor.
@@ -174,7 +174,7 @@ public class PosixAccount implements Serializable {
          * @param name name of the group
          * @param id GID of the group
          */
-        public Group(String name, int id) {
+        public Group(String name, long id) {
             this.name = Strings.safeTrim(name);
             if (this.name == null) {
                 throw new IllegalArgumentException("POSIX Group name may not be null");
@@ -197,7 +197,7 @@ public class PosixAccount implements Serializable {
          * 
          * @return GID for the group
          */
-        public int getGID() {
+        public long getGID() {
             return gid;
         }
 
@@ -210,7 +210,7 @@ public class PosixAccount implements Serializable {
         public int hashCode() {
             int hash = 13;
             hash = 31 * hash + name.hashCode();
-            hash = 31 * hash + gid;
+            hash = 31 * hash + (int)gid;
             return hash;
         }
 

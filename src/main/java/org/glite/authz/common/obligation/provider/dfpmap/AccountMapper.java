@@ -116,6 +116,7 @@ public class AccountMapper {
      */
     private PosixAccount mapToAccountByDN(X500Principal subjectDN) throws ObligationProcessingException {
         log.debug("Attempting to map subject {} to a POSIX account", subjectDN.getName());
+
         String accountIndicator = accountIndicatorMappingStrategy.mapToAccountIndicator(subjectDN, null, null);
         if (accountIndicator == null) {
             log.error("Unable to map subject" + subjectDN.getName() + " to a POSIX account indicator.");
@@ -127,6 +128,7 @@ public class AccountMapper {
             indicatorIsPoolAccountPrefix = true;
             accountIndicator = poolAccountManager.getPoolAccountPrefix(accountIndicator);
         }
+        log.debug("Subject {} mapped to account indiciator {}", subjectDN.getName(), accountIndicator);
 
         String loginName;
         if (indicatorIsPoolAccountPrefix) {
@@ -138,7 +140,8 @@ public class AccountMapper {
             log.error("Subject " + subjectDN.getName() + " could not be mapped to a POSIX login name");
             throw new ObligationProcessingException("Unable to map subject to a POSIX account");
         }
-        
+        log.debug("Subject {} mapped to login name {}", subjectDN.getName(), loginName);
+
         // We have to resolve the primary group information from /etc/passwd here
         // since no FQANs are available, secondary groups are not set in this case
         Passwd accountInfo = PosixUtil.getAccountByName(loginName);
@@ -147,14 +150,16 @@ public class AccountMapper {
                     + " is not configured, unable to determine primary group");
             throw new ObligationProcessingException("Unable to determine primary group");
         }
-        
-        String primaryGroupName = gidMappingStrategy.mapToName((int)accountInfo.getGID());
+        long primaryGid = accountInfo.getGID();
+        log.debug("Primary group for login name {} determined to be GID {}", loginName, primaryGid);
+
+        String primaryGroupName = gidMappingStrategy.mapToName(primaryGid);
         if (primaryGroupName == null) {
-            log.error("POSIX group with GID " + accountInfo.getGID()
-                    + " is not configured, unable to determine primary group");
+            log.error("POSIX group with GID " + primaryGid + " is not configured, unable to determine primary group");
             throw new ObligationProcessingException("Unable to determine primary group");
         }
-        
+        log.debug("Primary group GID {} mapped to group name {}", primaryGid, primaryGroupName);
+
         return buildPosixAccount(loginName, primaryGroupName, null);
     }
 
@@ -173,7 +178,7 @@ public class AccountMapper {
             throws ObligationProcessingException {
         log.debug("Attempting to map subject {} with primary FQAN {} and secondary FQANs {} to a POSIX account",
                 new Object[] { subjectDN.getName(), primaryFQAN, secondaryFQANs });
-        
+
         String accountIndicator = accountIndicatorMappingStrategy.mapToAccountIndicator(subjectDN, primaryFQAN,
                 secondaryFQANs);
         if (accountIndicator == null) {
@@ -187,6 +192,7 @@ public class AccountMapper {
             indicatorIsPoolAccountPrefix = true;
             accountIndicator = poolAccountManager.getPoolAccountPrefix(accountIndicator);
         }
+        log.debug("Subject {} mapped to account indiciator {}", subjectDN.getName(), accountIndicator);
 
         String primaryGroupName = null;
         List<String> secondaryGroupNames = null;
@@ -204,6 +210,8 @@ public class AccountMapper {
             throw new ObligationProcessingException("Subject " + subjectDN.getName()
                     + " could not be mapped to a primary group");
         }
+        log.debug("Subject {} mapped to primary group {} and second groups {}", new Object[] { subjectDN.getName(),
+                primaryGroupName, secondaryGroupNames });
 
         String loginName;
         if (indicatorIsPoolAccountPrefix) {
@@ -216,6 +224,8 @@ public class AccountMapper {
             log.error("Subject " + subjectDN.getName() + " could not be mapped to a POSIX login name");
             throw new ObligationProcessingException("Unable to map subject to a POSIX account");
         }
+        log.debug("Subject {} mapped to login name {}", subjectDN.getName(), loginName);
+
         return buildPosixAccount(loginName, primaryGroupName, secondaryGroupNames);
     }
 
@@ -233,10 +243,10 @@ public class AccountMapper {
      */
     private PosixAccount buildPosixAccount(String loginName, String primaryGroupName, List<String> secondaryGroupNames)
             throws ObligationProcessingException {
-        log.debug("Building POSIX account for login name {} with primary group {} and secondary groups {}",
+        log.debug("Building POSIX account descriptor for login name {} with primary group {} and secondary groups {}",
                 new Object[] { loginName, primaryGroupName, secondaryGroupNames });
 
-        Integer uid = uidMappingStrategy.mapToID(loginName);
+        Long uid = uidMappingStrategy.mapToID(loginName);
         if (uid == null) {
             log.error("Unable to resolve login " + loginName
                     + " to a UID.  This login name is not configured on this system");
@@ -244,7 +254,7 @@ public class AccountMapper {
         }
         log.debug("Login name {} resolved to UID {}", loginName, uid);
 
-        Integer gid = gidMappingStrategy.mapToID(primaryGroupName);
+        Long gid = gidMappingStrategy.mapToID(primaryGroupName);
         if (gid == null) {
             log.error("Unable to resolve group name " + primaryGroupName
                     + " to a GID.  This group name is not configured on this system");

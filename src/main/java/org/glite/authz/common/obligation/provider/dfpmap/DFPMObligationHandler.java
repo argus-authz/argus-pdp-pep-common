@@ -125,6 +125,8 @@ public class DFPMObligationHandler extends AbstractObligationHandler {
             }
             result.getObligations().removeAll(removedObligations);
         }
+        log.debug("Finished processing DN/FQAN to POSIX account mapping obligation for subject {}", subjectDN
+                        .getName());
     }
 
     /**
@@ -248,7 +250,8 @@ public class DFPMObligationHandler extends AbstractObligationHandler {
             return FQAN.parseFQAN(values.iterator().next().toString());
         } catch (IllegalArgumentException e) {
             log.error("Value of the Subject primary FQAN attribute of the authorization request was not a valid FQAN");
-            throw new ObligationProcessingException("Invalid request, subject's primary FQAN attribute value was invalid");
+            throw new ObligationProcessingException(
+                    "Invalid request, subject's primary FQAN attribute value was invalid");
         }
     }
 
@@ -292,7 +295,8 @@ public class DFPMObligationHandler extends AbstractObligationHandler {
         }
 
         if (values.size() > 1) {
-            log.warn("Subject secondary FQAN attribute of the authroization request contains more than one value, only the first will be used");
+            log
+                    .warn("Subject secondary FQAN attribute of the authroization request contains more than one value, only the first will be used");
         }
 
         ArrayList<FQAN> secondaryFQANs = new ArrayList<FQAN>();
@@ -304,7 +308,8 @@ public class DFPMObligationHandler extends AbstractObligationHandler {
                 secondaryFQANs.add(FQAN.parseFQAN(value));
             } catch (IllegalArgumentException e) {
                 log.error("Subject's secondary FQAN attribute value " + value + " is not a valid FQAN");
-                throw new ObligationProcessingException("Invalid request, subject's secondary FQAN attribute value was invalid");
+                throw new ObligationProcessingException(
+                        "Invalid request, subject's secondary FQAN attribute value was invalid");
             }
         }
         return secondaryFQANs;
@@ -385,7 +390,7 @@ public class DFPMObligationHandler extends AbstractObligationHandler {
         if (primaryGroup != null) {
             attributeAssignment = new AttributeAssignment();
             attributeAssignment.setAttributeId(GID_ATTRIB_ID);
-            attributeAssignment.getValues().add(Integer.toString(primaryGroup.getGID()));
+            attributeAssignment.getValues().add(Long.toString(primaryGroup.getGID()));
             obligation.getAttributeAssignments().add(attributeAssignment);
         }
 
@@ -413,7 +418,7 @@ public class DFPMObligationHandler extends AbstractObligationHandler {
         for (PosixAccount.Group secondaryGroup : secondaryGroups) {
             attributeAssignment = new AttributeAssignment();
             attributeAssignment.setAttributeId(GID_ATTRIB_ID);
-            attributeAssignment.getValues().add(Integer.toString(secondaryGroup.getGID()));
+            attributeAssignment.getValues().add(Long.toString(secondaryGroup.getGID()));
             obligation.getAttributeAssignments().add(attributeAssignment);
         }
 

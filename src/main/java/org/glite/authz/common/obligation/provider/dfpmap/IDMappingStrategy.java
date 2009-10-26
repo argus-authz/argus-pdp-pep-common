@@ -30,7 +30,7 @@ public interface IDMappingStrategy {
      * 
      * @throws ObligationProcessingException thrown if there is a problem mapping the name to the ID
      */
-    public Integer mapToID(String name) throws ObligationProcessingException;
+    public Long mapToID(String name) throws ObligationProcessingException;
     
     /**
      * Maps a given ID to its respective name.
@@ -41,5 +41,5 @@ public interface IDMappingStrategy {
      * 
      * @throws ObligationProcessingException thrown if there is a problem mapping the name to the ID
      */
-    public String mapToName(int id) throws ObligationProcessingException;
+    public String mapToName(long id) throws ObligationProcessingException;
 }
