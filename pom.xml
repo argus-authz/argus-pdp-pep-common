@@ -6,7 +6,7 @@
     <groupId>org.glite.authz</groupId>
     <artifactId>pdp-pep-common</artifactId>
     <name>gLite Authorization Service - PDP/PEP Common</name>
-    <version>1.0.2</version>
+    <version>1.0.3</version>
 
     <description>XACML based authorization service developed within the gLite project.
     </description>
@@ -48,7 +48,7 @@
         <dependency>
             <groupId>org.jruby.ext.posix</groupId>
             <artifactId>jna-posix</artifactId>
-            <version>1.0</version>
+            <version>1.0.3</version>
         </dependency>
         <dependency>
             <groupId>net.java.dev.jna</groupId>
@@ -75,10 +75,25 @@
             <artifactId>hessian</artifactId>
             <version>3.2.1</version>
         </dependency>
+         <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+            <version>1.5.8</version>
+        </dependency>
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>log4j-over-slf4j</artifactId>
-            <version>1.5.6</version>
+            <version>1.5.8</version>
+        </dependency>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>jcl-over-slf4j</artifactId>
+            <version>1.5.8</version>
+        </dependency>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>jul-to-slf4j</artifactId>
+            <version>1.5.8</version>
         </dependency>
 
         <!-- Provided Dependencies -->
@@ -110,24 +125,6 @@
             <groupId>ch.qos.logback</groupId>
             <artifactId>logback-classic</artifactId>
             <version>0.9.15</version>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>ch.qos.logback</groupId>
-            <artifactId>logback-core</artifactId>
-            <version>0.9.15</version>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>jcl-over-slf4j</artifactId>
-            <version>1.5.6</version>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>log4j-over-slf4j</artifactId>
-            <version>1.5.6</version>
             <scope>provided</scope>
         </dependency>
 
