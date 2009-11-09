@@ -29,14 +29,10 @@ import org.glite.authz.common.model.Request;
 import org.glite.authz.common.model.Resource;
 import org.glite.authz.common.model.Subject;
 import org.glite.authz.common.pip.PIPProcessingException;
-import org.glite.authz.common.util.Strings;
 
 /** A PIP that provides a static set of attributes to a {@link Request}. */
 @ThreadSafe
 public class StaticPIP extends AbstractPolicyInformationPoint {
-
-    /** ID of this PIP. */
-    private String id;
 
     /** Action attributes to be added to the request. */
     private List<Attribute> actionAttributes;
@@ -65,18 +61,15 @@ public class StaticPIP extends AbstractPolicyInformationPoint {
     /**
      * Constructor.
      * 
-     * @param pipID the ID of this PIP
+     * @param pipId the ID of this PIP
      * @param action attributes to be added to the action attributes in the request
      * @param environment attributes to be added to the environment attributes in the request
      * @param resource attributes to be added to the resource attributes in the request
      * @param subject attributes to be added to the subject attributes in the request
      */
-    public StaticPIP(String pipID, List<Attribute> action, List<Attribute> environment, List<Attribute> resource,
+    public StaticPIP(String pipId, List<Attribute> action, List<Attribute> environment, List<Attribute> resource,
             List<Attribute> subject) {
-        id = Strings.safeTrimOrNullString(pipID);
-        if (id == null) {
-            throw new IllegalArgumentException("PIP ID may not be null");
-        }
+        super(pipId);
 
         addAttributesToAllResources = false;
         addAttributesToAllSubjects = false;
@@ -85,11 +78,6 @@ public class StaticPIP extends AbstractPolicyInformationPoint {
         environmentAttributes = environment;
         resourceAttributes = resource;
         subjectAttributes = subject;
-    }
-
-    /** {@inheritDoc} */
-    public String getId() {
-        return id;
     }
 
     /**

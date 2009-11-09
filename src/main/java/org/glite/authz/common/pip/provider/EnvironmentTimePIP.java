@@ -31,7 +31,6 @@ import org.glite.authz.common.model.Attribute;
 import org.glite.authz.common.model.Environment;
 import org.glite.authz.common.model.Request;
 import org.glite.authz.common.pip.PIPProcessingException;
-import org.glite.authz.common.util.Strings;
 
 /**
  * A PIP the adds the time (in UTC), at invocation, as the environment variables current-time, current-date, and
@@ -49,9 +48,6 @@ public class EnvironmentTimePIP extends AbstractPolicyInformationPoint {
     /** Name of the current date/time attribute. */
     public static final String CURRENT_DATETIME_ATTRIB_NAME = "urn:oasis:names:tc:xacml:1.0:environment:current-dateTime";
 
-    /** ID for the PIP. */
-    private String id;
-
     /** XML calendar data type factory. */
     private DatatypeFactory xmlCalendarFactory;
 
@@ -61,21 +57,13 @@ public class EnvironmentTimePIP extends AbstractPolicyInformationPoint {
      * @param pipId ID of the PIP
      */
     public EnvironmentTimePIP(String pipId) {
-        id = Strings.safeTrimOrNullString(pipId);
-        if (id == null) {
-            throw new IllegalArgumentException("PIP ID may not be null");
-        }
+        super(pipId);
 
         try {
             xmlCalendarFactory = DatatypeFactory.newInstance();
         } catch (DatatypeConfigurationException e) {
             throw new RuntimeException("JAXP provider does not provide a complete JAXP 1.3 implementation", e);
         }
-    }
-
-    /** {@inheritDoc} */
-    public String getId() {
-        return id;
     }
 
     /** {@inheritDoc} */

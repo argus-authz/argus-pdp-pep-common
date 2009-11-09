@@ -19,12 +19,48 @@ package org.glite.authz.common.pip.provider;
 
 import org.glite.authz.common.AuthorizationServiceException;
 import org.glite.authz.common.pip.PolicyInformationPoint;
+import org.glite.authz.common.util.Strings;
 
 /**
  * Base class for {@link PolicyInformationPoint} implementations that provides no-op implementation of the
  * {@link PolicyInformationPoint#start()} and {@link PolicyInformationPoint#start()} methods
  */
 public abstract class AbstractPolicyInformationPoint implements PolicyInformationPoint {
+
+    /** ID for the policy information point. */
+    private String id;
+
+    /** Constructor. */
+    protected AbstractPolicyInformationPoint() {
+
+    }
+
+    /**
+     * Constructor.
+     * 
+     * @param pipid ID for the policy information point, may not be null or empty
+     */
+    protected AbstractPolicyInformationPoint(String pipid) {
+        setId(pipid);
+    }
+
+    /** {@inheritDoc} */
+    public String getId() {
+        return id;
+    }
+
+    /**
+     * Sets the ID for the policy information point.
+     * 
+     * @param pipid ID for the policy information point, may not be null or empty
+     */
+    protected void setId(String pipid) {
+        String tempId = Strings.safeTrimOrNullString(pipid);
+        if (tempId == null) {
+            throw new IllegalArgumentException("Policy Information Point ID may not be null or empty");
+        }
+        id = tempId;
+    }
 
     /** {@inheritDoc} */
     public void start() throws AuthorizationServiceException {

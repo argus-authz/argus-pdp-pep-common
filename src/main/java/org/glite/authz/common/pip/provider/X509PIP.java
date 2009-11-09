@@ -28,13 +28,11 @@ import java.util.Vector;
 
 import javax.security.auth.x500.X500Principal;
 
-import org.glite.authz.common.AuthorizationServiceException;
 import org.glite.authz.common.config.ConfigurationException;
 import org.glite.authz.common.model.Attribute;
 import org.glite.authz.common.model.Request;
 import org.glite.authz.common.model.Subject;
 import org.glite.authz.common.pip.PIPProcessingException;
-import org.glite.authz.common.pip.PolicyInformationPoint;
 import org.glite.authz.common.util.Strings;
 import org.glite.security.util.CertUtil;
 import org.glite.security.util.FileCertReader;
@@ -60,7 +58,7 @@ import org.slf4j.LoggerFactory;
  * 
  * @see <a href="https://twiki.cnaf.infn.it/cgi-bin/twiki/view/VOMS">VOMS website</a>
  */
-public class X509PIP implements PolicyInformationPoint {
+public class X509PIP extends AbstractPolicyInformationPoint {
 
     /** The ID of the subject attribute, {@value} , containing the end-entity certificate processed by the PIP. */
     public final static String X509_CERT_CHAIN_ID = "http://authz-interop.org/xacml/subject/cert-chain";
@@ -104,9 +102,6 @@ public class X509PIP implements PolicyInformationPoint {
     /** Class logger. */
     private Logger log = LoggerFactory.getLogger(X509PIP.class);
 
-    /** The id of this PIP */
-    private String id;
-
     /** Reads a set of certificates in to a chain of {@link X509Certificate} objects. */
     private FileCertReader certReader;
 
@@ -130,10 +125,7 @@ public class X509PIP implements PolicyInformationPoint {
      * @throws ConfigurationException thrown if the configuration of the PIP fails
      */
     public X509PIP(String pipID, PKIStore eeTrustMaterial, PKIStore acTrustMaterial) throws ConfigurationException {
-        id = Strings.safeTrimOrNullString(pipID);
-        if (id == null) {
-            throw new ConfigurationException("Policy information point ID may not be null");
-        }
+        super(pipID);
 
         if (eeTrustMaterial == null) {
             throw new ConfigurationException("Policy information point trust material may not be null");
@@ -151,11 +143,6 @@ public class X509PIP implements PolicyInformationPoint {
         } catch (Exception e) {
             throw new ConfigurationException("Unable to create X509 trust manager: " + e.getMessage());
         }
-    }
-
-    /** {@inheritDoc} */
-    public String getId() {
-        return id;
     }
 
     /**
@@ -406,18 +393,5 @@ public class X509PIP implements PolicyInformationPoint {
         }
 
         return vomsAttributes;
-    }
-
-    /**
-     * Used to stop any running threads invoked by this instance. E.g. the poller for changes in the vomsdir and trusted
-     * CAs directory.
-     */
-    public void stop() {
-        // nothing to do
-    }
-
-    /** {@inheritDoc} */
-    public void start() throws AuthorizationServiceException {
-        // nothing to do
     }
 }
