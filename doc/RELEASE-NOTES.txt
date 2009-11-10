@@ -1,0 +1,4 @@
+Changes in Release 1.0.4
+===========================================
+- Add X.509 PIP flag that determines whether a proxy certificate is required 
+  in the subject's certificate chain

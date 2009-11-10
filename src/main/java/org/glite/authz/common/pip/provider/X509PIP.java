@@ -38,6 +38,7 @@ import org.glite.security.util.CertUtil;
 import org.glite.security.util.FileCertReader;
 import org.glite.voms.FQAN;
 import org.glite.voms.PKIStore;
+import org.glite.voms.PKIUtils;
 import org.glite.voms.PKIVerifier;
 import org.glite.voms.VOMSAttribute;
 import org.glite.voms.VOMSValidator;
@@ -105,6 +106,9 @@ public class X509PIP extends AbstractPolicyInformationPoint {
     /** Reads a set of certificates in to a chain of {@link X509Certificate} objects. */
     private FileCertReader certReader;
 
+    /** Whether the given cert chain must contain a proxy certificate in order to be valid. */
+    private boolean requireProxyCertificate;
+    
     /** Whether to perform PKIX validation on the incoming certificate. */
     private boolean performPKIXValidation;
 
@@ -118,15 +122,18 @@ public class X509PIP extends AbstractPolicyInformationPoint {
      * The constructor for this PIP. This constructor enables support for the VOMS attribute certificates.
      * 
      * @param pipID ID of this PIP
+     * @param requireProxy whether a subject's certificate chain must require a proxy in order to be valid
      * @param eeTrustMaterial trust material used to validate the subject's end entity certificate
      * @param acTrustMaterial trust material used to validate the subject's attribute certificate certificate, may be
      *            null of AC support is not desired
      * 
      * @throws ConfigurationException thrown if the configuration of the PIP fails
      */
-    public X509PIP(String pipID, PKIStore eeTrustMaterial, PKIStore acTrustMaterial) throws ConfigurationException {
+    public X509PIP(String pipID, boolean requireProxy, PKIStore eeTrustMaterial, PKIStore acTrustMaterial) throws ConfigurationException {
         super(pipID);
 
+        requireProxyCertificate = requireProxy;
+        
         if (eeTrustMaterial == null) {
             throw new ConfigurationException("Policy information point trust material may not be null");
         }
@@ -254,14 +261,22 @@ public class X509PIP extends AbstractPolicyInformationPoint {
         }
 
         X509Certificate[] certChain = chainVector.toArray(new X509Certificate[] {});
+        boolean proxyPresent = false;
         for (X509Certificate cert : certChain) {
             if (cert.getVersion() != 3) {
                 log.warn("Subject certificate {} is not a version 3 certificate, certificate chain ignored", cert
                         .getSubjectX500Principal().getName(X500Principal.RFC2253));
                 return null;
             }
+            if(requireProxyCertificate && PKIUtils.isProxy(cert)){
+                proxyPresent = true;
+            }
         }
 
+        if(requireProxyCertificate && !proxyPresent){
+            return null;
+        }
+        
         return certChain;
     }
 

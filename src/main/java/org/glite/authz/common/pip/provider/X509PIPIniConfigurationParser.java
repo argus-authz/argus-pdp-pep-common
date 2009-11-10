@@ -30,6 +30,9 @@ import org.slf4j.LoggerFactory;
 
 /** Configuration parser for {@link X509PIP} PIPs. */
 public class X509PIPIniConfigurationParser implements IniPIPConfigurationParser {
+    
+    /** The name of the {@value} property which determines whether a subject's certificate chain must contain a proxy certificate. */
+    public final static String REQ_PROXY_PROP = "requireProxy";
 
     /**
      * The name of the {@value} property the indicates whether PKIX validation will be performed on the certificate
@@ -55,8 +58,10 @@ public class X509PIPIniConfigurationParser implements IniPIPConfigurationParser 
     /** {@inheritDoc} */
     public PolicyInformationPoint parse(Section iniConfig, AbstractConfigurationBuilder<?> configurationBuilder)
             throws ConfigurationException {
-        PKIStore acTrustMaterial = null;
+        boolean requireProxy = IniConfigUtil.getBoolean(iniConfig, REQ_PROXY_PROP, false);
+        log.info("subject proxy certificate required: {}", requireProxy);
         
+        PKIStore acTrustMaterial = null;
         String vomsInfoDir = IniConfigUtil.getString(iniConfig, VOMS_INFO_DIR_PROP, null);
         if (vomsInfoDir != null) {
             log.info("voms info directory: {}", vomsInfoDir);
@@ -73,7 +78,7 @@ public class X509PIPIniConfigurationParser implements IniPIPConfigurationParser 
             }
         }
 
-        X509PIP pip = new X509PIP(iniConfig.getName(), configurationBuilder.getTrustMaterialStore(), acTrustMaterial);
+        X509PIP pip = new X509PIP(iniConfig.getName(), requireProxy, configurationBuilder.getTrustMaterialStore(), acTrustMaterial);
 
         boolean performPKIXValidation = IniConfigUtil.getBoolean(iniConfig, PERFORM_PKIX_VALIDATION_PROP,
                 DEFAULT_PERFORM_PKIX_VALIDATION);
