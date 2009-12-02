@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<project>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.glite.authz</groupId>
@@ -12,6 +13,12 @@
     </description>
     <url>http://glite.web.cern.ch/glite/</url>
     <inceptionYear>2008</inceptionYear>
+
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <slf4j.groupId>org.slf4j</slf4j.groupId>
+        <slf4j.version>1.5.8</slf4j.version>
+    </properties>
 
     <repositories>
         <repository>
@@ -30,7 +37,6 @@
                 <enabled>false</enabled>
             </snapshots>
         </repository>
-
     </repositories>
 
     <dependencies>
@@ -39,6 +45,37 @@
             <groupId>org.opensaml</groupId>
             <artifactId>opensaml</artifactId>
             <version>2.3.0</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>velocity</groupId>
+                    <artifactId>velocity</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.apache.santuario</groupId>
+                    <artifactId>xmlsec</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>${slf4j.groupId}</groupId>
+                    <artifactId>jcl-over-slf4j</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>${slf4j.groupId}</groupId>
+                    <artifactId>log4j-over-slf4j</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>${slf4j.groupId}</groupId>
+                    <artifactId>jul-to-slf4j</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>net.jcip</groupId>
+                    <artifactId>jcip-annotations</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>${slf4j.groupId}</groupId>
+            <artifactId>slf4j-api</artifactId>
+            <version>${slf4j.version}</version>
         </dependency>
         <dependency>
             <groupId>net.sourceforge</groupId>
@@ -75,26 +112,6 @@
             <artifactId>hessian</artifactId>
             <version>3.2.1</version>
         </dependency>
-         <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-api</artifactId>
-            <version>1.5.8</version>
-        </dependency>
-        <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>log4j-over-slf4j</artifactId>
-            <version>1.5.8</version>
-        </dependency>
-        <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>jcl-over-slf4j</artifactId>
-            <version>1.5.8</version>
-        </dependency>
-        <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>jul-to-slf4j</artifactId>
-            <version>1.5.8</version>
-        </dependency>
 
         <!-- Provided Dependencies -->
         <dependency>
@@ -126,6 +143,26 @@
             <artifactId>logback-classic</artifactId>
             <version>0.9.15</version>
             <scope>provided</scope>
+        </dependency>
+
+        <!-- Runtime Dependencies -->
+        <dependency>
+            <groupId>${slf4j.groupId}</groupId>
+            <artifactId>log4j-over-slf4j</artifactId>
+            <version>${slf4j.version}</version>
+            <scope>runtime</scope>
+        </dependency>
+        <dependency>
+            <groupId>${slf4j.groupId}</groupId>
+            <artifactId>jcl-over-slf4j</artifactId>
+            <version>${slf4j.version}</version>
+            <scope>runtime</scope>
+        </dependency>
+        <dependency>
+            <groupId>${slf4j.groupId}</groupId>
+            <artifactId>jul-to-slf4j</artifactId>
+            <version>${slf4j.version}</version>
+            <scope>runtime</scope>
         </dependency>
 
         <!-- Test Dependencies-->
