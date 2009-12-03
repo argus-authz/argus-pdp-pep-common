@@ -37,9 +37,12 @@ public abstract class AbstractServiceConfigurationBuilder<ConfigType extends Abs
 
     /** Port number upon which the service listens. */
     private int port;
-    
+
     /** Whether SSL is enabled on the service port. */
     private boolean sslEnabled;
+
+    /** Whether client is required to authenticate with a client certificate. */
+    private boolean clientCertAuthRequired;
 
     /** Port number upon which the shutdown service listens. */
     private int shutdownPort;
@@ -63,12 +66,12 @@ public abstract class AbstractServiceConfigurationBuilder<ConfigType extends Abs
         soapClient = null;
         obligationService = new ObligationService();
     }
-    
+
     /**
      * Constructor that creates a builder whose settings are initialized with the properties from the given prototype
      * configuration.
      * 
-     * @param prototype
+     * @param prototype a prototypical configuration upon which this builder will be based
      */
     protected AbstractServiceConfigurationBuilder(AbstractServiceConfiguration prototype) {
         super(prototype);
@@ -77,12 +80,13 @@ public abstract class AbstractServiceConfigurationBuilder<ConfigType extends Abs
         hostname = prototype.getHostname();
         port = prototype.getPort();
         sslEnabled = prototype.isSslEnabled();
+        clientCertAuthRequired = prototype.isClientCertAuthRequired();
         shutdownPort = prototype.getShutdownPort();
         maxRequestQueueSize = prototype.getMaxRequestQueueSize();
         soapClient = prototype.getSOAPClient();
         obligationService = prototype.getObligationService();
     }
-    
+
     /**
      * Gets the Entity ID of the service.
      * 
@@ -155,6 +159,15 @@ public abstract class AbstractServiceConfigurationBuilder<ConfigType extends Abs
         return sslEnabled;
     }
 
+    /**
+     * Gets whether client certificate authentication is required when a client is connecting.
+     * 
+     * @return whether client certificate authentication is required
+     */
+    public boolean isClientCertAuthRequired() {
+        return clientCertAuthRequired;
+    }
+
     /** {@inheritDoc} */
     protected void populateConfiguration(ConfigType config) {
         super.populateConfiguration(config);
@@ -224,7 +237,7 @@ public abstract class AbstractServiceConfigurationBuilder<ConfigType extends Abs
     public void setShutdownPort(int port) {
         shutdownPort = port;
     }
-    
+
     /**
      * Sets the SOAP client used by the service to communicate with other services.
      * 
@@ -236,7 +249,7 @@ public abstract class AbstractServiceConfigurationBuilder<ConfigType extends Abs
         }
         soapClient = client;
     }
-    
+
     /**
      * Sets whether SSL is enabled on the service port.
      * 
@@ -244,5 +257,14 @@ public abstract class AbstractServiceConfigurationBuilder<ConfigType extends Abs
      */
     public void setSslEnabled(boolean enabled) {
         sslEnabled = enabled;
+    }
+
+    /**
+     * Sets whether client certificate authentication is required when a client is connecting.
+     * 
+     * @param required whether client certificate authentication is required
+     */
+    public void setClientCertAuthRequired(boolean required) {
+        clientCertAuthRequired = required;
     }
 }

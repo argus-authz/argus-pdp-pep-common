@@ -46,9 +46,12 @@ public abstract class AbstractIniServiceConfigurationParser<ConfigurationType ex
 
     /** The name of the {@value} property which indicates the port to which the service will bind. */
     public static final String PORT_PROP = "port";
-    
+
     /** The name of the {@value} property which indicates that the service port should use SSL instead of plain HTTP. */
-    public static final String SSL_ON_PORT_PROP="enableSSL";
+    public static final String SSL_ON_PORT_PROP = "enableSSL";
+
+    /** The name of the {@value} property which indicates that client certificate authentication is required. */
+    public static final String CLIENT_CERT_AUTHN_PROP = "requireClientCertAuthentication";
 
     /** The name of the {@value} property which indicates the port the service will listen on for shutdown commands. */
     public static final String SD_PORT_PROP = "shutdownPort";
@@ -58,7 +61,10 @@ public abstract class AbstractIniServiceConfigurationParser<ConfigurationType ex
 
     /** Default value of the {@value #SSL_ON_PORT_PROP} property, {@value} . */
     public static final boolean DEFAULT_SSL_ON_PORT = false;
-    
+
+    /** Default value of the {@value #CLIENT_CERT_AUTHN_PROP} property, {@value} . */
+    public static final boolean DEFAULT_CLIENT_CERT_AUTH = false;
+
     /** Default value of the {@value #REQUEST_QUEUE_PROP} property, {@value} . */
     public static final int DEFAULT_REQUEST_QUEUE = 500;
 
@@ -99,19 +105,31 @@ public abstract class AbstractIniServiceConfigurationParser<ConfigurationType ex
      * 
      * @return the value, or 0 if it is not set
      */
-    protected int getPort(Section configSection){
+    protected int getPort(Section configSection) {
         return IniConfigUtil.getInt(configSection, PORT_PROP, 0, 1, 65535);
     }
-    
+
     /**
      * Gets the value of the {@value #SSL_ON_PORT_PROP} property from the configuration section.
-     *
+     * 
      * @param configSection configuration section from which to extract the value
      * 
      * @return whether SSL should be enabled on the service port, defaults to {@value #DEFAULT_SSL_ON_PORT}.
      */
-    protected boolean isSSLEnabled(Section configSection){
+    protected boolean isSSLEnabled(Section configSection) {
         return IniConfigUtil.getBoolean(configSection, SSL_ON_PORT_PROP, DEFAULT_SSL_ON_PORT);
+    }
+
+    /**
+     * Gets the value of the {@value #CLIENT_CERT_AUTHN_PROP} property from the configuration section.
+     * 
+     * @param configSection configuration section from which to extract the value
+     * 
+     * @return whether client certificate authentication is required when a client is connecting, defaults to
+     *         {@value #CLIENT_CERT_AUTHN_PROP}.
+     */
+    protected boolean isClientCertAuthRequired(Section configSection) {
+        return IniConfigUtil.getBoolean(configSection, CLIENT_CERT_AUTHN_PROP, DEFAULT_CLIENT_CERT_AUTH);
     }
 
     /**
@@ -167,10 +185,14 @@ public abstract class AbstractIniServiceConfigurationParser<ConfigurationType ex
         int port = getPort(configSection);
         log.info("service listening port: {}", port);
         configBuilder.setPort(port);
-        
+
         boolean sslOn = isSSLEnabled(configSection);
         log.info("service port using SSL: {}", sslOn);
         configBuilder.setSslEnabled(sslOn);
+
+        boolean clientCertAuthRequired = isClientCertAuthRequired(configSection);
+        log.info("client certificate authentication required: {}", clientCertAuthRequired);
+        configBuilder.setClientCertAuthRequired(clientCertAuthRequired);
 
         int shutdownPort = getShutdownPort(configSection);
         log.info("service shutdown port: {}", (shutdownPort == 0 ? "default" : shutdownPort));
