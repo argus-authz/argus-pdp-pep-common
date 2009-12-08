@@ -28,7 +28,7 @@ import org.glite.authz.common.util.Strings;
 public class ServiceMetrics {
 
     /** Java runtime. */
-    Runtime runtime;
+    private Runtime runtime;
 
     /** ID for the service. */
     private String serviceId;
@@ -36,7 +36,7 @@ public class ServiceMetrics {
     /** Time the service started. */
     private long startupTime;
 
-    /** Total number of completed requests to service */
+    /** Total number of completed requests to service. */
     private long totalRequests;
 
     /** Total number of request that error'ed out. */
