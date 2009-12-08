@@ -56,6 +56,8 @@ public class AccountMapper {
      * @param aimStrategy strategy used to map a subject to a pool account indicator
      * @param gnmStrategy strategy used to map a subject to a set of group names
      * @param pam manager used to track and access pool accounts
+     * @param uidStategy strategy used to map to/from a UID
+     * @param gidStrategy strategy used to map to/from a GID
      */
     public AccountMapper(AccountIndicatorMappingStrategy aimStrategy, GroupNameMappingStrategy gnmStrategy,
             PoolAccountManager pam, IDMappingStrategy uidStategy, IDMappingStrategy gidStrategy) {
@@ -211,7 +213,7 @@ public class AccountMapper {
                     + " could not be mapped to a primary group");
         }
         log.debug("Subject {} mapped to primary group {} and second groups {}", new Object[] { subjectDN.getName(),
-                primaryGroupName, secondaryGroupNames });
+                primaryGroupName, secondaryGroupNames, });
 
         String loginName;
         if (indicatorIsPoolAccountPrefix) {

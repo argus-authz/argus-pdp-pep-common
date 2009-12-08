@@ -23,7 +23,7 @@ import org.glite.authz.common.pip.PolicyInformationPoint;
 import org.glite.authz.common.util.Strings;
 import org.ini4j.Ini.Section;
 
-/** Configuration parser for an {@link EnvironmentTimePIP} */
+/** Configuration parser for an {@link EnvironmentTimePIP}. */
 public class EnvironmentTimePIPIniConfigurationParser implements IniPIPConfigurationParser {
 
     /** {@inheritDoc} */

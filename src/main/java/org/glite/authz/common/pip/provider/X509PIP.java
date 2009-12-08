@@ -62,43 +62,43 @@ import org.slf4j.LoggerFactory;
 public class X509PIP extends AbstractPolicyInformationPoint {
 
     /** The ID of the subject attribute, {@value} , containing the end-entity certificate processed by the PIP. */
-    public final static String X509_CERT_CHAIN_ID = "http://authz-interop.org/xacml/subject/cert-chain";
+    public static final String X509_CERT_CHAIN_ID = "http://authz-interop.org/xacml/subject/cert-chain";
 
     /**
      * The ID of the subject attribute, {@value} , containing the end-entity certificate's issuer's DN in the
      * non-standard OpenSSL format.
      */
-    public final static String SUBJECT_X509_ID = "http://authz-interop.org/xacml/subject/subject-x509-id";
+    public static final String SUBJECT_X509_ID = "http://authz-interop.org/xacml/subject/subject-x509-id";
 
     /** The ID of the subject attribute, {@value} , containing the end-entity certificate's issuer's DN. */
-    public final static String X509_DN_ISSUER = "http://authz-interop.org/xacml/subject/subject-x509-issuer";
+    public static final String X509_DN_ISSUER = "http://authz-interop.org/xacml/subject/subject-x509-issuer";
 
     /** The ID of the subject attribute, {@value} , containing the end-entity certificate's serial number. */
-    public final static String X509_SN = "http://authz-interop.org/xacml/subject/certificate-serial-number";
+    public static final String X509_SN = "http://authz-interop.org/xacml/subject/certificate-serial-number";
 
     /** The ID of the subject attribute, {@value} , containing the VO given in the VOMS attribute certificate. */
-    public final static String VOMS_VO = "http://authz-interop.org/xacml/subject/vo";
+    public static final String VOMS_VO = "http://authz-interop.org/xacml/subject/vo";
 
     /**
      * The ID of the subject attribute, {@value} , containing the DN of the VOMS service that signed the VOMS attribute
      * certificate.
      */
-    public final static String VOMS_SIGNER = "http://authz-interop.org/xacml/subject/voms-signing-subject";
+    public static final String VOMS_SIGNER = "http://authz-interop.org/xacml/subject/voms-signing-subject";
 
     /** The ID of the subject attribute, {@value} , containing the DN of the signer of the VOMS service's certificate. */
-    public final static String VOMS_SIGNER_ISSUER = "http://authz-interop.org/xacml/subject/voms-signing-issuer";
+    public static final String VOMS_SIGNER_ISSUER = "http://authz-interop.org/xacml/subject/voms-signing-issuer";
 
     /** The ID of the subject attribute, {@value} , containing the FQANs given in the VOMS attribute certificate. */
-    public final static String VOMS_FQAN = "http://authz-interop.org/xacml/subject/voms-fqan";
+    public static final String VOMS_FQAN = "http://authz-interop.org/xacml/subject/voms-fqan";
 
     /** The ID of the subject attribute, {@value} , containing the primary FQAN given in the VOMS attribute certificate. */
-    public final static String VOMS_PRIMARY_FQAN = "http://authz-interop.org/xacml/subject/voms-primary-fqan";
+    public static final String VOMS_PRIMARY_FQAN = "http://authz-interop.org/xacml/subject/voms-primary-fqan";
 
     /**
      * The ID of the subject attribute, {@value} , containing the generic attributes given in the VOMS attribute
      * certificate.
      */
-    public final static String VOMS_GA = "http://authz-interop.org/xacml/subject/generic-attribute";
+    public static final String VOMS_GA = "http://authz-interop.org/xacml/subject/generic-attribute";
 
     /** Class logger. */
     private Logger log = LoggerFactory.getLogger(X509PIP.class);
@@ -286,6 +286,10 @@ public class X509PIP extends AbstractPolicyInformationPoint {
      * @param endEntityCertificate end entity certificate for the subject currently being processed
      * @param certChain the certificate chain containing the end entity certificate from which information will be
      *            extracted
+     *
+     * @return the attribute extracted from the certificate chain 
+     * 
+     * @throws PIPProcessingException thrown if there is a problem reading the information from the certificate chain
      */
     private Collection<Attribute> processCertChain(X509Certificate endEntityCertificate, X509Certificate[] certChain)
             throws PIPProcessingException {

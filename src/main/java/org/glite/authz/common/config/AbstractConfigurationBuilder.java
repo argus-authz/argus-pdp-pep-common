@@ -255,7 +255,7 @@ public abstract class AbstractConfigurationBuilder<ConfigType extends AbstractCo
     }
 
     /**
-     * Sets the size of the buffer, in bytes, used when sending data
+     * Sets the size of the buffer, in bytes, used when sending data.
      * 
      * @param size size of the buffer, in bytes, used when sending data; may not be less than 1
      */

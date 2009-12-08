@@ -38,8 +38,6 @@ public class IniConfigUtil {
      * @param defaultValue default value for the property
      * 
      * @return the value
-     * 
-     * @throws ConfigurationException thrown if the value does not exist
      */
     public static boolean getBoolean(Section configSection, String propName, boolean defaultValue) {
         String value = getString(configSection, propName, null);
@@ -64,6 +62,9 @@ public class IniConfigUtil {
      * @param propName name of the configuration property
      * 
      * @return the value
+     * 
+     * @throws ConfigurationException thrown if given configuration section does not contain a property with the given
+     *             name
      */
     public static boolean getBoolean(Section configSection, String propName) throws ConfigurationException {
         String value = getString(configSection, propName, null);
@@ -174,12 +175,16 @@ public class IniConfigUtil {
                 if (tempInt >= minValue && tempInt <= maxValue) {
                     return tempInt;
                 } else {
-                    log.warn("Property {} in configuration section {} with a value of {} was not greater than or equal to {} and less than or equal to {}, using default value of {}",
+                    log
+                            .warn(
+                                    "Property {} in configuration section {} with a value of {} was not greater than or equal to {} and less than or equal to {}, using default value of {}",
                                     new Object[] { propName, configSection.getName(), tempInt, minValue, maxValue,
                                             defaultValue });
                 }
             } catch (NumberFormatException e) {
-                log.warn("Property {} in configuration section {} was not a valid integer, using default value of {}, using default value of {}",
+                log
+                        .warn(
+                                "Property {} in configuration section {} was not a valid integer, using default value of {}, using default value of {}",
                                 new Object[] { propName, configSection.getName(), strValue, defaultValue });
             }
         }

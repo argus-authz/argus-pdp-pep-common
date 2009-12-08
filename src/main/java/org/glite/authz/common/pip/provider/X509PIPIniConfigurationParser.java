@@ -30,18 +30,21 @@ import org.slf4j.LoggerFactory;
 
 /** Configuration parser for {@link X509PIP} PIPs. */
 public class X509PIPIniConfigurationParser implements IniPIPConfigurationParser {
-    
-    /** The name of the {@value} property which determines whether a subject's certificate chain must contain a proxy certificate. */
-    public final static String REQ_PROXY_PROP = "requireProxy";
+
+    /**
+     * The name of the {@value} property which determines whether a subject's certificate chain must contain a proxy
+     * certificate.
+     */
+    public static final String REQ_PROXY_PROP = "requireProxy";
 
     /**
      * The name of the {@value} property the indicates whether PKIX validation will be performed on the certificate
      * chain.
      */
-    public final static String PERFORM_PKIX_VALIDATION_PROP = "performPKIXValidation";
+    public static final String PERFORM_PKIX_VALIDATION_PROP = "performPKIXValidation";
 
     /** The name of the {@value} property which gives the absolute path to the 'vomsdir' directory. */
-    public final static String VOMS_INFO_DIR_PROP = "vomsInfoDir";
+    public static final String VOMS_INFO_DIR_PROP = "vomsInfoDir";
 
     /** The name of the {@value} which gives the refresh period, in minutes, for 'vomsdir' information. */
     public static final String VOMS_INFO_REFRESH_PROP = "vomsInfoRefresh";
@@ -49,8 +52,8 @@ public class X509PIPIniConfigurationParser implements IniPIPConfigurationParser 
     /** Default value (1 hour in minutes) of the {@value #VOMS_INFO_REFRESH_PROP} property, {@value} . */
     public static final int DEFAULT_VOMS_INFO_REFRESH = 60;
 
-    /** Default value of {@value #PERFORM_PKIX_VALIDATION_PROP}, {@value} */
-    public final static boolean DEFAULT_PERFORM_PKIX_VALIDATION = true;
+    /** Default value of {@value #PERFORM_PKIX_VALIDATION_PROP}, {@value} . */
+    public static final boolean DEFAULT_PERFORM_PKIX_VALIDATION = true;
 
     /** Class logger. */
     private Logger log = LoggerFactory.getLogger(X509PIPIniConfigurationParser.class);
@@ -60,14 +63,16 @@ public class X509PIPIniConfigurationParser implements IniPIPConfigurationParser 
             throws ConfigurationException {
         boolean requireProxy = IniConfigUtil.getBoolean(iniConfig, REQ_PROXY_PROP, false);
         log.info("subject proxy certificate required: {}", requireProxy);
-        
+
         PKIStore acTrustMaterial = null;
         String vomsInfoDir = IniConfigUtil.getString(iniConfig, VOMS_INFO_DIR_PROP, null);
         if (vomsInfoDir != null) {
             log.info("voms info directory: {}", vomsInfoDir);
             // get refresh interval: default 1h
-            int vomsInfoRefresh= IniConfigUtil.getInt(iniConfig, VOMS_INFO_REFRESH_PROP, DEFAULT_VOMS_INFO_REFRESH, 1, Integer.MAX_VALUE);
-            vomsInfoRefresh= vomsInfoRefresh * 60 * 1000; // minute -> millis
+            int vomsInfoRefresh = IniConfigUtil.getInt(iniConfig, VOMS_INFO_REFRESH_PROP, DEFAULT_VOMS_INFO_REFRESH, 1,
+                    Integer.MAX_VALUE);
+            // minute -> millis
+            vomsInfoRefresh = vomsInfoRefresh * 60 * 1000;
             log.info("voms info refresh interval: {}ms", vomsInfoRefresh);
             try {
                 Files.getFile(vomsInfoDir, false, true, true, false);
@@ -78,7 +83,8 @@ public class X509PIPIniConfigurationParser implements IniPIPConfigurationParser 
             }
         }
 
-        X509PIP pip = new X509PIP(iniConfig.getName(), requireProxy, configurationBuilder.getTrustMaterialStore(), acTrustMaterial);
+        X509PIP pip = new X509PIP(iniConfig.getName(), requireProxy, configurationBuilder.getTrustMaterialStore(),
+                acTrustMaterial);
 
         boolean performPKIXValidation = IniConfigUtil.getBoolean(iniConfig, PERFORM_PKIX_VALIDATION_PROP,
                 DEFAULT_PERFORM_PKIX_VALIDATION);

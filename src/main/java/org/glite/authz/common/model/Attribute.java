@@ -33,113 +33,113 @@ import org.glite.authz.common.util.Strings;
 @NotThreadSafe
 public final class Attribute implements Serializable {
 
-    /** The string data type URI, {@value} */
-    public final static String DT_STRING = "http://www.w3.org/2001/XMLSchema#string";
+    /** The string data type URI, {@value} . */
+    public static final String DT_STRING = "http://www.w3.org/2001/XMLSchema#string";
 
-    /** The boolean data type URI, {@value} */
-    public final static String DT_BOOLEAN = "http://www.w3.org/2001/XMLSchema#boolean";
+    /** The boolean data type URI, {@value} . */
+    public static final String DT_BOOLEAN = "http://www.w3.org/2001/XMLSchema#boolean";
 
-    /** The integer data type URI, {@value} */
-    public final static String DT_INTEGER = "http://www.w3.org/2001/XMLSchema#integer";
+    /** The integer data type URI, {@value} . */
+    public static final String DT_INTEGER = "http://www.w3.org/2001/XMLSchema#integer";
 
-    /** The double data type URI, {@value} */
-    public final static String DT_DOUBLE = "http://www.w3.org/2001/XMLSchema#double";
+    /** The double data type URI, {@value} . */
+    public static final String DT_DOUBLE = "http://www.w3.org/2001/XMLSchema#double";
 
-    /** The time data type URI, {@value} */
-    public final static String DT_TIME = "http://www.w3.org/2001/XMLSchema#time";
+    /** The time data type URI, {@value} . */
+    public static final String DT_TIME = "http://www.w3.org/2001/XMLSchema#time";
 
-    /** The date data type URI, {@value} */
-    public final static String DT_DATE = "http://www.w3.org/2001/XMLSchema#date";
+    /** The date data type URI, {@value} . */
+    public static final String DT_DATE = "http://www.w3.org/2001/XMLSchema#date";
 
-    /** The date/time data type URI, {@value} */
-    public final static String DT_DATE_TIME = "http://www.w3.org/2001/XMLSchema#dateTime";
+    /** The date/time data type URI, {@value} . */
+    public static final String DT_DATE_TIME = "http://www.w3.org/2001/XMLSchema#dateTime";
 
-    /** The XQuery dayTimeDuration data type URI, {@value} */
-    public final static String DT_DAY_TIME = "http://www.w3.org/TR/2002/WD-xquery-operators-20020816#dayTimeDuration";
+    /** The XQuery dayTimeDuration data type URI, {@value} . */
+    public static final String DT_DAY_TIME = "http://www.w3.org/TR/2002/WD-xquery-operators-20020816#dayTimeDuration";
 
-    /** The XQuery yearMonthDuration data type URI, {@value} */
-    public final static String DT_YEAR_MONTH = "http://www.w3.org/TR/2002/WD-xquery-operators-20020816#yearMonthDuration";
+    /** The XQuery yearMonthDuration data type URI, {@value} . */
+    public static final String DT_YEAR_MONTH = "http://www.w3.org/TR/2002/WD-xquery-operators-20020816#yearMonthDuration";
 
-    /** The any URI data type URI, {@value} */
-    public final static String DT_ANY_URI = "http://www.w3.org/2001/XMLSchema#anyURI";
+    /** The any URI data type URI, {@value} . */
+    public static final String DT_ANY_URI = "http://www.w3.org/2001/XMLSchema#anyURI";
 
-    /** The hex-encoded binary data type URI, {@value} */
-    public final static String DT_HEX_BINARY = "http://www.w3.org/2001/XMLSchema#hexBinary";
+    /** The hex-encoded binary data type URI, {@value} . */
+    public static final String DT_HEX_BINARY = "http://www.w3.org/2001/XMLSchema#hexBinary";
 
-    /** The base64-encoded binary data type URI, {@value} */
-    public final static String DT_BASE64_BINARY = "http://www.w3.org/2001/XMLSchema#base64Binary";
+    /** The base64-encoded binary data type URI, {@value} . */
+    public static final String DT_BASE64_BINARY = "http://www.w3.org/2001/XMLSchema#base64Binary";
 
-    /** The RFC822 name (email address) data type URI, {@value} */
-    public final static String DT_RFC822_NAME = "urn:oasis:names:tc:xacml:1.0:data-type:rfc822Name";
+    /** The RFC822 name (email address) data type URI, {@value} . */
+    public static final String DT_RFC822_NAME = "urn:oasis:names:tc:xacml:1.0:data-type:rfc822Name";
 
-    /** The X.500 name (DN) data type URI, {@value} */
-    public final static String DT_X500_NAME = "urn:oasis:names:tc:xacml:1.0:data-type:x500Name";
+    /** The X.500 name (DN) data type URI, {@value} . */
+    public static final String DT_X500_NAME = "urn:oasis:names:tc:xacml:1.0:data-type:x500Name";
 
-    /** The action ID attribute ID, {@value} */
-    public final static String ID_ACT_ID = "urn:oasis:names:tc:xacml:1.0:action:action-id";
+    /** The action ID attribute ID, {@value} . */
+    public static final String ID_ACT_ID = "urn:oasis:names:tc:xacml:1.0:action:action-id";
 
-    /** The action implied action attribute ID, {@value} */
-    public final static String ID_ACT_IMPLIED_ACTION = "urn:oasis:names:tc:xacml:1.0:action:implied-action";
+    /** The action implied action attribute ID, {@value} . */
+    public static final String ID_ACT_IMPLIED_ACTION = "urn:oasis:names:tc:xacml:1.0:action:implied-action";
 
-    /** The environment current time attribute ID, {@value} */
-    public final static String ID_ENV_CURRENT_TIME = "urn:oasis:names:tc:xacml:1.0:environment:current-time";
+    /** The environment current time attribute ID, {@value} . */
+    public static final String ID_ENV_CURRENT_TIME = "urn:oasis:names:tc:xacml:1.0:environment:current-time";
 
-    /** The environment current date attribute ID, {@value} */
-    public final static String ID_ENV_CURRENT_DATE = "urn:oasis:names:tc:xacml:1.0:environment:current-date";
+    /** The environment current date attribute ID, {@value} . */
+    public static final String ID_ENV_CURRENT_DATE = "urn:oasis:names:tc:xacml:1.0:environment:current-date";
 
-    /** The environment current date/time attribute ID, {@value} */
-    public final static String ID_ENV_CURRENT_DATE_TIME = "urn:oasis:names:tc:xacml:1.0:environment:current-dateTime";
+    /** The environment current date/time attribute ID, {@value} . */
+    public static final String ID_ENV_CURRENT_DATE_TIME = "urn:oasis:names:tc:xacml:1.0:environment:current-dateTime";
 
-    /** The resource location attribute ID, {@value} */
-    public final static String ID_RES_LOCATION = "urn:oasis:names:tc:xacml:1.0:resource:resource-location";
+    /** The resource location attribute ID, {@value} . */
+    public static final String ID_RES_LOCATION = "urn:oasis:names:tc:xacml:1.0:resource:resource-location";
 
-    /** The resource ID attribute ID, {@value} */
-    public final static String ID_RES_ID = "urn:oasis:names:tc:xacml:1.0:resource:resource-id";
+    /** The resource ID attribute ID, {@value} . */
+    public static final String ID_RES_ID = "urn:oasis:names:tc:xacml:1.0:resource:resource-id";
 
-    /** The resource simple file name attribute ID, {@value} */
-    public final static String ID_RES_SIMPLE_FILE_NAME = "urn:oasis:names:tc:xacml:1.0:resource:simple-file-name";
+    /** The resource simple file name attribute ID, {@value} . */
+    public static final String ID_RES_SIMPLE_FILE_NAME = "urn:oasis:names:tc:xacml:1.0:resource:simple-file-name";
 
-    /** The subject authentication locality DNS name attribute ID, {@value} */
-    public final static String ID_SUB_AUTHN_DNS_NAME = "urn:oasis:names:tc:xacml:1.0:subject:authn-locality:dns-name";
+    /** The subject authentication locality DNS name attribute ID, {@value} . */
+    public static final String ID_SUB_AUTHN_DNS_NAME = "urn:oasis:names:tc:xacml:1.0:subject:authn-locality:dns-name";
 
-    /** The subject authentication locality IP address attribute ID, {@value} */
-    public final static String ID_SUB_AUTHN_IP_ADDRESS = "urn:oasis:names:tc:xacml:1.0:subject:authn-locality:ip-address";
+    /** The subject authentication locality IP address attribute ID, {@value} . */
+    public static final String ID_SUB_AUTHN_IP_ADDRESS = "urn:oasis:names:tc:xacml:1.0:subject:authn-locality:ip-address";
 
-    /** The subject authentication method attribute ID, {@value} */
-    public final static String ID_SUB_AUTHN_METHOD = "urn:oasis:names:tc:xacml:1.0:subject:authentication-method";
+    /** The subject authentication method attribute ID, {@value} . */
+    public static final String ID_SUB_AUTHN_METHOD = "urn:oasis:names:tc:xacml:1.0:subject:authentication-method";
 
-    /** The subject authentication time attribute ID, {@value} */
-    public final static String ID_SUB_AUTHN_TIME = "urn:oasis:names:tc:xacml:1.0:subject:authentication-time";
+    /** The subject authentication time attribute ID, {@value} . */
+    public static final String ID_SUB_AUTHN_TIME = "urn:oasis:names:tc:xacml:1.0:subject:authentication-time";
 
-    /** The subject key information attribute ID, {@value} */
-    public final static String ID_SUB_KEY_INFO = "urn:oasis:names:tc:xacml:1.0:subject:key-info";
+    /** The subject key information attribute ID, {@value} . */
+    public static final String ID_SUB_KEY_INFO = "urn:oasis:names:tc:xacml:1.0:subject:key-info";
 
-    /** The subject request time attribute ID, {@value} */
-    public final static String ID_SUB_REQUEST_TIME = "urn:oasis:names:tc:xacml:1.0:subject:request-time";
+    /** The subject request time attribute ID, {@value} . */
+    public static final String ID_SUB_REQUEST_TIME = "urn:oasis:names:tc:xacml:1.0:subject:request-time";
 
-    /** The subject session start time attribute ID, {@value} */
-    public final static String ID_SUB_SESSION_START_TIME = "urn:oasis:names:tc:xacml:1.0:subject:session-start-time";
+    /** The subject session start time attribute ID, {@value} . */
+    public static final String ID_SUB_SESSION_START_TIME = "urn:oasis:names:tc:xacml:1.0:subject:session-start-time";
 
-    /** The subject ID attribute ID, {@value} */
-    public final static String ID_SUB_ID = "urn:oasis:names:tc:xacml:1.0:subject:subject-id";
+    /** The subject ID attribute ID, {@value} . */
+    public static final String ID_SUB_ID = "urn:oasis:names:tc:xacml:1.0:subject:subject-id";
 
-    /** The subject ID qualifier attribute ID, {@value} */
-    public final static String ID_SUB_ID_QUALIFIER = "urn:oasis:names:tc:xacml:1.0:subject:subject-id-qualifier";
+    /** The subject ID qualifier attribute ID, {@value} . */
+    public static final String ID_SUB_ID_QUALIFIER = "urn:oasis:names:tc:xacml:1.0:subject:subject-id-qualifier";
 
-    /** The subject category access subject attribute ID, {@value} */
-    public final static String ID_SUB_CAT_ACCESS_SUBJECT = "urn:oasis:names:tc:xacml:1.0:subject-category:access-subject";
+    /** The subject category access subject attribute ID, {@value} . */
+    public static final String ID_SUB_CAT_ACCESS_SUBJECT = "urn:oasis:names:tc:xacml:1.0:subject-category:access-subject";
 
-    /** The subject category codebase attribute ID, {@value} */
-    public final static String ID_SUB_CAT_CODEBASE = "urn:oasis:names:tc:xacml:1.0:subject-category:codebase";
+    /** The subject category codebase attribute ID, {@value} . */
+    public static final String ID_SUB_CAT_CODEBASE = "urn:oasis:names:tc:xacml:1.0:subject-category:codebase";
 
-    /** The subject category intermediary subject attribute ID, {@value} */
-    public final static String ID_SUB_CAT_INTERMEDIARY_SUBJECT = "urn:oasis:names:tc:xacml:1.0:subject-category:intermediary-subject";
+    /** The subject category intermediary subject attribute ID, {@value} . */
+    public static final String ID_SUB_CAT_INTERMEDIARY_SUBJECT = "urn:oasis:names:tc:xacml:1.0:subject-category:intermediary-subject";
 
-    /** The subject category recipient attribute ID, {@value} */
-    public final static String ID_SUB_CAT_RECIPIENT_SUBJECT = "urn:oasis:names:tc:xacml:1.0:subject-category:recipient-subject";
+    /** The subject category recipient attribute ID, {@value} . */
+    public static final String ID_SUB_CAT_RECIPIENT_SUBJECT = "urn:oasis:names:tc:xacml:1.0:subject-category:recipient-subject";
 
-    /** The subject category requesting machine attribute ID, {@value} */
-    public final static String ID_SUB_CAT_REQUEST_MACHINE = "urn:oasis:names:tc:xacml:1.0:subject-category:requesting-machine";
+    /** The subject category requesting machine attribute ID, {@value} . */
+    public static final String ID_SUB_CAT_REQUEST_MACHINE = "urn:oasis:names:tc:xacml:1.0:subject-category:requesting-machine";
 
     /** Serial version UID. */
     private static final long serialVersionUID = -998357326993743203L;
@@ -225,7 +225,7 @@ public final class Attribute implements Serializable {
         return values;
     }
 
-    /** {@inheritDoc} */
+    /** {@inheritDoc}. */
     public String toString() {
         StringBuilder stringBuilder = new StringBuilder();
 
@@ -245,7 +245,7 @@ public final class Attribute implements Serializable {
         return stringBuilder.toString();
     }
 
-    /** {@inheritDoc} */
+    /** {@inheritDoc}. */
     public int hashCode() {
         int hash = 13;
 
@@ -257,7 +257,7 @@ public final class Attribute implements Serializable {
         return hash;
     }
 
-    /** {@inheritDoc} */
+    /** {@inheritDoc}. */
     public boolean equals(Object obj) {
         if (this == obj) {
             return true;

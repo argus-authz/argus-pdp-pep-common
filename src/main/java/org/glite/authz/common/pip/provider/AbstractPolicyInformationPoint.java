@@ -23,7 +23,7 @@ import org.glite.authz.common.util.Strings;
 
 /**
  * Base class for {@link PolicyInformationPoint} implementations that provides no-op implementation of the
- * {@link PolicyInformationPoint#start()} and {@link PolicyInformationPoint#start()} methods
+ * {@link PolicyInformationPoint#start()} and {@link PolicyInformationPoint#start()} methods.
  */
 public abstract class AbstractPolicyInformationPoint implements PolicyInformationPoint {
 

@@ -20,17 +20,17 @@ package org.glite.authz.common.logging;
 public class LoggingConstants {
 
     /** Name of a category where various messages are logged. */
-    public final static String MESSAGE_CATEGORY = "org.glite.authz.message";
+    public static final String MESSAGE_CATEGORY = "org.glite.authz.message";
     
     /** Name of the category to which protocol messages are written. */
-    public final static String PROTOCOL_MESSAGE_CATEGORY = MESSAGE_CATEGORY + ".protocol";
+    public static final String PROTOCOL_MESSAGE_CATEGORY = MESSAGE_CATEGORY + ".protocol";
     
     /** Name of the category to which policies are written. */
-    public final static String POLICY_MESSAGE_CATEGORY = MESSAGE_CATEGORY+ ".policy";
+    public static final String POLICY_MESSAGE_CATEGORY = MESSAGE_CATEGORY+ ".policy";
     
     /** Name of the category to which access messages are written. */
-    public final static String ACCESS_CATEGORY = "org.glite.authz.access";
+    public static final String ACCESS_CATEGORY = "org.glite.authz.access";
     
     /** Name of the category to which audit messages are written. */
-    public final static String AUDIT_CATEGORY = "org.glite.authz.audit";
+    public static final String AUDIT_CATEGORY = "org.glite.authz.audit";
 }

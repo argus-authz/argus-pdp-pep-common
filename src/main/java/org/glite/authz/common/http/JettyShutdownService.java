@@ -43,12 +43,13 @@ import org.slf4j.LoggerFactory;
  * commands have been run, the created shutdown service is stopped as well. The shutdown process occurs asynchronously
  * and does NOT block the return of the GET request.
  * 
- * Additionally, the same shutdown procedure is bound as a JVM shutdown hook in the event that the process is terminated in that fashion.
+ * Additionally, the same shutdown procedure is bound as a JVM shutdown hook in the event that the process is terminated
+ * in that fashion.
  */
 public class JettyShutdownService {
-    
+
     /** Class logger. */
-    private final static Logger log = LoggerFactory.getLogger(JettyShutdownService.class);
+    private static final Logger LOG = LoggerFactory.getLogger(JettyShutdownService.class);
 
     /**
      * Creates and starts the shutdown service.
@@ -78,7 +79,7 @@ public class JettyShutdownService {
                 resp.setStatus(HttpServletResponse.SC_OK);
                 resp.getWriter().write("ok");
                 resp.flushBuffer();
-                log.info("Service shutting down");
+                LOG.info("Service shutting down");
                 shutdownCommandThread.start();
                 return;
             }
@@ -90,8 +91,8 @@ public class JettyShutdownService {
     }
 
     /**
-     * Creates the thread that run in order to shutdown everything.  This will create a new shutdown command, added to the end of the given list,
-     * that will shutdown the shutdown service currently being created.
+     * Creates the thread that run in order to shutdown everything. This will create a new shutdown command, added to
+     * the end of the given list, that will shutdown the shutdown service currently being created.
      * 
      * @param shutdownService the shutdown service being created
      * @param commands the shutdown commands to run before stopping the shutdown service

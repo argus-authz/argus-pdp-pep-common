@@ -39,6 +39,8 @@ public class DFPMFileParser {
      * 
      * @param map the map to populate
      * @param mapFileReader reader of the map file
+     * 
+     * @throws ConfigurationException thrown if the map file can not be read
      */
     public void parse(final DFPM map, final Reader mapFileReader) throws ConfigurationException {
         LineNumberReader reader = new LineNumberReader(mapFileReader);
@@ -61,6 +63,8 @@ public class DFPMFileParser {
      * @param map map to populate
      * @param line the line to parse
      * @param lineNumber the current line number
+     * 
+     * @throws ConfigurationException thrown if the map file contains an invalid mapping entry
      */
     private void parseLine(DFPM map, String line, int lineNumber) throws ConfigurationException {
         String trimmedLine = Strings.safeTrimOrNullString(line);

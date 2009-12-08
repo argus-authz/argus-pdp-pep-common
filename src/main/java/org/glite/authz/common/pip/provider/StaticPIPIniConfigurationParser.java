@@ -93,7 +93,7 @@ public class StaticPIPIniConfigurationParser implements IniPIPConfigurationParse
      */
     public static final String ATTRIBUTE_VALUE_DELIM_PROP = "valueDelimiter";
 
-    /** The default value of the {@value #ATTRIBUTE_VALUE_DELIM_PROP} property: {@value} */
+    /** The default value of the {@value #ATTRIBUTE_VALUE_DELIM_PROP} property: {@value} . */
     public static final String DEFAULT_VALUE_DELIM = ",";
 
     /** The default value of the {@value #RESOURCE_ATTRIBUTES_IN_ALL_PROP} property: {@value} . */
@@ -140,7 +140,9 @@ public class StaticPIPIniConfigurationParser implements IniPIPConfigurationParse
 
         boolean resourceAttributesInAllResource = IniConfigUtil.getBoolean(iniConfig, RESOURCE_ATTRIBUTES_IN_ALL_PROP,
                 DEFAULT_RESOURCE_ATTRIBUTES_IN_ALL);
-        log.info("resource attributes will be applied to all resources in request: {}", resourceAttributesInAllResource);
+        log
+                .info("resource attributes will be applied to all resources in request: {}",
+                        resourceAttributesInAllResource);
         pip.setAddAttributesToAllResources(resourceAttributesInAllResource);
 
         boolean subjectAttributesInAllSubject = IniConfigUtil.getBoolean(iniConfig, SUBJECT_ATTRIBUTES_IN_ALL_PROP,
@@ -216,7 +218,7 @@ public class StaticPIPIniConfigurationParser implements IniPIPConfigurationParse
     }
 
     /**
-     * Creates an {@link Attribute} from a INI configuration section containing the following properties:
+     * Creates an {@link Attribute} from a INI configuration section containing the following properties.
      * 
      * <ul>
      * <li>{@value #ATTRIBUTE_ID_PROP} - required - contains the ID of the attribute</li>

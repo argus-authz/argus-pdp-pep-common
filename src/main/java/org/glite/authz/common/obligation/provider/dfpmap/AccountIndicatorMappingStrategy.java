@@ -36,6 +36,8 @@ public interface AccountIndicatorMappingStrategy {
      * @param secondaryFQANs subject's secondary FQANs
      * 
      * @return the account indicator or null
+     * 
+     * @throws ObligationProcessingException thrown if there is a problem mapping the subject to an account
      */
     public String mapToAccountIndicator(X500Principal subjectDN, FQAN primaryFQAN, List<FQAN> secondaryFQANs)
             throws ObligationProcessingException;

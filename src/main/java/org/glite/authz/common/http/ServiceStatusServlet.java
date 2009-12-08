@@ -27,7 +27,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.glite.authz.common.config.AbstractServiceConfiguration;
 
-/** Servlet that prints the metrics available from the {@link AbstractServiceConfiguration#getServiceMetrics()} */
+/** Servlet that prints the metrics available from the {@link AbstractServiceConfiguration#getServiceMetrics()}. */
 public class ServiceStatusServlet extends HttpServlet {
 
     /** Serial version UID. */

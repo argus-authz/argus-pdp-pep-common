@@ -8,9 +8,54 @@
     
     <dependencySets>
         <dependencySet>
+            <scope>compile</scope>
             <outputDirectory>/lib</outputDirectory>
             <includes>
-                <include>*:jar:*</include>
+                <include>*:jar</include>
+            </includes>
+            <excludes>
+                <exclude>org.mortbay.jetty:*</exclude>
+                <exclude>javax.servlet:*</exclude>
+                <exclude>net.jcip:*</exclude>
+                <exclude>ch.qos.logback:*</exclude>
+            </excludes>
+        </dependencySet>
+        
+        <dependencySet>
+            <scope>runtime</scope>
+            <outputDirectory>/lib/endorsed</outputDirectory>
+            <includes>
+                <include>org.apache.xerces:*</include>
+                <include>org.apache.xalan:*</include>
+            </includes>
+        </dependencySet>
+        
+        <dependencySet>
+            <scope>runtime</scope>
+            <outputDirectory>/lib/slf4j-adapter</outputDirectory>
+            <includes>
+                <include>org.slf4j:jcl-over-slf4j</include>
+                <include>org.slf4j:jul-to-slf4j</include>
+                <include>org.slf4j:log4j-over-slf4j</include>
+            </includes>
+        </dependencySet>
+        
+        <dependencySet>
+            <scope>runtime</scope>
+            <outputDirectory>/lib/slf4j-bridge</outputDirectory>
+            <includes>
+                <include>org.slf4j:slf4j-jcl</include>
+                <include>org.slf4j:slf4j-jdk14</include>
+                <include>org.slf4j:slf4j-log4j12</include>
+                <include>org.slf4j:slf4j-nop</include>
+                <include>org.slf4j:slf4j-simple</include>
+            </includes>
+        </dependencySet>
+        <dependencySet>
+            <scope>provided</scope>
+            <outputDirectory>/lib/slf4j-bridge</outputDirectory>
+            <includes>
+                <include>ch.qos.logback:logback-classic</include>
             </includes>
         </dependencySet>
     </dependencySets>

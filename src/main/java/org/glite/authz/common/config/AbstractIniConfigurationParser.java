@@ -20,7 +20,6 @@ package org.glite.authz.common.config;
 import java.io.IOException;
 import java.util.StringTokenizer;
 
-import javax.net.ssl.KeyManager;
 import javax.net.ssl.X509KeyManager;
 
 import net.jcip.annotations.ThreadSafe;
@@ -218,11 +217,10 @@ public abstract class AbstractIniConfigurationParser<ConfigurationType extends A
     }
 
     /**
-     * Creates a {@link KeyManager} from the {@value #SERVICE_KEY_PROP} and {@value #SERVICE_CERT_PROP} properties, if
-     * they exist.
+     * Creates a {@link javax.net.ssl.KeyManager} from the {@value #SERVICE_KEY_PROP} and {@value #SERVICE_CERT_PROP}
+     * properties, if they exist.
      * 
      * @param configSection current configuration section being processed
-     * @param configBuilder current builder being constructed from the parser
      * 
      * @return the constructed key manager, or null if the required properties do not exist
      * 
@@ -264,7 +262,6 @@ public abstract class AbstractIniConfigurationParser<ConfigurationType extends A
      * they exist. This store holds the material used to validate X.509 certificates.
      * 
      * @param configSection current configuration section being processed
-     * @param configBuilder current builder being constructed from the parser
      * 
      * @return the constructed trust material store, or null if the required attribute did not exist
      * 

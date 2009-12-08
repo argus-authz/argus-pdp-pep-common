@@ -195,7 +195,7 @@ public abstract class AbstractIniServiceConfigurationParser<ConfigurationType ex
         configBuilder.setClientCertAuthRequired(clientCertAuthRequired);
 
         int shutdownPort = getShutdownPort(configSection);
-        log.info("service shutdown port: {}", (shutdownPort == 0 ? "default" : shutdownPort));
+        log.info("service shutdown port: {}", shutdownPort == 0 ? "default" : shutdownPort);
         configBuilder.setShutdownPort(shutdownPort);
 
         int maxConnections = getMaximumRequests(configSection);

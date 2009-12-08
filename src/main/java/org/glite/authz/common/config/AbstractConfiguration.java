@@ -165,7 +165,7 @@ public abstract class AbstractConfiguration {
      * 
      * @param timeout HTTP connection timeout, in milliseconds; may not be less than 1
      */
-    protected synchronized final void setConnectionTimeout(int timeout) {
+    protected final synchronized void setConnectionTimeout(int timeout) {
         if (connectionTimeout != 0) {
             throw new IllegalStateException("The connection timeout has already been set, it may not be changed.");
         }
@@ -181,7 +181,7 @@ public abstract class AbstractConfiguration {
      * 
      * @param max maximum number of concurrent connections that may be in-process at one time; may not be less than 1
      */
-    protected synchronized final void setMaxRequests(int max) {
+    protected final synchronized void setMaxRequests(int max) {
         if (maxRequests != 0) {
             throw new IllegalStateException(
                     "The maximum number of requests has already been set, it may not be changed.");
@@ -198,7 +198,7 @@ public abstract class AbstractConfiguration {
      * 
      * @param service service used to handle obligations
      */
-    protected synchronized final void setObligationService(ObligationService service) {
+    protected final synchronized void setObligationService(ObligationService service) {
         if (service == null) {
             return;
         }
@@ -214,7 +214,7 @@ public abstract class AbstractConfiguration {
      * 
      * @param pips list of registered policy information points
      */
-    protected synchronized final void setPolicyInformationPoints(List<PolicyInformationPoint> pips) {
+    protected final synchronized void setPolicyInformationPoints(List<PolicyInformationPoint> pips) {
         if (policyInformationPoints != null) {
             throw new IllegalArgumentException(
                     "A list of registered policy information points has already been set, it may not be changed.");
@@ -231,7 +231,7 @@ public abstract class AbstractConfiguration {
      * 
      * @param size size of the buffer, in bytes, used when receiving data; may not be less than 1
      */
-    protected synchronized final void setReceiveBufferSize(int size) {
+    protected final synchronized void setReceiveBufferSize(int size) {
         if (receiveBufferSize != 0) {
             throw new IllegalStateException("Receive buffer size has already been set, it may not be changed.");
         }
@@ -243,11 +243,11 @@ public abstract class AbstractConfiguration {
     }
 
     /**
-     * Sets the size of the buffer, in bytes, used when sending data
+     * Sets the size of the buffer, in bytes, used when sending data.
      * 
      * @param size size of the buffer, in bytes, used when sending data; may not be less than 1
      */
-    protected synchronized final void setSendBufferSize(int size) {
+    protected final synchronized void setSendBufferSize(int size) {
         if (sendBufferSize != 0) {
             throw new IllegalStateException("Send buffer size has already been set, it may not be changed.");
         }
@@ -262,7 +262,7 @@ public abstract class AbstractConfiguration {
      * 
      * @param manager credential used by this service to create SSL connections and digital signatures
      */
-    protected synchronized final void setKeyManager(X509KeyManager manager) {
+    protected final synchronized void setKeyManager(X509KeyManager manager) {
         if (keyManager != null) {
             throw new IllegalStateException("The service key manager has already been set, it may not be changed.");
         }
@@ -274,7 +274,7 @@ public abstract class AbstractConfiguration {
      * 
      * @param material store containing the trust material used to validate X509 certificates
      */
-    protected synchronized final void setX509TrustMaterial(PKIStore material) {
+    protected final synchronized void setX509TrustMaterial(PKIStore material) {
         if (trustMaterialStore != null) {
             throw new IllegalStateException(
                     "The X.509 trust material store has already been set, it may not be changed");

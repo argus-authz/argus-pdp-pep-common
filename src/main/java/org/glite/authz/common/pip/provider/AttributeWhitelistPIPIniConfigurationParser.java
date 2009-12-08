@@ -1,5 +1,6 @@
 /*
- * Copyright 2009 EGEE Collaboration
+ * Copyright 2008 Members of the EGEE Collaboration.
+ * See http://www.eu-egee.org/partners for details on the copyright holders. 
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -65,7 +66,7 @@ public class AttributeWhitelistPIPIniConfigurationParser implements IniPIPConfig
     }
 
     /**
-     * Parses a space delimited list of attribute IDs
+     * Parses a space delimited list of attribute IDs.
      * 
      * @param ids space delimited list of attribute IDs, may be null
      * 

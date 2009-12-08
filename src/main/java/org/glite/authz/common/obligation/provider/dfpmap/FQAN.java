@@ -29,13 +29,13 @@ import org.glite.authz.common.util.Strings;
 public class FQAN {
 
     /** The allowed characters in the components of an FQAN (group component ID, attribute ID, and attribute value). */
-    public final static String fqanComponentCharactersRegex = "[_\\w\\.\\-\\*]+";
+    public static final String fqanComponentCharactersRegex = "[_\\w\\.\\-\\*]+";
 
     /** ID of the {@value} attribute. */
-    public final static String ROLE_ATTRIB_ID = "Role";
+    public static final String ROLE_ATTRIB_ID = "Role";
 
     /** ID of the {@value} attribute. */
-    public final static String CAPABILITY_ATTRIB_ID = "Capability";
+    public static final String CAPABILITY_ATTRIB_ID = "Capability";
 
     /** The group component of the FQAN. */
     private String attributeGroupId;
@@ -146,7 +146,7 @@ public class FQAN {
     public static class Attribute {
 
         /** The string representing a null value, {@value} . */
-        public final static String NULL_VALUE = "NULL";
+        public static final String NULL_VALUE = "NULL";
 
         /** The ID of the attribute. */
         private String id;
@@ -176,7 +176,7 @@ public class FQAN {
          * 
          * @return the constructed attribute
          * 
-         * @throws IllegalKeyFormatException thrown if the FQAN contains illegal characters or is not in the proper
+         * @throws IllegalArgumentException thrown if the FQAN contains illegal characters or is not in the proper
          *             {@literal <id>=<value>} format
          */
         public static Attribute parse(String attributeString) throws IllegalArgumentException {
@@ -270,7 +270,7 @@ public class FQAN {
      * 
      * @return the FQAN
      * 
-     * @throws IllegalKeyFormatException thrown if the FQAN is not valid either because its format is wrong or one of
+     * @throws IllegalArgumentException thrown if the FQAN is not valid either because its format is wrong or one of
      *             its components contains invalid characters
      */
     public static FQAN parseFQAN(String fqanString) throws IllegalArgumentException {
