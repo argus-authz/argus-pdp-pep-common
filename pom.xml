@@ -49,6 +49,10 @@
             <version>2.3.0</version>
             <exclusions>
                 <exclusion>
+                    <groupId>commons-logging</groupId>
+                    <artifactId>commons-logging</artifactId>
+                </exclusion>
+                <exclusion>
                     <groupId>${slf4j.groupId}</groupId>
                     <artifactId>jcl-over-slf4j</artifactId>
                 </exclusion>
