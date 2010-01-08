@@ -20,16 +20,12 @@ package org.glite.authz.common.config;
 import java.io.IOException;
 import java.security.cert.CRLException;
 import java.security.cert.CertificateException;
-import java.util.Collections;
-import java.util.List;
 
 import javax.net.ssl.X509KeyManager;
 import javax.net.ssl.X509TrustManager;
 
 import net.jcip.annotations.ThreadSafe;
 
-import org.glite.authz.common.obligation.ObligationService;
-import org.glite.authz.common.pip.PolicyInformationPoint;
 import org.glite.voms.PKIStore;
 import org.glite.voms.VOMSTrustManager;
 
@@ -61,12 +57,6 @@ public abstract class AbstractConfiguration {
     /** Size of the buffer, in bytes, used when sending data. */
     private int sendBufferSize;
 
-    /** Registered policy information points. */
-    private List<PolicyInformationPoint> policyInformationPoints;
-
-    /** Service used to handle obligations. */
-    private ObligationService obligationService;
-
     /** Constructor. */
     protected AbstractConfiguration() {
         keyManager = null;
@@ -75,8 +65,6 @@ public abstract class AbstractConfiguration {
         connectionTimeout = 0;
         receiveBufferSize = 0;
         sendBufferSize = 0;
-        policyInformationPoints = null;
-        obligationService = null;
     }
 
     /**
@@ -95,24 +83,6 @@ public abstract class AbstractConfiguration {
      */
     public int getMaxRequests() {
         return maxRequests;
-    }
-
-    /**
-     * Gets the service used to handle obligations.
-     * 
-     * @return service used to handle obligations
-     */
-    public ObligationService getObligationService() {
-        return obligationService;
-    }
-
-    /**
-     * Gets the immutable list of registered policy information points.
-     * 
-     * @return immutable list of registered policy information points
-     */
-    public List<PolicyInformationPoint> getPolicyInformationPoints() {
-        return policyInformationPoints;
     }
 
     /**
@@ -191,39 +161,6 @@ public abstract class AbstractConfiguration {
             throw new IllegalArgumentException("Maximum number of requests may not be less than 1");
         }
         maxRequests = max;
-    }
-
-    /**
-     * Sets the service used to handle obligations.
-     * 
-     * @param service service used to handle obligations
-     */
-    protected final synchronized void setObligationService(ObligationService service) {
-        if (service == null) {
-            return;
-        }
-
-        if (obligationService != null) {
-            throw new IllegalStateException("Obligation service has already been set, it may not be changed");
-        }
-        obligationService = service;
-    }
-
-    /**
-     * Sets the list of registered policy information points.
-     * 
-     * @param pips list of registered policy information points
-     */
-    protected final synchronized void setPolicyInformationPoints(List<PolicyInformationPoint> pips) {
-        if (policyInformationPoints != null) {
-            throw new IllegalArgumentException(
-                    "A list of registered policy information points has already been set, it may not be changed.");
-        }
-        if (pips == null) {
-            return;
-        }
-
-        policyInformationPoints = Collections.unmodifiableList(pips);
     }
 
     /**

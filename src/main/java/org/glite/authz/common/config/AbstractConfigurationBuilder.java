@@ -17,15 +17,10 @@
 
 package org.glite.authz.common.config;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import javax.net.ssl.X509KeyManager;
 
 import net.jcip.annotations.NotThreadSafe;
 
-import org.glite.authz.common.obligation.ObligationService;
-import org.glite.authz.common.pip.PolicyInformationPoint;
 import org.glite.authz.common.util.Strings;
 import org.glite.voms.PKIStore;
 
@@ -58,12 +53,6 @@ public abstract class AbstractConfigurationBuilder<ConfigType extends AbstractCo
     /** Size of the buffer, in bytes, used when sending data. */
     private int sendBufferSize;
 
-    /** Registered policy information points. */
-    private List<PolicyInformationPoint> policyInformationPoints;
-
-    /** Service used to handler obligations. */
-    private ObligationService obligationService;
-
     /** Constructor. */
     protected AbstractConfigurationBuilder() {
         maxConnections = 0;
@@ -72,8 +61,6 @@ public abstract class AbstractConfigurationBuilder<ConfigType extends AbstractCo
         sendBufferSize = 0;
         keyManager = null;
         trustMaterialStore = null;
-        policyInformationPoints = new ArrayList<PolicyInformationPoint>();
-        obligationService = new ObligationService();
     }
 
     /**
@@ -86,19 +73,12 @@ public abstract class AbstractConfigurationBuilder<ConfigType extends AbstractCo
         connectionTimeout = prototype.getConnectionTimeout();
         receiveBufferSize = prototype.getReceiveBufferSize();
         sendBufferSize = prototype.getSendBufferSize();
-
-        if (prototype.getPolicyInformationPoints() != null) {
-            policyInformationPoints = new ArrayList<PolicyInformationPoint>(prototype.getPolicyInformationPoints());
-        } else {
-            policyInformationPoints = new ArrayList<PolicyInformationPoint>();
-        }
-        obligationService = prototype.getObligationService();
     }
 
     /**
      * Builds the configuration represented by the current set properties. Please note that configuration builders are
-     * <strong>not</strong> threadsafe.  So care should be taken that another thread does not change properties while 
-     * the configuration is being built.
+     * <strong>not</strong> threadsafe. So care should be taken that another thread does not change properties while the
+     * configuration is being built.
      * 
      * @return the constructed configuration
      */
@@ -129,24 +109,6 @@ public abstract class AbstractConfigurationBuilder<ConfigType extends AbstractCo
      */
     public int getMaxConnections() {
         return maxConnections;
-    }
-
-    /**
-     * Gets the service used to handle obligations.
-     * 
-     * @return service used to handle obligations
-     */
-    public ObligationService getObligationService() {
-        return obligationService;
-    }
-
-    /**
-     * Gets the list of registered PIPs.
-     * 
-     * @return list of registered PIPs
-     */
-    public List<PolicyInformationPoint> getPIPs() {
-        return policyInformationPoints;
     }
 
     /**
@@ -193,7 +155,6 @@ public abstract class AbstractConfigurationBuilder<ConfigType extends AbstractCo
     protected void populateConfiguration(ConfigType config) {
         config.setConnectionTimeout(connectionTimeout);
         config.setMaxRequests(maxConnections);
-        config.setPolicyInformationPoints(policyInformationPoints);
         config.setReceiveBufferSize(receiveBufferSize);
         config.setSendBufferSize(sendBufferSize);
         config.setKeyManager(keyManager);
@@ -231,15 +192,6 @@ public abstract class AbstractConfigurationBuilder<ConfigType extends AbstractCo
             throw new IllegalArgumentException("Maximum number of threads may not be less than 1");
         }
         maxConnections = max;
-    }
-
-    /**
-     * Sets the service used to handle obligations.
-     * 
-     * @param service service used to handle obligations
-     */
-    public void setObligationService(ObligationService service) {
-        obligationService = service;
     }
 
     /**

@@ -17,7 +17,6 @@
 
 package org.glite.authz.common.config;
 
-import org.glite.authz.common.obligation.ObligationService;
 import org.glite.authz.common.util.Strings;
 import org.opensaml.ws.soap.client.SOAPClient;
 
@@ -53,9 +52,6 @@ public abstract class AbstractServiceConfigurationBuilder<ConfigType extends Abs
     /** SOAP client used to communicate with the PAP. */
     private SOAPClient soapClient;
 
-    /** Obligation service used by PEP. */
-    private ObligationService obligationService;
-
     /** Constructor. */
     protected AbstractServiceConfigurationBuilder() {
         entityId = null;
@@ -64,7 +60,6 @@ public abstract class AbstractServiceConfigurationBuilder<ConfigType extends Abs
         shutdownPort = 0;
         maxRequestQueueSize = 0;
         soapClient = null;
-        obligationService = new ObligationService();
     }
 
     /**
@@ -84,7 +79,6 @@ public abstract class AbstractServiceConfigurationBuilder<ConfigType extends Abs
         shutdownPort = prototype.getShutdownPort();
         maxRequestQueueSize = prototype.getMaxRequestQueueSize();
         soapClient = prototype.getSOAPClient();
-        obligationService = prototype.getObligationService();
     }
 
     /**
@@ -112,15 +106,6 @@ public abstract class AbstractServiceConfigurationBuilder<ConfigType extends Abs
      */
     public int getMaxRequestQueueSize() {
         return maxRequestQueueSize;
-    }
-
-    /**
-     * Gets the service used to handle obligations.
-     * 
-     * @return service used to handle obligations
-     */
-    public ObligationService getObligationService() {
-        return obligationService;
     }
 
     /**
@@ -175,10 +160,10 @@ public abstract class AbstractServiceConfigurationBuilder<ConfigType extends Abs
         config.setHostname(hostname);
         config.setPort(port);
         config.setSslEnabled(sslEnabled);
+        config.setClientCertAuthRequired(clientCertAuthRequired);
         config.setShutdownPort(shutdownPort);
         config.setMaxRequestQueueSize(maxRequestQueueSize);
         config.setSOAPClient(soapClient);
-        config.setObligationService(obligationService);
     }
 
     /**
@@ -209,15 +194,6 @@ public abstract class AbstractServiceConfigurationBuilder<ConfigType extends Abs
      */
     public void setMaxRequestQueueSize(int max) {
         maxRequestQueueSize = max;
-    }
-
-    /**
-     * Sets the service used to handle obligations.
-     * 
-     * @param service service used to handle obligations
-     */
-    public void setObligationService(ObligationService service) {
-        obligationService = service;
     }
 
     /**

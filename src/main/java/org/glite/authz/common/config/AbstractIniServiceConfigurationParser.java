@@ -117,7 +117,12 @@ public abstract class AbstractIniServiceConfigurationParser<ConfigurationType ex
      * @return whether SSL should be enabled on the service port, defaults to {@value #DEFAULT_SSL_ON_PORT}.
      */
     protected boolean isSSLEnabled(Section configSection) {
-        return IniConfigUtil.getBoolean(configSection, SSL_ON_PORT_PROP, DEFAULT_SSL_ON_PORT);
+        if (configSection.containsKey(SERVICE_KEY_PROP) && configSection.containsKey(SERVICE_CERT_PROP)
+                && configSection.containsKey(TRUST_INFO_DIR_PROP)) {
+            return IniConfigUtil.getBoolean(configSection, SSL_ON_PORT_PROP, DEFAULT_SSL_ON_PORT);
+        } else {
+            return false;
+        }
     }
 
     /**
@@ -129,7 +134,11 @@ public abstract class AbstractIniServiceConfigurationParser<ConfigurationType ex
      *         {@value #CLIENT_CERT_AUTHN_PROP}.
      */
     protected boolean isClientCertAuthRequired(Section configSection) {
-        return IniConfigUtil.getBoolean(configSection, CLIENT_CERT_AUTHN_PROP, DEFAULT_CLIENT_CERT_AUTH);
+        if (isSSLEnabled(configSection)) {
+            return IniConfigUtil.getBoolean(configSection, CLIENT_CERT_AUTHN_PROP, DEFAULT_CLIENT_CERT_AUTH);
+        } else {
+            return false;
+        }
     }
 
     /**
@@ -186,14 +195,6 @@ public abstract class AbstractIniServiceConfigurationParser<ConfigurationType ex
         log.info("service listening port: {}", port);
         configBuilder.setPort(port);
 
-        boolean sslOn = isSSLEnabled(configSection);
-        log.info("service port using SSL: {}", sslOn);
-        configBuilder.setSslEnabled(sslOn);
-
-        boolean clientCertAuthRequired = isClientCertAuthRequired(configSection);
-        log.info("client certificate authentication required: {}", clientCertAuthRequired);
-        configBuilder.setClientCertAuthRequired(clientCertAuthRequired);
-
         int shutdownPort = getShutdownPort(configSection);
         log.info("service shutdown port: {}", shutdownPort == 0 ? "default" : shutdownPort);
         configBuilder.setShutdownPort(shutdownPort);
@@ -218,12 +219,17 @@ public abstract class AbstractIniServiceConfigurationParser<ConfigurationType ex
         log.info("send buffer size: {} bytes", sendBuffer);
         configBuilder.setSendBufferSize(sendBuffer);
 
-        configBuilder.setKeyManager(getX509KeyManager(iniFile.get(SECURITY_SECTION_HEADER)));
-        configBuilder.setX509TrustMaterial(getX509TrustMaterialStore(iniFile.get(SECURITY_SECTION_HEADER)));
+        Section securityConfig = iniFile.get(SECURITY_SECTION_HEADER);        
+        configBuilder.setKeyManager(getX509KeyManager(securityConfig));
+        configBuilder.setX509TrustMaterial(getX509TrustMaterialStore(securityConfig));
 
-        processObligationHandlers(iniFile, configSection, configBuilder);
+        boolean sslOn = isSSLEnabled(securityConfig);
+        log.info("service port using SSL: {}", sslOn);
+        configBuilder.setSslEnabled(sslOn);
 
-        processPolicyInformationPoints(iniFile, configSection, configBuilder);
+        boolean clientCertAuthRequired = isClientCertAuthRequired(securityConfig);
+        log.info("client certificate authentication required: {}", clientCertAuthRequired);
+        configBuilder.setClientCertAuthRequired(clientCertAuthRequired);
     }
 
     /**
