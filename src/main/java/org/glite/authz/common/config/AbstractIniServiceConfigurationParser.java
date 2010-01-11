@@ -53,8 +53,8 @@ public abstract class AbstractIniServiceConfigurationParser<ConfigurationType ex
     /** The name of the {@value} property which indicates that client certificate authentication is required. */
     public static final String CLIENT_CERT_AUTHN_PROP = "requireClientCertAuthentication";
 
-    /** The name of the {@value} property which indicates the port the service will listen on for shutdown commands. */
-    public static final String SD_PORT_PROP = "shutdownPort";
+    /** The name of the {@value} property which indicates the port the service will listen on for admin commands. */
+    public static final String ADMIN_PORT_PROP = "adminPort";
 
     /** The name of the {@value} property which indicates the maximum number of requests that will be queued up. */
     public static final String REQUEST_QUEUE_PROP = "requestQueueSize";
@@ -142,14 +142,14 @@ public abstract class AbstractIniServiceConfigurationParser<ConfigurationType ex
     }
 
     /**
-     * Gets the value of the {@value #SD_PORT_PROP} property from the configuration section.
+     * Gets the value of the {@value #ADMIN_PORT_PROP} property from the configuration section.
      * 
      * @param configSection configuration section from which to extract the value
      * 
      * @return the value, or 0 if is not set
      */
-    protected int getShutdownPort(Section configSection) {
-        return IniConfigUtil.getInt(configSection, SD_PORT_PROP, 0, 1, 65535);
+    protected int getAdminPort(Section configSection) {
+        return IniConfigUtil.getInt(configSection, ADMIN_PORT_PROP, 0, 1, 65535);
     }
 
     /**
@@ -195,9 +195,9 @@ public abstract class AbstractIniServiceConfigurationParser<ConfigurationType ex
         log.info("service listening port: {}", port);
         configBuilder.setPort(port);
 
-        int shutdownPort = getShutdownPort(configSection);
-        log.info("service shutdown port: {}", shutdownPort == 0 ? "default" : shutdownPort);
-        configBuilder.setShutdownPort(shutdownPort);
+        int adminPort = getAdminPort(configSection);
+        log.info("service shutdown port: {}", adminPort == 0 ? "default" : adminPort);
+        configBuilder.setAdminPort(adminPort);
 
         int maxConnections = getMaximumRequests(configSection);
         log.info("max requests: {}", maxConnections);

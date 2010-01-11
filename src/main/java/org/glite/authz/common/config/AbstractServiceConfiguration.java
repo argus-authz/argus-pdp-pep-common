@@ -41,8 +41,8 @@ public abstract class AbstractServiceConfiguration extends AbstractConfiguration
     /** Whether client is required to authenticate with a client certificate. */
     private Boolean clientCertAuthRequired;
 
-    /** Port number upon which the shutdown service listens. */
-    private int shutdownPort;
+    /** Port number upon which the admin service listens. */
+    private int adminPort;
 
     /** Max number of requests that will be queued if all processing threads are busy. */
     private int maxRequestQueueSize;
@@ -61,7 +61,7 @@ public abstract class AbstractServiceConfiguration extends AbstractConfiguration
         hostname = null;
         port = 0;
         sslEnabled = null;
-        shutdownPort = 0;
+        adminPort = 0;
         maxRequestQueueSize = 0;
         soapClient = null;
     }
@@ -121,12 +121,12 @@ public abstract class AbstractServiceConfiguration extends AbstractConfiguration
     }
 
     /**
-     * Gets the port number upon which the shutdown service listens.
+     * Gets the port number upon which the admin service listens.
      * 
-     * @return port number upon which the shutdown service listens
+     * @return port number upon which the admin service listens
      */
-    public int getShutdownPort() {
-        return shutdownPort;
+    public int getAdminPort() {
+        return adminPort;
     }
 
     /**
@@ -209,16 +209,16 @@ public abstract class AbstractServiceConfiguration extends AbstractConfiguration
     }
 
     /**
-     * Sets the port number upon which the shutdown service listens.
+     * Sets the port number upon which the admin service listens.
      * 
-     * @param port port number upon which the shutdown service listens
+     * @param port port number upon which the admin service listens
      */
-    protected final synchronized void setShutdownPort(int port) {
-        if (shutdownPort != 0) {
-            throw new IllegalStateException("Shutdown service port has already been set, it may not be changed");
+    protected final synchronized void setAdminPort(int port) {
+        if (adminPort != 0) {
+            throw new IllegalStateException("Admin service port has already been set, it may not be changed");
         }
 
-        shutdownPort = port;
+        adminPort = port;
     }
 
     /**

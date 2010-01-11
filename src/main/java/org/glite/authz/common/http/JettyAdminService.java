@@ -57,7 +57,7 @@ public class JettyAdminService {
     public JettyAdminService(int port) {
         adminPort = port;
         if (adminPort < 1) {
-            throw new IllegalArgumentException("Admin port must be greated than 0");
+            throw new IllegalArgumentException("Admin port must be greater than 0");
         }
 
         if (adminPort > 65535) {
@@ -113,9 +113,6 @@ public class JettyAdminService {
 
     /**
      * Creates and starts the shutdown service.
-     * 
-     * @param shutdownPort port on which the service will listen
-     * @param shutdownCommands list of commands to run at shutdown time
      */
     public synchronized void start() {
         if (adminService.isRunning()) {

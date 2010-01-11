@@ -43,8 +43,8 @@ public abstract class AbstractServiceConfigurationBuilder<ConfigType extends Abs
     /** Whether client is required to authenticate with a client certificate. */
     private boolean clientCertAuthRequired;
 
-    /** Port number upon which the shutdown service listens. */
-    private int shutdownPort;
+    /** Port number upon which the admin service listens. */
+    private int adminPort;
 
     /** Max number of requests that will be queued if all PDP processing threads are busy. */
     private int maxRequestQueueSize;
@@ -57,7 +57,7 @@ public abstract class AbstractServiceConfigurationBuilder<ConfigType extends Abs
         entityId = null;
         hostname = null;
         port = 0;
-        shutdownPort = 0;
+        adminPort = 0;
         maxRequestQueueSize = 0;
         soapClient = null;
     }
@@ -76,7 +76,7 @@ public abstract class AbstractServiceConfigurationBuilder<ConfigType extends Abs
         port = prototype.getPort();
         sslEnabled = prototype.isSslEnabled();
         clientCertAuthRequired = prototype.isClientCertAuthRequired();
-        shutdownPort = prototype.getShutdownPort();
+        adminPort = prototype.getAdminPort();
         maxRequestQueueSize = prototype.getMaxRequestQueueSize();
         soapClient = prototype.getSOAPClient();
     }
@@ -118,12 +118,12 @@ public abstract class AbstractServiceConfigurationBuilder<ConfigType extends Abs
     }
 
     /**
-     * Gets the port number upon which the shutdown service listens.
+     * Gets the port number upon which the admin service listens.
      * 
-     * @return port number upon which the shutdown service listens
+     * @return port number upon which the shuadmintdown service listens
      */
-    public int getShutdownPort() {
-        return shutdownPort;
+    public int getAdminPort() {
+        return adminPort;
     }
 
     /**
@@ -161,7 +161,7 @@ public abstract class AbstractServiceConfigurationBuilder<ConfigType extends Abs
         config.setPort(port);
         config.setSslEnabled(sslEnabled);
         config.setClientCertAuthRequired(clientCertAuthRequired);
-        config.setShutdownPort(shutdownPort);
+        config.setAdminPort(adminPort);
         config.setMaxRequestQueueSize(maxRequestQueueSize);
         config.setSOAPClient(soapClient);
     }
@@ -206,12 +206,12 @@ public abstract class AbstractServiceConfigurationBuilder<ConfigType extends Abs
     }
 
     /**
-     * Sets the port number upon which the shutdown service listens.
+     * Sets the port number upon which the admin service listens.
      * 
-     * @param port port number upon which the shutdown service listens
+     * @param newPort port number upon which the admin service listens
      */
-    public void setShutdownPort(int port) {
-        shutdownPort = port;
+    public void setAdminPort(int newPort) {
+        adminPort = newPort;
     }
 
     /**
