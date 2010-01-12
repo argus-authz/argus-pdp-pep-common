@@ -63,7 +63,6 @@ public class ShutdownCommand extends AbstractAdminCommand {
     /** {@inheritDoc} */
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         resp.setStatus(HttpServletResponse.SC_OK);
-        resp.getWriter().write("ok");
         resp.flushBuffer();
         log.info("Service shutting down");
         if (shutdownThread != null) {
