@@ -46,7 +46,7 @@ public class WorkerNodeProfileV1Constants {
     public static final String ATT_USER_ID = ProfileConstants.OPENXACML_ATTRIBUTE_STEM + "/user-id";
 
     /** Identifier for virtual organization attributes. */
-    public static final String ATT_VO = ProfileConstants.OPENXACML_ATTRIBUTE_STEM + "/virtual-organizaiton";
+    public static final String ATT_VO = ProfileConstants.OPENXACML_ATTRIBUTE_STEM + "/virtual-organization";
 
     /** Identifier for VOMS issuer attributes. */
     public static final String ATT_VOMS_ISSUER = ProfileConstants.OPENXACML_ATTRIBUTE_STEM + "/voms-issuer";
