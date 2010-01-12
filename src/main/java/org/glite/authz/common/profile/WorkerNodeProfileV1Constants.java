@@ -38,7 +38,10 @@ public class WorkerNodeProfileV1Constants {
 
     /** Identifier for primary group ID attributes. */
     public static final String ATT_PRIMARY_GROUP_ID = ProfileConstants.OPENXACML_ATTRIBUTE_STEM + "/group-id/primary";
-
+    
+    /** Identifier for profile ID attributes. */
+    public static final String ATT_PROFILE_ID = ProfileConstants.OPENXACML_ATTRIBUTE_STEM + "/profile-id";
+    
     /** Identifier for subject issuer attributes. */
     public static final String ATT_SUBJECT_ISSUER = ProfileConstants.OPENXACML_ATTRIBUTE_STEM + "/subject-issuer";
 
