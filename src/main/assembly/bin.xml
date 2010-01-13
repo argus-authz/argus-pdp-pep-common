@@ -15,7 +15,6 @@
             </includes>
             <excludes>
                 <exclude>org.mortbay.jetty:*</exclude>
-                <exclude>javax.servlet:*</exclude>
                 <exclude>net.jcip:*</exclude>
                 <exclude>ch.qos.logback:*</exclude>
             </excludes>

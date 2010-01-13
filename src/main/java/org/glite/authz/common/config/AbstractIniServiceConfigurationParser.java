@@ -53,8 +53,14 @@ public abstract class AbstractIniServiceConfigurationParser<ConfigurationType ex
     /** The name of the {@value} property which indicates that client certificate authentication is required. */
     public static final String CLIENT_CERT_AUTHN_PROP = "requireClientCertAuthentication";
 
+    /** The name of the {@value} property which indicates the host the service will listen on for admin commands. */
+    public static final String ADMIN_HOST_PROP = "adminHost";
+
     /** The name of the {@value} property which indicates the port the service will listen on for admin commands. */
     public static final String ADMIN_PORT_PROP = "adminPort";
+
+    /** The name of the {@value} property which indicates the password required for admin commands. */
+    public static final String ADMIN_PASSWORD_PROP = "adminPassword";
 
     /** The name of the {@value} property which indicates the maximum number of requests that will be queued up. */
     public static final String REQUEST_QUEUE_PROP = "requestQueueSize";
@@ -142,6 +148,17 @@ public abstract class AbstractIniServiceConfigurationParser<ConfigurationType ex
     }
 
     /**
+     * Gets the value of the {@value #ADMIN_HOST_PROP} property from the configuration section.
+     * 
+     * @param configSection configuration section from which to extract the value
+     * 
+     * @return the value, or null if not set
+     */
+    protected String getAdminHost(Section configSection) {
+        return IniConfigUtil.getString(configSection, ADMIN_HOST_PROP, null);
+    }
+
+    /**
      * Gets the value of the {@value #ADMIN_PORT_PROP} property from the configuration section.
      * 
      * @param configSection configuration section from which to extract the value
@@ -150,6 +167,17 @@ public abstract class AbstractIniServiceConfigurationParser<ConfigurationType ex
      */
     protected int getAdminPort(Section configSection) {
         return IniConfigUtil.getInt(configSection, ADMIN_PORT_PROP, 0, 1, 65535);
+    }
+
+    /**
+     * Gets the value of the {@value #ADMIN_PASSWORD_PROP} property from the configuration section.
+     * 
+     * @param configSection configuration section from which to extract the value
+     * 
+     * @return the value or null if it is not set
+     */
+    protected String getAdminPassword(Section configSection) {
+        return IniConfigUtil.getString(configSection, ADMIN_PASSWORD_PROP, null);
     }
 
     /**
@@ -195,9 +223,17 @@ public abstract class AbstractIniServiceConfigurationParser<ConfigurationType ex
         log.info("service listening port: {}", port);
         configBuilder.setPort(port);
 
+        String adminHost = getAdminHost(configSection);
+        log.info("service admin host: {}", adminHost == null ? "default" : adminHost);
+        configBuilder.setAdminHost(adminHost);
+        
         int adminPort = getAdminPort(configSection);
-        log.info("service shutdown port: {}", adminPort == 0 ? "default" : adminPort);
+        log.info("service admin port: {}", adminPort == 0 ? "default" : adminPort);
         configBuilder.setAdminPort(adminPort);
+
+        String adminPassword = getAdminPassword(configSection);
+        log.info("service admin password set: {}", adminPassword == null ? "no" : "yes");
+        configBuilder.setAdminPassword(adminPassword);
 
         int maxConnections = getMaximumRequests(configSection);
         log.info("max requests: {}", maxConnections);
@@ -219,7 +255,7 @@ public abstract class AbstractIniServiceConfigurationParser<ConfigurationType ex
         log.info("send buffer size: {} bytes", sendBuffer);
         configBuilder.setSendBufferSize(sendBuffer);
 
-        Section securityConfig = iniFile.get(SECURITY_SECTION_HEADER);        
+        Section securityConfig = iniFile.get(SECURITY_SECTION_HEADER);
         configBuilder.setKeyManager(getX509KeyManager(securityConfig));
         configBuilder.setX509TrustMaterial(getX509TrustMaterialStore(securityConfig));
 

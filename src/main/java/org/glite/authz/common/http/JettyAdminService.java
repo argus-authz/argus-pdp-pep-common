@@ -20,10 +20,13 @@ package org.glite.authz.common.http;
 import java.util.List;
 
 import org.glite.authz.common.util.LazyList;
+import org.glite.authz.common.util.Strings;
 import org.mortbay.jetty.Connector;
+import org.mortbay.jetty.Handler;
 import org.mortbay.jetty.Server;
 import org.mortbay.jetty.nio.BlockingChannelConnector;
 import org.mortbay.jetty.servlet.Context;
+import org.mortbay.jetty.servlet.FilterHolder;
 import org.mortbay.jetty.servlet.ServletHolder;
 
 /**
@@ -40,8 +43,14 @@ public class JettyAdminService {
     /** Jetty service within which admin commands run. */
     private Server adminService;
 
+    /** Hostname of the service. */
+    private String adminHost;
+
     /** Port of the service. */
     private int adminPort;
+
+    /** Password required for admin commands. */
+    private String adminPassword;
 
     /** Commands registered with the service. */
     private List<AbstractAdminCommand> adminCommands;
@@ -52,9 +61,16 @@ public class JettyAdminService {
     /**
      * Constructor.
      * 
+     * @param hostname hostname upon which the admin service listens
      * @param port port upon which the admin service listens
+     * @param password password required to execute admin commands, may be null if no password is required
      */
-    public JettyAdminService(int port) {
+    public JettyAdminService(String hostname, int port, String password) {
+        adminHost = Strings.safeTrimOrNullString(hostname);
+        if (adminHost == null) {
+            throw new IllegalArgumentException("Admin service hostname may not be null");
+        }
+
         adminPort = port;
         if (adminPort < 1) {
             throw new IllegalArgumentException("Admin port must be greater than 0");
@@ -63,6 +79,8 @@ public class JettyAdminService {
         if (adminPort > 65535) {
             throw new IllegalArgumentException("Admin port must be less than 65536");
         }
+
+        adminPassword = Strings.safeTrimOrNullString(password);
 
         adminService = buildAdminService();
         adminCommands = new LazyList<AbstractAdminCommand>();
@@ -129,6 +147,11 @@ public class JettyAdminService {
             commandContext.addServlet(servletHolder, command.getCommandPath());
         }
 
+        if (adminPassword != null) {
+            FilterHolder passwordFiler = new FilterHolder(new PasswordProtectFilter(adminPassword));
+            commandContext.addFilter(passwordFiler, "/*", Handler.REQUEST);
+        }
+
         JettyRunThread shutdownServiceRunThread = new JettyRunThread(adminService);
         shutdownServiceRunThread.start();
     }
@@ -144,7 +167,7 @@ public class JettyAdminService {
         adminService.setSendDateHeader(false);
 
         BlockingChannelConnector connector = new BlockingChannelConnector();
-        connector.setHost("127.0.0.1");
+        connector.setHost(adminHost);
         connector.setPort(adminPort);
         adminService.setConnectors(new Connector[] { connector });
 

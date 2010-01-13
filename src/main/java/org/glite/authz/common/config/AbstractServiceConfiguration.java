@@ -41,8 +41,14 @@ public abstract class AbstractServiceConfiguration extends AbstractConfiguration
     /** Whether client is required to authenticate with a client certificate. */
     private Boolean clientCertAuthRequired;
 
+    /** Hostname upon which the admin service listens. */
+    private String adminHost;
+
     /** Port number upon which the admin service listens. */
     private int adminPort;
+
+    /** Password required for admin commands. */
+    private String adminPassword;
 
     /** Max number of requests that will be queued if all processing threads are busy. */
     private int maxRequestQueueSize;
@@ -61,7 +67,9 @@ public abstract class AbstractServiceConfiguration extends AbstractConfiguration
         hostname = null;
         port = 0;
         sslEnabled = null;
+        adminHost = null;
         adminPort = 0;
+        adminPassword = null;
         maxRequestQueueSize = 0;
         soapClient = null;
     }
@@ -121,12 +129,30 @@ public abstract class AbstractServiceConfiguration extends AbstractConfiguration
     }
 
     /**
+     * Gets the host upon which the admin service listens.
+     * 
+     * @return host upon which the admin service listens
+     */
+    public String getAdminHost() {
+        return adminHost;
+    }
+
+    /**
      * Gets the port number upon which the admin service listens.
      * 
      * @return port number upon which the admin service listens
      */
     public int getAdminPort() {
         return adminPort;
+    }
+
+    /**
+     * Gets the password required for admin commands.
+     * 
+     * @return password required for admin commands
+     */
+    public String getAdminPassword() {
+        return adminPassword;
     }
 
     /**
@@ -209,6 +235,18 @@ public abstract class AbstractServiceConfiguration extends AbstractConfiguration
     }
 
     /**
+     * Sets the hostname upon which the admin service listens.
+     * 
+     * @param host hostname upon which the admin service listens
+     */
+    protected final synchronized void setAdminHost(String host) {
+        if (adminHost != null) {
+            throw new IllegalStateException("Admin hostname has alrady been set, it may not be changed.");
+        }
+        adminHost = host;
+    }
+
+    /**
      * Sets the port number upon which the admin service listens.
      * 
      * @param port port number upon which the admin service listens
@@ -219,6 +257,19 @@ public abstract class AbstractServiceConfiguration extends AbstractConfiguration
         }
 
         adminPort = port;
+    }
+
+    /**
+     * Sets the password required for admin commands.
+     * 
+     * @param password the password required for admin commands
+     */
+    protected final synchronized void setAdminPassword(String password) {
+        if (adminPassword != null) {
+            throw new IllegalStateException("Admin password has alrady been set, it may not be changed.");
+        }
+
+        adminPassword = password;
     }
 
     /**

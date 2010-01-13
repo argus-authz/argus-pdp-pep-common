@@ -43,8 +43,14 @@ public abstract class AbstractServiceConfigurationBuilder<ConfigType extends Abs
     /** Whether client is required to authenticate with a client certificate. */
     private boolean clientCertAuthRequired;
 
+    /** Hostname upon which the admin service listens. */
+    private String adminHost;
+
     /** Port number upon which the admin service listens. */
     private int adminPort;
+
+    /** Password required for admin commands. */
+    private String adminPassword;
 
     /** Max number of requests that will be queued if all PDP processing threads are busy. */
     private int maxRequestQueueSize;
@@ -57,7 +63,11 @@ public abstract class AbstractServiceConfigurationBuilder<ConfigType extends Abs
         entityId = null;
         hostname = null;
         port = 0;
+        sslEnabled = false;
+        clientCertAuthRequired = false;
+        adminHost = null;
         adminPort = 0;
+        adminPassword = null;
         maxRequestQueueSize = 0;
         soapClient = null;
     }
@@ -76,7 +86,9 @@ public abstract class AbstractServiceConfigurationBuilder<ConfigType extends Abs
         port = prototype.getPort();
         sslEnabled = prototype.isSslEnabled();
         clientCertAuthRequired = prototype.isClientCertAuthRequired();
+        adminHost = prototype.getAdminHost();
         adminPort = prototype.getAdminPort();
+        adminPassword = prototype.getAdminPassword();
         maxRequestQueueSize = prototype.getMaxRequestQueueSize();
         soapClient = prototype.getSOAPClient();
     }
@@ -118,12 +130,30 @@ public abstract class AbstractServiceConfigurationBuilder<ConfigType extends Abs
     }
 
     /**
+     * Gets the host upon which the admin service listens.
+     * 
+     * @return host upon which the admin service listens
+     */
+    public String getAdminHost() {
+        return adminHost;
+    }
+
+    /**
      * Gets the port number upon which the admin service listens.
      * 
      * @return port number upon which the shuadmintdown service listens
      */
     public int getAdminPort() {
         return adminPort;
+    }
+
+    /**
+     * Gets the password required for admin commands.
+     * 
+     * @return password required for admin commands
+     */
+    public String getAdminPassword() {
+        return adminPassword;
     }
 
     /**
@@ -161,7 +191,9 @@ public abstract class AbstractServiceConfigurationBuilder<ConfigType extends Abs
         config.setPort(port);
         config.setSslEnabled(sslEnabled);
         config.setClientCertAuthRequired(clientCertAuthRequired);
+        config.setAdminHost(adminHost);
         config.setAdminPort(adminPort);
+        config.setAdminPassword(adminPassword);
         config.setMaxRequestQueueSize(maxRequestQueueSize);
         config.setSOAPClient(soapClient);
     }
@@ -206,12 +238,30 @@ public abstract class AbstractServiceConfigurationBuilder<ConfigType extends Abs
     }
 
     /**
+     * Sets the host upon which the admin service listens.
+     * 
+     * @param host host upon which the admin service listens
+     */
+    public void setAdminHost(String host) {
+        adminHost = host;
+    }
+
+    /**
      * Sets the port number upon which the admin service listens.
      * 
      * @param newPort port number upon which the admin service listens
      */
     public void setAdminPort(int newPort) {
         adminPort = newPort;
+    }
+
+    /**
+     * Sets the password required for admin commands.
+     * 
+     * @param password password required for admin commands
+     */
+    public void setAdminPassword(String password) {
+        adminPassword = password;
     }
 
     /**
