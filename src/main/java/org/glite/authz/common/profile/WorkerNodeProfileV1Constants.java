@@ -21,56 +21,56 @@ package org.glite.authz.common.profile;
 public class WorkerNodeProfileV1Constants {
 
     /** Identifier for the "execute" action. */
-    public static final String ACT_EXECUTE = ProfileConstants.OPENXACML_ACTION_STEM + "/execute";
+    public static final String ACT_EXECUTE = ProfileConstants.GLITE_ORG_ACTION_STEM + "/execute";
 
     /** Identifier for FQAN attributes. */
-    public static final String ATT_FQAN = ProfileConstants.OPENXACML_ATTRIBUTE_STEM + "/fqan";
+    public static final String ATT_FQAN = ProfileConstants.GLITE_ORG_ATTRIBUTE_STEM + "/fqan";
 
     /** Identifier for group ID attributes. */
-    public static final String ATT_GROUP_ID = ProfileConstants.OPENXACML_ATTRIBUTE_STEM + "/group-id";
+    public static final String ATT_GROUP_ID = ProfileConstants.GLITE_ORG_ATTRIBUTE_STEM + "/group-id";
 
     /** Identifier for pilot job classifier attributes. */
-    public static final String ATT_PILOT_JOB_CLASSIFIER = ProfileConstants.OPENXACML_ATTRIBUTE_STEM
+    public static final String ATT_PILOT_JOB_CLASSIFIER = ProfileConstants.GLITE_ORG_ATTRIBUTE_STEM
             + "/pilot-job-classifier";
 
     /** Identifier for primary FQAN attributes. */
-    public static final String ATT_PRIMARY_FQAN = ProfileConstants.OPENXACML_ATTRIBUTE_STEM + "/fqan/primary";
+    public static final String ATT_PRIMARY_FQAN = ProfileConstants.GLITE_ORG_ATTRIBUTE_STEM + "/fqan/primary";
 
     /** Identifier for primary group ID attributes. */
-    public static final String ATT_PRIMARY_GROUP_ID = ProfileConstants.OPENXACML_ATTRIBUTE_STEM + "/group-id/primary";
+    public static final String ATT_PRIMARY_GROUP_ID = ProfileConstants.GLITE_ORG_ATTRIBUTE_STEM + "/group-id/primary";
     
     /** Identifier for profile ID attributes. */
-    public static final String ATT_PROFILE_ID = ProfileConstants.OPENXACML_ATTRIBUTE_STEM + "/profile-id";
+    public static final String ATT_PROFILE_ID = ProfileConstants.GLITE_ORG_ATTRIBUTE_STEM + "/profile-id";
     
     /** Identifier for subject issuer attributes. */
-    public static final String ATT_SUBJECT_ISSUER = ProfileConstants.OPENXACML_ATTRIBUTE_STEM + "/subject-issuer";
+    public static final String ATT_SUBJECT_ISSUER = ProfileConstants.GLITE_ORG_ATTRIBUTE_STEM + "/subject-issuer";
 
     /** Identifier for user ID attributes. */
-    public static final String ATT_USER_ID = ProfileConstants.OPENXACML_ATTRIBUTE_STEM + "/user-id";
+    public static final String ATT_USER_ID = ProfileConstants.GLITE_ORG_ATTRIBUTE_STEM + "/user-id";
 
     /** Identifier for virtual organization attributes. */
-    public static final String ATT_VO = ProfileConstants.OPENXACML_ATTRIBUTE_STEM + "/virtual-organization";
+    public static final String ATT_VO = ProfileConstants.GLITE_ORG_ATTRIBUTE_STEM + "/virtual-organization";
 
     /** Identifier for VOMS issuer attributes. */
-    public static final String ATT_VOMS_ISSUER = ProfileConstants.OPENXACML_ATTRIBUTE_STEM + "/voms-issuer";
+    public static final String ATT_VOMS_ISSUER = ProfileConstants.GLITE_ORG_ATTRIBUTE_STEM + "/voms-issuer";
 
     /** Identifier for the FQAN data type. */
-    public static final String DAT_FQAN = ProfileConstants.OPENXACML_DATATYPE_STEM + "/fqan";
+    public static final String DAT_FQAN = ProfileConstants.GLITE_ORG_DATATYPE_STEM + "/fqan";
 
     /** Identifier for the exact FQAN matching function. */
-    public static final String ALG_FQAN_EXACT = ProfileConstants.OPENXACML_ALGORITHM_STEM + "/fqan-match";
+    public static final String ALG_FQAN_EXACT = ProfileConstants.GLITE_ORG_ALGORITHM_STEM + "/fqan-match";
 
     /** Identifier for the regular expression FQAN matching function. */
-    public static final String ALG_FQAN_REGEXP = ProfileConstants.OPENXACML_ALGORITHM_STEM + "/fqan-regexp-match";
+    public static final String ALG_FQAN_REGEXP = ProfileConstants.GLITE_ORG_ALGORITHM_STEM + "/fqan-regexp-match";
 
     /** Identifier for the local environment mapping obligation. */
-    public static final String OBL_LOCAL_ENV_MAP = ProfileConstants.OPENXACML_OBLIGATION_STEM + "/local-environment-map";
+    public static final String OBL_LOCAL_ENV_MAP = ProfileConstants.GLITE_ORG_OBLIGATION_STEM + "/local-environment-map";
 
     /** Identifier for the local POSIX environment mapping obligation. */
-    public static final String OBL_POSIX_ENV_MAP = ProfileConstants.OPENXACML_OBLIGATION_STEM
+    public static final String OBL_POSIX_ENV_MAP = ProfileConstants.GLITE_ORG_OBLIGATION_STEM
             + "/lcal-environment-map/posix";
 
     /** Identifier for this version of the Grid Worker Node Authorization Profile. */
-    public static final String PRO_ID = ProfileConstants.OPENXACML_PROFILE_STEM + "/grid-wn/1.0";
+    public static final String PRO_ID = ProfileConstants.GLITE_ORG_PROFILE_STEM + "/grid-wn/1.0";
 
 }
