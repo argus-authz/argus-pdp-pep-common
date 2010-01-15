@@ -21,7 +21,7 @@ package org.glite.authz.common.profile;
 public class ProfileConstants {
 
     /** Base URN NSS for MACE XACML identifiers. */
-    public static final String GLITE_ORG_STEM = "http://glite.org";
+    public static final String GLITE_ORG_STEM = "http://glite.org/xacml";
 
     /** Base URN NSS for MACE XACML action identifiers. */
     public static final String GLITE_ORG_ACTION_STEM = GLITE_ORG_STEM + "/action";

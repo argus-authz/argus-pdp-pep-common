@@ -68,7 +68,7 @@ public class WorkerNodeProfileV1Constants {
 
     /** Identifier for the local POSIX environment mapping obligation. */
     public static final String OBL_POSIX_ENV_MAP = ProfileConstants.GLITE_ORG_OBLIGATION_STEM
-            + "/lcal-environment-map/posix";
+            + "/local-environment-map/posix";
 
     /** Identifier for this version of the Grid Worker Node Authorization Profile. */
     public static final String PRO_ID = ProfileConstants.GLITE_ORG_PROFILE_STEM + "/grid-wn/1.0";
