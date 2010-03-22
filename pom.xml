@@ -229,11 +229,9 @@
                     <includes>
                         <include>src/**</include>
                     </includes>
-<!--
                     <excludes>
-                        <exclude>**/com/caucho/**</exclude>
+                        <exclude>**/resources/**</exclude>
                     </excludes>
--->
                 </configuration>
                 <executions>
                     <execution>
