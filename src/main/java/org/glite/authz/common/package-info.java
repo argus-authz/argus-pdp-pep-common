@@ -16,6 +16,6 @@
  */
 
 /**
- * These are common components between the PEP and PDP code.
+ * These are common components between the PEP and PDP services.
  */
 package org.glite.authz.common;
