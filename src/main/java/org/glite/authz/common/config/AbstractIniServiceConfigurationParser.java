@@ -20,6 +20,8 @@ package org.glite.authz.common.config;
 import javax.net.ssl.X509KeyManager;
 import javax.net.ssl.X509TrustManager;
 
+import org.glite.voms.PKIStore;
+
 import org.ini4j.Ini;
 import org.ini4j.Ini.Section;
 import org.opensaml.ws.soap.client.http.HttpClientBuilder;
@@ -66,7 +68,7 @@ public abstract class AbstractIniServiceConfigurationParser<ConfigurationType ex
     public static final String REQUEST_QUEUE_PROP = "requestQueueSize";
 
     /** Default value of the {@value #SSL_ON_PORT_PROP} property, {@value} . */
-    public static final boolean DEFAULT_SSL_ON_PORT = false;
+    public static final boolean DEFAULT_SSL_ON_PROP = false;
 
     /** Default value of the {@value #CLIENT_CERT_AUTHN_PROP} property, {@value} . */
     public static final boolean DEFAULT_CLIENT_CERT_AUTH = false;
@@ -120,14 +122,16 @@ public abstract class AbstractIniServiceConfigurationParser<ConfigurationType ex
      * 
      * @param configSection configuration section from which to extract the value
      * 
-     * @return whether SSL should be enabled on the service port, defaults to {@value #DEFAULT_SSL_ON_PORT}.
+     * @return whether SSL should be enabled on the service port, defaults to {@value #DEFAULT_SSL_ON_PROP}.
      */
     protected boolean isSSLEnabled(Section configSection) {
+        if (configSection == null)
+            return DEFAULT_SSL_ON_PROP;
         if (configSection.containsKey(SERVICE_KEY_PROP) && configSection.containsKey(SERVICE_CERT_PROP)
                 && configSection.containsKey(TRUST_INFO_DIR_PROP)) {
-            return IniConfigUtil.getBoolean(configSection, SSL_ON_PORT_PROP, DEFAULT_SSL_ON_PORT);
+            return IniConfigUtil.getBoolean(configSection, SSL_ON_PORT_PROP, DEFAULT_SSL_ON_PROP);
         } else {
-            return false;
+            return DEFAULT_SSL_ON_PROP;
         }
     }
 
@@ -137,13 +141,15 @@ public abstract class AbstractIniServiceConfigurationParser<ConfigurationType ex
      * @param configSection configuration section from which to extract the value
      * 
      * @return whether client certificate authentication is required when a client is connecting, defaults to
-     *         {@value #CLIENT_CERT_AUTHN_PROP}.
+     *         {@value #DEFAULT_CLIENT_CERT_AUTH}.
      */
     protected boolean isClientCertAuthRequired(Section configSection) {
+        if (configSection == null)
+            return DEFAULT_CLIENT_CERT_AUTH;
         if (isSSLEnabled(configSection)) {
             return IniConfigUtil.getBoolean(configSection, CLIENT_CERT_AUTHN_PROP, DEFAULT_CLIENT_CERT_AUTH);
         } else {
-            return false;
+            return DEFAULT_CLIENT_CERT_AUTH;
         }
     }
 
@@ -226,7 +232,7 @@ public abstract class AbstractIniServiceConfigurationParser<ConfigurationType ex
         String adminHost = getAdminHost(configSection);
         log.info("service admin host: {}", adminHost == null ? "default" : adminHost);
         configBuilder.setAdminHost(adminHost);
-        
+
         int adminPort = getAdminPort(configSection);
         log.info("service admin port: {}", adminPort == 0 ? "default" : adminPort);
         configBuilder.setAdminPort(adminPort);
@@ -255,9 +261,29 @@ public abstract class AbstractIniServiceConfigurationParser<ConfigurationType ex
         log.info("send buffer size: {} bytes", sendBuffer);
         configBuilder.setSendBufferSize(sendBuffer);
 
+    }
+
+    
+    /**
+     * Process the information contained in the {@value #SECURITY_SECTION_HEADER} configuration section.
+     * 
+     * @param iniFile INI file being processed
+     * @param configBuilder builder being populated with configuration information
+     * 
+     * @throws ConfigurationException thrown if there is a problem reading the information contained in the
+     *             {@value #SECURITY_SECTION_HEADER} section
+     */
+    protected void processSecuritySection(Ini iniFile, AbstractServiceConfigurationBuilder<?> configBuilder)
+            throws ConfigurationException {
         Section securityConfig = iniFile.get(SECURITY_SECTION_HEADER);
-        configBuilder.setKeyManager(getX509KeyManager(securityConfig));
-        configBuilder.setX509TrustMaterial(getX509TrustMaterialStore(securityConfig));
+        if (securityConfig==null) {
+            log.warn("INI configuration does not contain the '{}' section", SECURITY_SECTION_HEADER);
+        }
+        X509KeyManager x509KeyManager= getX509KeyManager(securityConfig);
+        configBuilder.setKeyManager(x509KeyManager);
+        
+        PKIStore pkiStore= getX509TrustMaterialStore(securityConfig);
+        configBuilder.setX509TrustMaterial(pkiStore);
 
         boolean sslOn = isSSLEnabled(securityConfig);
         log.info("service port using SSL: {}", sslOn);
@@ -265,9 +291,8 @@ public abstract class AbstractIniServiceConfigurationParser<ConfigurationType ex
 
         boolean clientCertAuthRequired = isClientCertAuthRequired(securityConfig);
         log.info("client certificate authentication required: {}", clientCertAuthRequired);
-        configBuilder.setClientCertAuthRequired(clientCertAuthRequired);
+        configBuilder.setClientCertAuthRequired(clientCertAuthRequired);    
     }
-
     /**
      * Builds a SOAP client builder from the information contained in the configuration section.
      * 

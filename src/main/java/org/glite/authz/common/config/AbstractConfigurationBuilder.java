@@ -69,6 +69,8 @@ public abstract class AbstractConfigurationBuilder<ConfigType extends AbstractCo
      * @param prototype the prototype configuration whose values will be used to initialize this builder
      */
     protected AbstractConfigurationBuilder(AbstractConfiguration prototype) {
+        keyManager = prototype.getKeyManager();
+        trustMaterialStore = prototype.getTrustMaterialStore();
         maxConnections = prototype.getMaxRequests();
         connectionTimeout = prototype.getConnectionTimeout();
         receiveBufferSize = prototype.getReceiveBufferSize();

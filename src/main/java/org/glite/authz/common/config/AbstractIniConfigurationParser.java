@@ -191,8 +191,8 @@ public abstract class AbstractIniConfigurationParser<ConfigurationType extends A
     }
 
     /**
-     * Creates a {@link PKIStore} from the {@value #TRUST_INFO_DIR_PROP} and {@value #CRLS_REQUIRED_PROP} properties, if
-     * they exist. This store holds the material used to validate X.509 certificates.
+     * Creates a {@link PKIStore} from the {@value #TRUST_INFO_DIR_PROP} property, if they exist. This store holds the
+     * material used to validate X.509 certificates.
      * 
      * @param configSection current configuration section being processed
      * 
