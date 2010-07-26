@@ -89,6 +89,12 @@ public class AuthorizationProfileConstants {
     /** The algorithm FQAN regular expression match id: {@value} */
     public static final String ID_ALGORITHM_FQAN_REGEXP_MATCH = NS_ALGORITHM + SEPARATOR + "fqan-regexp-match";
 
+    /** Profile ID for the XACML Grid Worker Node Authorization Profile v1.0: {@value} */
+    public static final String GRID_WN_AUTHZ_V1_PROFILE_ID = NS_PROFILE + SEPARATOR + "grid-wn/1.0";
+
+    /** Profile ID for the XACML Grid Computing Element Authorization Profile v1.0: {@value} */
+    public static final String GRID_CE_AUTHZ_V1_PROFILE_ID = NS_PROFILE + SEPARATOR + "grid-ce/1.0";
+    
     /**
      * Prevent instantiation
      */
