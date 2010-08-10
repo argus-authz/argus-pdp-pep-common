@@ -1,5 +1,5 @@
 /*
- * Copyright (c) Members of the EGEE Collaboration. 2010.
+ * Copyright (c) Members of the EGEE Collaboration. 2006-2010.
  * See http://www.eu-egee.org/partners/ for details on the copyright holders.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -16,6 +16,7 @@
  *
  * $Id$
  */
+
 package org.glite.authz.common.profile;
 
 /**
@@ -23,7 +24,7 @@ package org.glite.authz.common.profile;
  */
 public class AuthorizationProfileConstants {
 
-    /** Namespaces, datatypes and identifiers name components separtor */
+    /** Namespaces, datatypes and identifiers name components separator */
     private static final char SEPARATOR = '/';
 
     /** The namespace base prefix {@value} */
@@ -90,16 +91,9 @@ public class AuthorizationProfileConstants {
     public static final String ID_ALGORITHM_FQAN_REGEXP_MATCH = NS_ALGORITHM + SEPARATOR + "fqan-regexp-match";
 
     /** Profile ID for the XACML Grid Worker Node Authorization Profile v1.0: {@value} */
-    public static final String GRID_WN_AUTHZ_V1_PROFILE_ID = NS_PROFILE + SEPARATOR + "grid-wn/1.0";
+    public static final String GRID_WN_AUTHZ_V1_PROFILE_ID = NS_PROFILE + SEPARATOR + "grid-wn" + SEPARATOR + "1.0";
 
     /** Profile ID for the XACML Grid Computing Element Authorization Profile v1.0: {@value} */
-    public static final String GRID_CE_AUTHZ_V1_PROFILE_ID = NS_PROFILE + SEPARATOR + "grid-ce/1.0";
-    
-    /**
-     * Prevent instantiation
-     */
-    private AuthorizationProfileConstants() {
-        // empty
-    }
+    public static final String GRID_CE_AUTHZ_V1_PROFILE_ID = NS_PROFILE + SEPARATOR + "grid-ce" + SEPARATOR + "1.0";
 
 }
