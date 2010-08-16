@@ -216,49 +216,50 @@ public abstract class AbstractIniServiceConfigurationParser<ConfigurationType ex
             log.error(errorMsg);
             throw new ConfigurationException(errorMsg);
         }
+        String name= configSection.getName();
 
         String entityId = getEntityId(configSection);
-        log.info("entity ID: {}", entityId);
+        log.info("{}: entity ID: {}", name,entityId);
         configBuilder.setEntityId(entityId);
 
         String host = getHostname(configSection);
-        log.info("service host address: {}", host);
+        log.info("{}: service hostname: {}", name,host);
         configBuilder.setHost(host);
 
         int port = getPort(configSection);
-        log.info("service listening port: {}", port);
+        log.info("{}: service port: {}", name,port);
         configBuilder.setPort(port);
 
         String adminHost = getAdminHost(configSection);
-        log.info("service admin host: {}", adminHost == null ? "default" : adminHost);
+        log.info("{}: service admin hostname: {}", name,adminHost == null ? "default" : adminHost);
         configBuilder.setAdminHost(adminHost);
 
         int adminPort = getAdminPort(configSection);
-        log.info("service admin port: {}", adminPort == 0 ? "default" : adminPort);
+        log.info("{}: service admin port: {}", name,adminPort == 0 ? "default" : adminPort);
         configBuilder.setAdminPort(adminPort);
 
         String adminPassword = getAdminPassword(configSection);
-        log.info("service admin password set: {}", adminPassword == null ? "no" : "yes");
+        log.info("{}: service admin password set: {}", name,adminPassword == null ? "no" : "yes");
         configBuilder.setAdminPassword(adminPassword);
 
         int maxConnections = getMaximumRequests(configSection);
-        log.info("max requests: {}", maxConnections);
+        log.info("{}: max requests: {}", name,maxConnections);
         configBuilder.setMaxConnections(maxConnections);
 
         int connTimeout = getConnectionTimeout(configSection);
-        log.info("connection timeout: {}ms", connTimeout);
+        log.info("{}: connection timeout: {}ms", name,connTimeout);
         configBuilder.setConnectionTimeout(connTimeout);
 
         int maxReqQueue = getMaxRequestQueueSize(configSection);
-        log.info("max request queue size: {}", maxReqQueue);
+        log.info("{}: max request queue size: {}", name,maxReqQueue);
         configBuilder.setMaxRequestQueueSize(maxReqQueue);
 
         int receiveBuffer = getReceiveBufferSize(configSection);
-        log.info("recieve buffer size: {} bytes", receiveBuffer);
+        log.info("{}: recieve buffer size: {} bytes", name,receiveBuffer);
         configBuilder.setReceiveBufferSize(receiveBuffer);
 
         int sendBuffer = getSendBufferSize(configSection);
-        log.info("send buffer size: {} bytes", sendBuffer);
+        log.info("{}: send buffer size: {} bytes", name,sendBuffer);
         configBuilder.setSendBufferSize(sendBuffer);
 
     }
@@ -279,6 +280,8 @@ public abstract class AbstractIniServiceConfigurationParser<ConfigurationType ex
         if (securityConfig==null) {
             log.warn("INI configuration does not contain the '{}' section", SECURITY_SECTION_HEADER);
         }
+        
+        String name= securityConfig.getName();
         X509KeyManager x509KeyManager= getX509KeyManager(securityConfig);
         configBuilder.setKeyManager(x509KeyManager);
         
@@ -286,11 +289,11 @@ public abstract class AbstractIniServiceConfigurationParser<ConfigurationType ex
         configBuilder.setX509TrustMaterial(pkiStore);
 
         boolean sslOn = isSSLEnabled(securityConfig);
-        log.info("service port using SSL: {}", sslOn);
+        log.info("{}: service port using SSL: {}", name,sslOn);
         configBuilder.setSslEnabled(sslOn);
 
         boolean clientCertAuthRequired = isClientCertAuthRequired(securityConfig);
-        log.info("client certificate authentication required: {}", clientCertAuthRequired);
+        log.info("{}: TLS client certificate authentication required: {}", name,clientCertAuthRequired);
         configBuilder.setClientCertAuthRequired(clientCertAuthRequired);    
     }
     /**
@@ -306,22 +309,22 @@ public abstract class AbstractIniServiceConfigurationParser<ConfigurationType ex
             X509TrustManager trustManager) {
         HttpClientBuilder httpClientBuilder = new HttpClientBuilder();
         httpClientBuilder.setContentCharSet("UTF-8");
-
+        String name= configSection.getName();
         int conTimeout = getConnectionTimeout(configSection);
-        log.info("connection timeout: {}ms", conTimeout);
+        log.info("{}: connection timeout: {}ms", name,conTimeout);
         httpClientBuilder.setConnectionTimeout(conTimeout);
 
         int maxRequests = getMaximumRequests(configSection);
-        log.info("maximum requests: {}", maxRequests);
+        log.info("{}: maximum requests: {}", name,maxRequests);
         httpClientBuilder.setMaxTotalConnections(maxRequests);
         httpClientBuilder.setMaxConnectionsPerHost(maxRequests);
 
         int recBuffSize = getSendBufferSize(configSection);
-        log.info("recieve buffer size: {} bytes", recBuffSize);
+        log.info("{}: recieve buffer size: {} bytes", name,recBuffSize);
         httpClientBuilder.setReceiveBufferSize(recBuffSize);
 
         int sendBuffSize = getSendBufferSize(configSection);
-        log.info("send buffer size: {} bytes", sendBuffSize);
+        log.info("{}: send buffer size: {} bytes", name,sendBuffSize);
         httpClientBuilder.setSendBufferSize(sendBuffSize);
 
         if (keyManager != null && trustManager != null) {
