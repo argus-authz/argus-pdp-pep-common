@@ -163,21 +163,21 @@ public abstract class AbstractIniConfigurationParser<ConfigurationType extends A
         if (configSection == null) {
             return null;
         }
-
+        String name= configSection.getName();
         String privateKeyFilePath = IniConfigUtil.getString(configSection, SERVICE_KEY_PROP, null);
         if (privateKeyFilePath == null) {
-            log.info("No service private key file provided, no service credential will be used.");
+            log.info("{}: No service private key file provided, no service credential will be used.",name);
             return null;
         }
 
         String certificateFilePath = IniConfigUtil.getString(configSection, SERVICE_CERT_PROP, null);
         if (certificateFilePath == null) {
-            log.info("No service certificate file provided, no service credential will be used.");
+            log.info("{}: No service certificate file provided, no service credential will be used.",name);
             return null;
         }
 
-        log.info("Service credential will use private key {} and certificate {}", privateKeyFilePath,
-                certificateFilePath);
+        log.info("{}: service credential will use private key {} and certificate {}", new Object[] {name, privateKeyFilePath,
+                certificateFilePath});
         CaseInsensitiveProperties keystoreProps = new CaseInsensitiveProperties();
         keystoreProps.setProperty(ContextWrapper.CREDENTIALS_KEY_FILE, privateKeyFilePath);
         keystoreProps.setProperty(ContextWrapper.CREDENTIALS_CERT_FILE, certificateFilePath);
@@ -191,8 +191,8 @@ public abstract class AbstractIniConfigurationParser<ConfigurationType extends A
     }
 
     /**
-     * Creates a {@link PKIStore} from the {@value #TRUST_INFO_DIR_PROP} and {@value #CRLS_REQUIRED_PROP} properties, if
-     * they exist. This store holds the material used to validate X.509 certificates.
+     * Creates a {@link PKIStore} from the {@value #TRUST_INFO_DIR_PROP} property, if they exist. This store holds the
+     * material used to validate X.509 certificates.
      * 
      * @param configSection current configuration section being processed
      * 
@@ -204,10 +204,10 @@ public abstract class AbstractIniConfigurationParser<ConfigurationType extends A
         if (configSection == null) {
             return null;
         }
-
+        String name= configSection.getName();
         String trustStoreDir = IniConfigUtil.getString(configSection, TRUST_INFO_DIR_PROP, null);
         if (trustStoreDir == null) {
-            log.info("No truststore directory given, no trust manager will be used");
+            log.info("{}: No truststore directory given, no trust manager will be used",name);
             return null;
         }
 
@@ -217,10 +217,10 @@ public abstract class AbstractIniConfigurationParser<ConfigurationType extends A
             log.error("Unable to read truststore directory " + trustStoreDir, e);
             throw new ConfigurationException(e.getMessage());
         }
-        log.info("X.509 trusted information directory: {}", trustStoreDir);
+        log.info("{}: X.509 trusted information directory: {}", name,trustStoreDir);
 
         int refreshInterval = getTrustMaterialRefreshInterval(configSection) * 60 * 1000;
-        log.info("trust information refresh interval: {}ms", refreshInterval);
+        log.info("{}: trust information refresh interval: {}ms", name,refreshInterval);
 
         try {
             PKIStore trustMaterial = new PKIStore(trustStoreDir, PKIStore.TYPE_CADIR);

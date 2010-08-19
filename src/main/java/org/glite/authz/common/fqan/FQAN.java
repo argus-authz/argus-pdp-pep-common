@@ -32,6 +32,9 @@ public class FQAN {
 
     /** The value "NULL", used in the canonical form to represent the absence of a Role or Capability. */
     public static final String NULL = "NULL";
+    
+    /** The wildcard <code>*</code> used for pattern matching */
+    public static final String WILDCARD = "*";
 
     /** Group name component of the FQAN. */
     private String groupName;
@@ -46,14 +49,15 @@ public class FQAN {
      * Constructor.
      * 
      * @param fqanGroupName group name of the FQAN, may not be null
-     * @param fqanRole role of the FQAN, may be null
-     * @param fqanCapability capability of the FQAN, may be null
+     * @param fqanRole role value of the FQAN, may be null
+     * @param fqanCapability capability value of the FQAN, may be null
      */
     public FQAN(String fqanGroupName, String fqanRole, String fqanCapability) {
         groupName = Strings.safeTrimOrNullString(fqanGroupName);
         if (groupName == null) {
             throw new IllegalArgumentException("Group name may not be null");
         }
+        // remove trailing / in group name
         if (groupName.endsWith("/")) {
             groupName = groupName.substring(0, groupName.length() - 1);
         }
@@ -70,6 +74,25 @@ public class FQAN {
     }
 
     /**
+     * Constructor with a FQAN group name and a Role value.
+     * 
+     * @param fqanGroupName group name of the FQAN, may not be null
+     * @param fqanRole role value of the FQAN, may be null
+     */
+    public FQAN(String fqanGroupName, String fqanRole) {
+        this(fqanGroupName, fqanRole, null);
+    }
+
+    /**
+     * Constructor with a FQAN group name, but without Role (NULL).
+     * 
+     * @param fqanGroupName group name of the FQAN, may not be null
+     */
+    public FQAN(String fqanGroupName) {
+        this(fqanGroupName, null, null);
+    }
+
+    /**
      * Gets the group name component of the FQAN.
      * 
      * @return group name component of the FQAN
@@ -79,7 +102,7 @@ public class FQAN {
     }
 
     /**
-     * Gets the Role component of the FQAN.
+     * Gets the Role value of the FQAN i.e. <code>/Role=value</code>.
      * 
      * @return Role component of the FQAN
      */
@@ -88,7 +111,7 @@ public class FQAN {
     }
 
     /**
-     * Gets the Capability component of the FQAN.
+     * Gets the Capability value of the FQAN i.e <code>/Capability=value</code>.
      * 
      * @return Capability component of the FQAN
      */
@@ -134,19 +157,19 @@ public class FQAN {
 
                 if (subComponents[0].equalsIgnoreCase(ROLE)) {
                     if (role != null) {
-                        throw new ParseException("Role may not appear more than once in an FQAN", fqan
-                                .indexOf(component));
+                        throw new ParseException("Role may not appear more than once in an FQAN",
+                                fqan.indexOf(component));
                     }
                     role = subComponents[1];
                 } else if (subComponents[0].equalsIgnoreCase(CAPABILITY)) {
                     if (capability != null) {
-                        throw new ParseException("Capability may not appear more than once in an FQAN", fqan
-                                .indexOf(component));
+                        throw new ParseException("Capability may not appear more than once in an FQAN",
+                                fqan.indexOf(component));
                     }
                     capability = subComponents[1];
                 } else {
-                    throw new ParseException("FQAN contains an unknown, non-group-name component: " + component, fqan
-                            .indexOf(component));
+                    throw new ParseException("FQAN contains an unknown, non-group-name component: " + component,
+                            fqan.indexOf(component));
                 }
             } else {
                 if (!Strings.isEmpty(component)) {
@@ -154,8 +177,8 @@ public class FQAN {
                 }
             }
         }
-        
-        if(groupName.length() == 0){
+
+        if (groupName.length() == 0) {
             throw new ParseException("FQAN did not contain a group name", 0);
         }
 
@@ -164,7 +187,15 @@ public class FQAN {
 
     /** {@inheritDoc} */
     public String toString() {
-        return groupName + "/" + ROLE + "=" + role + "/" + CAPABILITY + "=" + capability;
+        StringBuffer sb = new StringBuffer();
+        sb.append(groupName);
+        if (!role.equalsIgnoreCase(NULL)) {
+            sb.append('/').append(ROLE).append('=').append(role);
+        }
+        if (!capability.equalsIgnoreCase(NULL)) {
+            sb.append('/').append(CAPABILITY).append('=').append(capability);
+        }
+        return sb.toString();
     }
 
     /** {@inheritDoc} */
@@ -195,9 +226,9 @@ public class FQAN {
     /**
      * Checks whether this FQAN matches the given FQAN regular expression.
      * 
-     * @param regexp the regular expression
+     * @param regexp the FQAN regular expression
      * 
-     * @return true if the
+     * @return true if the FQAN matches the regular expression.
      * 
      * @throws ParseException thrown if the given expression is not a valid FQAN regular expression
      * 
@@ -206,7 +237,7 @@ public class FQAN {
      */
     public boolean matches(String regexp) throws ParseException {
         FQAN regexpFQAN = FQAN.parseFQAN(regexp);
-        return isGroupNameEqual(regexpFQAN) && isRoleEqual(regexpFQAN);
+        return matchesGroupName(regexpFQAN) && matchesRole(regexpFQAN);
     }
 
     /**
@@ -219,24 +250,28 @@ public class FQAN {
      * 
      * @throws ParseException thrown if the regular expression is not valid
      */
-    protected boolean isGroupNameEqual(FQAN regexpFQAN) throws ParseException {
-        String regexp = regexpFQAN.getGroupName();
-        if (regexp.contains("*")) {
+    protected boolean matchesGroupName(FQAN regexpFQAN) throws ParseException {
+        String regexpGroup = regexpFQAN.getGroupName();
+        if (regexpGroup.contains(WILDCARD)) {
             // group name contains a regular expression
-            String groupNameBase = regexp.substring(0, regexp.length() - 1);
+            String groupNameBase = regexpGroup.substring(0, regexpGroup.length() - 1);
             if (!groupNameBase.endsWith("/")) {
                 throw new ParseException(
-                        "Invalid regular expression within FQAN group name, name does not end with a '/*'", regexp
-                                .length());
+                        "Invalid regular expression within FQAN group name, name does not end with a '/*'",
+                        regexpGroup.length());
             }
-            if (groupNameBase.contains("*")) {
+            if (groupNameBase.contains(WILDCARD)) {
                 throw new ParseException(
-                        "Invalid regular expression within FQAN group name, name contains more than one '*'", regexp
-                                .indexOf("*"));
+                        "Invalid regular expression within FQAN group name, name contains more than one '*'",
+                        regexpGroup.indexOf(WILDCARD));
+            }
+            if (groupNameBase.equals("/")) {
+                throw new ParseException(
+                        "Invalid regular expression within FQAN group name, VO not specified", 0);
             }
 
-            // we explicitly terminate this FQAN's group name so that we can easily compare 
-            // against the regexp strings, which are terminated, the alternative would have 
+            // we explicitly terminate this FQAN's group name so that we can easily compare
+            // against the regexp strings, which are terminated, the alternative would have
             // been to strip off the terminator from the regexp string but that leads to problems
             // ie. '/foo/* would match '/foobar'
             String terminatedGroupName = groupName + "/";
@@ -244,7 +279,7 @@ public class FQAN {
         }
 
         // group name does not contain a regular expression
-        return regexp.equals(groupName);
+        return regexpGroup.equals(groupName);
     }
 
     /**
@@ -257,21 +292,20 @@ public class FQAN {
      * 
      * @throws ParseException thrown if the regular expression is not valid
      */
-    protected boolean isRoleEqual(FQAN regexpFQAN) throws ParseException {
-        String regexp = regexpFQAN.getRole();
-        if (regexp.endsWith("*")) {
+    protected boolean matchesRole(FQAN regexpFQAN) throws ParseException {
+        String regexpRole = regexpFQAN.getRole();
+        if (regexpRole.contains(WILDCARD)) {
             // role contains a regular expression
-            String roleBase = regexp.substring(0, regexp.length() - 1);
-            if (roleBase.contains("*")) {
+            if (!regexpRole.equals(WILDCARD)) {
                 throw new ParseException(
-                        "Invalid regular expression within FQAN role, role contains more than one '*'", regexp
-                                .indexOf(regexp));
+                        "Invalid regular expression within FQAN role, role is not '*'",
+                        regexpFQAN.toString().indexOf(regexpRole));
             }
-            return role.startsWith(roleBase);
+            return true;
         }
 
         // role doesn't contain a regular expression
         // since values are normalized
-        return regexp.contains(role);
+        return regexpRole.equals(role);
     }
 }

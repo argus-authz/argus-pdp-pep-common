@@ -20,6 +20,8 @@ package org.glite.authz.common.config;
 import javax.net.ssl.X509KeyManager;
 import javax.net.ssl.X509TrustManager;
 
+import org.glite.voms.PKIStore;
+
 import org.ini4j.Ini;
 import org.ini4j.Ini.Section;
 import org.opensaml.ws.soap.client.http.HttpClientBuilder;
@@ -66,7 +68,7 @@ public abstract class AbstractIniServiceConfigurationParser<ConfigurationType ex
     public static final String REQUEST_QUEUE_PROP = "requestQueueSize";
 
     /** Default value of the {@value #SSL_ON_PORT_PROP} property, {@value} . */
-    public static final boolean DEFAULT_SSL_ON_PORT = false;
+    public static final boolean DEFAULT_SSL_ON_PROP = false;
 
     /** Default value of the {@value #CLIENT_CERT_AUTHN_PROP} property, {@value} . */
     public static final boolean DEFAULT_CLIENT_CERT_AUTH = false;
@@ -120,14 +122,16 @@ public abstract class AbstractIniServiceConfigurationParser<ConfigurationType ex
      * 
      * @param configSection configuration section from which to extract the value
      * 
-     * @return whether SSL should be enabled on the service port, defaults to {@value #DEFAULT_SSL_ON_PORT}.
+     * @return whether SSL should be enabled on the service port, defaults to {@value #DEFAULT_SSL_ON_PROP}.
      */
     protected boolean isSSLEnabled(Section configSection) {
+        if (configSection == null)
+            return DEFAULT_SSL_ON_PROP;
         if (configSection.containsKey(SERVICE_KEY_PROP) && configSection.containsKey(SERVICE_CERT_PROP)
                 && configSection.containsKey(TRUST_INFO_DIR_PROP)) {
-            return IniConfigUtil.getBoolean(configSection, SSL_ON_PORT_PROP, DEFAULT_SSL_ON_PORT);
+            return IniConfigUtil.getBoolean(configSection, SSL_ON_PORT_PROP, DEFAULT_SSL_ON_PROP);
         } else {
-            return false;
+            return DEFAULT_SSL_ON_PROP;
         }
     }
 
@@ -137,13 +141,15 @@ public abstract class AbstractIniServiceConfigurationParser<ConfigurationType ex
      * @param configSection configuration section from which to extract the value
      * 
      * @return whether client certificate authentication is required when a client is connecting, defaults to
-     *         {@value #CLIENT_CERT_AUTHN_PROP}.
+     *         {@value #DEFAULT_CLIENT_CERT_AUTH}.
      */
     protected boolean isClientCertAuthRequired(Section configSection) {
+        if (configSection == null)
+            return DEFAULT_CLIENT_CERT_AUTH;
         if (isSSLEnabled(configSection)) {
             return IniConfigUtil.getBoolean(configSection, CLIENT_CERT_AUTHN_PROP, DEFAULT_CLIENT_CERT_AUTH);
         } else {
-            return false;
+            return DEFAULT_CLIENT_CERT_AUTH;
         }
     }
 
@@ -210,64 +216,86 @@ public abstract class AbstractIniServiceConfigurationParser<ConfigurationType ex
             log.error(errorMsg);
             throw new ConfigurationException(errorMsg);
         }
+        String name= configSection.getName();
 
         String entityId = getEntityId(configSection);
-        log.info("entity ID: {}", entityId);
+        log.info("{}: entity ID: {}", name,entityId);
         configBuilder.setEntityId(entityId);
 
         String host = getHostname(configSection);
-        log.info("service host address: {}", host);
+        log.info("{}: service hostname: {}", name,host);
         configBuilder.setHost(host);
 
         int port = getPort(configSection);
-        log.info("service listening port: {}", port);
+        log.info("{}: service port: {}", name,port);
         configBuilder.setPort(port);
 
         String adminHost = getAdminHost(configSection);
-        log.info("service admin host: {}", adminHost == null ? "default" : adminHost);
+        log.info("{}: service admin hostname: {}", name,adminHost == null ? "default" : adminHost);
         configBuilder.setAdminHost(adminHost);
-        
+
         int adminPort = getAdminPort(configSection);
-        log.info("service admin port: {}", adminPort == 0 ? "default" : adminPort);
+        log.info("{}: service admin port: {}", name,adminPort == 0 ? "default" : adminPort);
         configBuilder.setAdminPort(adminPort);
 
         String adminPassword = getAdminPassword(configSection);
-        log.info("service admin password set: {}", adminPassword == null ? "no" : "yes");
+        log.info("{}: service admin password set: {}", name,adminPassword == null ? "no" : "yes");
         configBuilder.setAdminPassword(adminPassword);
 
         int maxConnections = getMaximumRequests(configSection);
-        log.info("max requests: {}", maxConnections);
+        log.info("{}: max requests: {}", name,maxConnections);
         configBuilder.setMaxConnections(maxConnections);
 
         int connTimeout = getConnectionTimeout(configSection);
-        log.info("connection timeout: {}ms", connTimeout);
+        log.info("{}: connection timeout: {}ms", name,connTimeout);
         configBuilder.setConnectionTimeout(connTimeout);
 
         int maxReqQueue = getMaxRequestQueueSize(configSection);
-        log.info("max request queue size: {}", maxReqQueue);
+        log.info("{}: max request queue size: {}", name,maxReqQueue);
         configBuilder.setMaxRequestQueueSize(maxReqQueue);
 
         int receiveBuffer = getReceiveBufferSize(configSection);
-        log.info("recieve buffer size: {} bytes", receiveBuffer);
+        log.info("{}: recieve buffer size: {} bytes", name,receiveBuffer);
         configBuilder.setReceiveBufferSize(receiveBuffer);
 
         int sendBuffer = getSendBufferSize(configSection);
-        log.info("send buffer size: {} bytes", sendBuffer);
+        log.info("{}: send buffer size: {} bytes", name,sendBuffer);
         configBuilder.setSendBufferSize(sendBuffer);
 
+    }
+
+    
+    /**
+     * Process the information contained in the {@value #SECURITY_SECTION_HEADER} configuration section.
+     * 
+     * @param iniFile INI file being processed
+     * @param configBuilder builder being populated with configuration information
+     * 
+     * @throws ConfigurationException thrown if there is a problem reading the information contained in the
+     *             {@value #SECURITY_SECTION_HEADER} section
+     */
+    protected void processSecuritySection(Ini iniFile, AbstractServiceConfigurationBuilder<?> configBuilder)
+            throws ConfigurationException {
         Section securityConfig = iniFile.get(SECURITY_SECTION_HEADER);
-        configBuilder.setKeyManager(getX509KeyManager(securityConfig));
-        configBuilder.setX509TrustMaterial(getX509TrustMaterialStore(securityConfig));
+        if (securityConfig==null) {
+            log.warn("INI configuration does not contain the '{}' section", SECURITY_SECTION_HEADER);
+        }
+        
+        String name= securityConfig.getName();
+        X509KeyManager x509KeyManager= getX509KeyManager(securityConfig);
+        configBuilder.setKeyManager(x509KeyManager);
+        
+        PKIStore pkiStore= getX509TrustMaterialStore(securityConfig);
+        configBuilder.setX509TrustMaterial(pkiStore);
 
         boolean sslOn = isSSLEnabled(securityConfig);
-        log.info("service port using SSL: {}", sslOn);
+        log.info("{}: service port using SSL: {}", name,sslOn);
         configBuilder.setSslEnabled(sslOn);
 
         boolean clientCertAuthRequired = isClientCertAuthRequired(securityConfig);
-        log.info("client certificate authentication required: {}", clientCertAuthRequired);
-        configBuilder.setClientCertAuthRequired(clientCertAuthRequired);
+        log.info("{}: TLS client certificate authentication required: {}", name,clientCertAuthRequired);
+        configBuilder.setClientCertAuthRequired(clientCertAuthRequired);    
     }
-
     /**
      * Builds a SOAP client builder from the information contained in the configuration section.
      * 
@@ -281,22 +309,22 @@ public abstract class AbstractIniServiceConfigurationParser<ConfigurationType ex
             X509TrustManager trustManager) {
         HttpClientBuilder httpClientBuilder = new HttpClientBuilder();
         httpClientBuilder.setContentCharSet("UTF-8");
-
+        String name= configSection.getName();
         int conTimeout = getConnectionTimeout(configSection);
-        log.info("connection timeout: {}ms", conTimeout);
+        log.info("{}: connection timeout: {}ms", name,conTimeout);
         httpClientBuilder.setConnectionTimeout(conTimeout);
 
         int maxRequests = getMaximumRequests(configSection);
-        log.info("maximum requests: {}", maxRequests);
+        log.info("{}: maximum requests: {}", name,maxRequests);
         httpClientBuilder.setMaxTotalConnections(maxRequests);
         httpClientBuilder.setMaxConnectionsPerHost(maxRequests);
 
         int recBuffSize = getSendBufferSize(configSection);
-        log.info("recieve buffer size: {} bytes", recBuffSize);
+        log.info("{}: recieve buffer size: {} bytes", name,recBuffSize);
         httpClientBuilder.setReceiveBufferSize(recBuffSize);
 
         int sendBuffSize = getSendBufferSize(configSection);
-        log.info("send buffer size: {} bytes", sendBuffSize);
+        log.info("{}: send buffer size: {} bytes", name,sendBuffSize);
         httpClientBuilder.setSendBufferSize(sendBuffSize);
 
         if (keyManager != null && trustManager != null) {
