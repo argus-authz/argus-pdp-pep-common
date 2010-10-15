@@ -6,12 +6,12 @@
     <parent>
         <groupId>org.glite.authz</groupId>
         <artifactId>argus-parent</artifactId>
-        <version>1.2.0</version>
+        <version>1.2.1</version>
         <relativePath>../org.glite.authz</relativePath>
     </parent>
 
     <groupId>org.glite.authz</groupId>
-    <name>Argus PDP and PEP daemon common library</name>
+    <name>Argus PDP and PEP server common library</name>
     <artifactId>pdp-pep-common</artifactId>
     <version>1.2.1</version>
     <packaging>jar</packaging>
