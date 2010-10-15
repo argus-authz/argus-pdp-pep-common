@@ -240,6 +240,11 @@ public class FQAN {
         return matchesGroupName(regexpFQAN) && matchesRole(regexpFQAN);
     }
 
+    public boolean matches(FQAN regexpFQAN) throws ParseException {
+        return matchesGroupName(regexpFQAN) && matchesRole(regexpFQAN);
+    }
+    
+    
     /**
      * Checks if the group name of this FQAN matches a group name regular expression. In the event that the expression
      * does not contain the wildcard '*' character, exact equality matching is performed
