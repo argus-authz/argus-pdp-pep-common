@@ -58,6 +58,9 @@ public abstract class AbstractIniServiceConfigurationParser<ConfigurationType ex
     /** The name of the {@value} property which indicates the host the service will listen on for admin commands. */
     public static final String ADMIN_HOST_PROP = "adminHost";
 
+    /** Default value of the {@value #ADMIN_HOST_PROP} property: {@value} . */
+    public static final String DEFAULT_ADMIN_HOST = "localhost";
+
     /** The name of the {@value} property which indicates the port the service will listen on for admin commands. */
     public static final String ADMIN_PORT_PROP = "adminPort";
 
@@ -158,10 +161,10 @@ public abstract class AbstractIniServiceConfigurationParser<ConfigurationType ex
      * 
      * @param configSection configuration section from which to extract the value
      * 
-     * @return the value, or null if not set
+     * @return the admin host value, or the default admin host {@value #DEFAULT_ADMIN_HOST} if it is not set
      */
     protected String getAdminHost(Section configSection) {
-        return IniConfigUtil.getString(configSection, ADMIN_HOST_PROP, null);
+        return IniConfigUtil.getString(configSection, ADMIN_HOST_PROP, DEFAULT_ADMIN_HOST);
     }
 
     /**
