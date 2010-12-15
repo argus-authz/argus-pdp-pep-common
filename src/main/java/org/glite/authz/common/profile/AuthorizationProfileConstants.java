@@ -19,6 +19,9 @@
 
 package org.glite.authz.common.profile;
 
+
+
+
 /**
  * Namespaces, datatypes and identifiers constants used by the authorization profiles.
  */
@@ -53,6 +56,12 @@ public class AuthorizationProfileConstants {
 
     /** The attribute id subject-issuer identifier: {@value} */
     public static final String ID_ATTRIBUTE_SUBJECT_ISSUER = NS_ATTRIBUTE + SEPARATOR + "subject-issuer";
+    
+    /** The attribute id subject-id identifier: {@value} */
+    public static final String ID_ATTRIBUTE_SUBJECT_ID= "urn:oasis:names:tc:xacml:1.0:subject:subject-id";
+    
+    /** The attribute id subject key-info identifier: {@value} */
+    public static final String ID_ATTRIBUTE_SUBJECT_KEY_INFO= "urn:oasis:names:tc:xacml:1.0:subject:key-info";
 
     /** The attribute id virtual-organization identifier: {@value} */
     public static final String ID_ATTRIBUTE_VIRTUAL_ORGANIZATION = NS_ATTRIBUTE + SEPARATOR + "virtual-organization";
@@ -75,6 +84,12 @@ public class AuthorizationProfileConstants {
     /** The attribute id primary group-id identifier: {@value} . */
     public static final String ID_ATTRIBUTE_PRIMARY_GROUP_ID = ID_ATTRIBUTE_GROUP_ID + SEPARATOR + "primary";
 
+        /** The attribute id resource-id identifier: {@value} */
+    public static final String ID_ATTRIBUTE_RESOURCE_ID= "urn:oasis:names:tc:xacml:1.0:resource:resource-id";
+
+    /** The attribute id action-id identifier: {@value} */
+    public static final String ID_ATTRIBUTE_ACTION_ID= "urn:oasis:names:tc:xacml:1.0:action:action-id";
+
     /** The obligation id map to local environment identifier: {@value} . */
     public static final String ID_OBLIGATION_LOCAL_ENV_MAP = NS_OBLIGATION + SEPARATOR + "local-environment-map";
 
@@ -84,6 +99,15 @@ public class AuthorizationProfileConstants {
     /** The datatype FQAN: {@value} */
     public static final String DATATYPE_FQAN = NS_DATATYPE + SEPARATOR + "fqan";
 
+    /** The datatype #anyURI: {@value} */
+    public static final String DATATYPE_ANY_URI= "http://www.w3.org/2001/XMLSchema#anyURI";
+    
+    /** The datatype #string: {@value} */
+    public static final String DATATYPE_STRING= "http://www.w3.org/2001/XMLSchema#string";
+
+    /** The datatype X.500 name (RFC2253 format DN): {@value} . */
+    public static final String DATATYPE_X500_NAME = "urn:oasis:names:tc:xacml:1.0:data-type:x500Name";
+    
     /** The algorithm FQAN exact match id: {@value} */
     public static final String ID_ALGORITHM_FQAN_EXACT_MATCH = NS_ALGORITHM + SEPARATOR + "fqan-match";
 
