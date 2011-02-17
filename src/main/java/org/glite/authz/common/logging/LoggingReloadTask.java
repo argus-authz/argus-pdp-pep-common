@@ -35,12 +35,12 @@ import ch.qos.logback.core.status.StatusManager;
 
 /** A work task for reloading the logging configuration. */
 public class LoggingReloadTask extends TimerTask {
-    
+
     /** Class logger. */
     private Logger log = LoggerFactory.getLogger(LoggingReloadTask.class);
 
     /** Path to the logging configuration file. */
-    private String loggingConfigFilePath;
+    private File loggingConfigFile;
 
     /** The last time the logging configuration was modified. */
     private long lastModification;
@@ -49,9 +49,11 @@ public class LoggingReloadTask extends TimerTask {
      * Constructor.
      * 
      * @param configFilePath path to the logging configuration file to watch for changes and reload.
+     * @throws IOException if the configFilePath is a directory, does not exist, or can not be read
      */
-    public LoggingReloadTask(String configFilePath) {
-        loggingConfigFilePath = Strings.safeTrimOrNullString(configFilePath);
+    public LoggingReloadTask(String configFilePath) throws IOException {
+        String loggingConfigFilePath = Strings.safeTrimOrNullString(configFilePath);
+        loggingConfigFile = Files.getReadableFile(loggingConfigFilePath);
         lastModification = -1;
     }
 
@@ -59,14 +61,6 @@ public class LoggingReloadTask extends TimerTask {
     public void run() {
         LoggerContext loggerContext = (LoggerContext) LoggerFactory.getILoggerFactory();
         StatusManager statusManager = loggerContext.getStatusManager();
-
-        File loggingConfigFile = null;
-        try {
-            loggingConfigFile = Files.getReadableFile(loggingConfigFilePath);
-        } catch (IOException e) {
-            log.error("Error loading logging configuration file: " + loggingConfigFilePath, e);
-            return;
-        }
 
         if (lastModification >= loggingConfigFile.lastModified()) {
             // file hasn't changed since the last time we looked
