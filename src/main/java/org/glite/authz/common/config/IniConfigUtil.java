@@ -17,6 +17,9 @@
 
 package org.glite.authz.common.config;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.glite.authz.common.util.Strings;
 import org.ini4j.Ini.Section;
 import org.slf4j.Logger;
@@ -175,20 +178,68 @@ public class IniConfigUtil {
                 if (tempInt >= minValue && tempInt <= maxValue) {
                     return tempInt;
                 } else {
-                    log
-                            .warn(
-                                    "Property {} in configuration section {} with a value of {} was not greater than or equal to {} and less than or equal to {}, using default value of {}",
-                                    new Object[] { propName, configSection.getName(), tempInt, minValue, maxValue,
-                                            defaultValue });
+                    log.warn(
+                            "Property {} in configuration section {} with a value of {} was not greater than or equal to {} and less than or equal to {}, using default value of {}",
+                            new Object[] { propName, configSection.getName(), tempInt, minValue, maxValue, defaultValue });
                 }
             } catch (NumberFormatException e) {
-                log
-                        .warn(
-                                "Property {} in configuration section {} was not a valid integer, using default value of {}, using default value of {}",
-                                new Object[] { propName, configSection.getName(), strValue, defaultValue });
+                log.warn(
+                        "Property {} in configuration section {} was not a valid integer, using default value of {}, using default value of {}",
+                        new Object[] { propName, configSection.getName(), strValue, defaultValue });
             }
         }
 
         return defaultValue;
+    }
+
+    /** Separator for the strings list elements */
+    public static final String STRING_LIST_SEPARATOR = " ";
+
+    /**
+     * Extracts a string list values from a configuration property, the string list values are separated with
+     * {@value #STRING_LIST_SEPARATOR} (space).
+     * 
+     * @param configSection configuration section from which to extract the strings list
+     * @param propName name of the configuration property
+     * 
+     * @return the values list of the property
+     * 
+     * @throws ConfigurationException thrown if the configuration property does not exist or has a null/empty value
+     */
+    public static String[] getStringsList(Section configSection, String propName) throws ConfigurationException {
+        return getStringsList(configSection, propName, STRING_LIST_SEPARATOR);
+    }
+
+    /**
+     * Extracts a string list values from a configuration property, the string list values are separated with
+     * {@value #STRING_LIST_SEPARATOR} (space).
+     * 
+     * @param configSection configuration section from which to extract the strings list
+     * @param propName name of the configuration property
+     * @param defaultList the default list values to return if the configuration property does not exist or has
+     *            null/empty value
+     * @return the values list of the property
+     */
+    public static String[] getStringsList(Section configSection, String propName, String[] defaultList) {
+        String[] stringList = null;
+        try {
+            stringList = getStringsList(configSection, propName, STRING_LIST_SEPARATOR);
+        } catch (ConfigurationException e) {
+            return defaultList;
+        }
+        return stringList;
+    }
+
+    private static String[] getStringsList(Section configSection, String propName, String listSeparator)
+            throws ConfigurationException {
+        String valuesList = getString(configSection, propName);
+        List<String> values = new ArrayList<String>();
+        for (String value : valuesList.split(listSeparator)) {
+            String trimmedValue = Strings.safeTrimOrNullString(value);
+            if (trimmedValue != null) {
+                values.add(trimmedValue);
+            }
+        }
+        return values.toArray(new String[values.size()]);
     }
 }
