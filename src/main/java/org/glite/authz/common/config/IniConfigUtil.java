@@ -206,8 +206,8 @@ public class IniConfigUtil {
      * 
      * @throws ConfigurationException thrown if the configuration property does not exist or has a null/empty value
      */
-    public static String[] getStringsList(Section configSection, String propName) throws ConfigurationException {
-        return getStringsList(configSection, propName, STRING_LIST_SEPARATOR);
+    public static String[] getStringsArray(Section configSection, String propName) throws ConfigurationException {
+        return getStringsArray(configSection, propName, STRING_LIST_SEPARATOR);
     }
 
     /**
@@ -216,21 +216,21 @@ public class IniConfigUtil {
      * 
      * @param configSection configuration section from which to extract the strings list
      * @param propName name of the configuration property
-     * @param defaultList the default list values to return if the configuration property does not exist or has
+     * @param defaultValues the default list values to return if the configuration property does not exist or has
      *            null/empty value
      * @return the values list of the property
      */
-    public static String[] getStringsList(Section configSection, String propName, String[] defaultList) {
-        String[] stringList = null;
+    public static String[] getStringsArray(Section configSection, String propName, String[] defaultValues) {
+        String[] values = null;
         try {
-            stringList = getStringsList(configSection, propName, STRING_LIST_SEPARATOR);
+            values = getStringsArray(configSection, propName, STRING_LIST_SEPARATOR);
         } catch (ConfigurationException e) {
-            return defaultList;
+            return defaultValues;
         }
-        return stringList;
+        return values;
     }
 
-    private static String[] getStringsList(Section configSection, String propName, String listSeparator)
+    private static String[] getStringsArray(Section configSection, String propName, String listSeparator)
             throws ConfigurationException {
         String valuesList = getString(configSection, propName);
         List<String> values = new ArrayList<String>();
