@@ -196,29 +196,28 @@ public class IniConfigUtil {
     public static final String STRING_LIST_SEPARATOR = " ";
 
     /**
-     * Extracts a string list values from a configuration property, the string list values are separated with
+     * Extracts a string list values from a configuration property, the values are separated with
      * {@value #STRING_LIST_SEPARATOR} (space).
      * 
      * @param configSection configuration section from which to extract the strings list
      * @param propName name of the configuration property
      * 
-     * @return the values list of the property
+     * @return the string values array of the property
      * 
-     * @throws ConfigurationException thrown if the configuration property does not exist or has a null/empty value
+     * @throws ConfigurationException thrown if the configuration property does not exist.
      */
     public static String[] getStringsArray(Section configSection, String propName) throws ConfigurationException {
         return getStringsArray(configSection, propName, STRING_LIST_SEPARATOR);
     }
 
     /**
-     * Extracts a string list values from a configuration property, the string list values are separated with
+     * Extracts a string list values from a configuration property, the values are separated with
      * {@value #STRING_LIST_SEPARATOR} (space).
      * 
      * @param configSection configuration section from which to extract the strings list
      * @param propName name of the configuration property
-     * @param defaultValues the default list values to return if the configuration property does not exist or has
-     *            null/empty value
-     * @return the values list of the property
+     * @param defaultValues the default list values to return if the configuration property does not exist.
+     * @return the string values array of the property
      */
     public static String[] getStringsArray(Section configSection, String propName, String[] defaultValues) {
         String[] values = null;
@@ -232,9 +231,14 @@ public class IniConfigUtil {
 
     private static String[] getStringsArray(Section configSection, String propName, String listSeparator)
             throws ConfigurationException {
-        String valuesList = getString(configSection, propName);
+        String propValues = configSection.get(propName);
+        if (propValues == null) {
+            throw new ConfigurationException("INI configuration section " + configSection.getName()
+                    + " does not contain the required property " + propName);
+
+        }
         List<String> values = new ArrayList<String>();
-        for (String value : valuesList.split(listSeparator)) {
+        for (String value : propValues.split(listSeparator)) {
             String trimmedValue = Strings.safeTrimOrNullString(value);
             if (trimmedValue != null) {
                 values.add(trimmedValue);
