@@ -44,6 +44,7 @@ public class JettyShutdownTask implements Runnable {
         if (httpServer.isRunning()) {
             try {
                 httpServer.stop();
+                log.info("Server stopped.");
             } catch (Exception e) {
                 log.error("Unable to shutdown HTTP server", e);
                 System.exit(1);
