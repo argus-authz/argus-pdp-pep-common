@@ -1,7 +1,26 @@
-Changes in Release 1.0.4
-===========================================
+pdp-pep-common 1.2.2
+--------------------
+- All ECDH cipher suites are disabled on the server SSL connector. There is 
+  a problem with OpenSSL 1.0 client and JDK 1.6 during the SSL handshake.
+
+pdp-pep-common 1.2.1
+--------------------
+- Some new constants added in the AuthorizationProfileConstants class.
+- New strings list parsing methods added in IniConfigUtil.
+
+pdp-pep-common 1.2.0
+--------------------
+- ProfileConstants and WorkerNodeProfileV1Constants classes merged into a new
+  AuthorizationProfileConstants class.
+- FQAN class updated with new constructors and better matches(...) functions.
+- Service configuration parser updated with better logging messages, and separated 
+  processSecuritySection(...) method.
+
+pdp-pep-common 1.1.0
+--------------------
 - Add X.509 PIP flag that determines whether a proxy certificate is required 
-  in the subject's certificate chain
-- Move model, PIP, and obligation handling code in to PEP library
+  in the subject's certificate chain.
+- Move model, PIP, and obligation handling code in to PEP common library.
 - Refactor Jetty shutdown service in to a general admin service with which
-  additional administrative commands and shutdown tasks may be registered
+  additional administrative commands and shutdown tasks may be registered.
+
