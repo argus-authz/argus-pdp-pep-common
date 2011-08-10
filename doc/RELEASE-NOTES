@@ -1,10 +1,11 @@
 pdp-pep-common 1.2.2
 --------------------
-- All ECDH cipher suites are disabled on the server SSL connector. There is 
-  a problem with OpenSSL 1.0 client and JDK 1.6 during the SSL handshake.
+- Maven parent module: org.glite.authz:argus-parent:1.4
 
 pdp-pep-common 1.2.1
 --------------------
+- All ECDH cipher suites are disabled on the server SSL connector. There is 
+  a problem with OpenSSL 1.0 client and JDK 1.6 during the SSL handshake.
 - Some new constants added in the AuthorizationProfileConstants class.
 - New strings list parsing methods added in IniConfigUtil.
 
