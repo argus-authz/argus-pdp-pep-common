@@ -23,6 +23,9 @@ import net.jcip.annotations.ThreadSafe;
 
 import org.glite.authz.common.util.Strings;
 
+import org.joda.time.DateTime;
+import org.joda.time.chrono.ISOChronology;
+
 /** A set of metrics kept about a running service. */
 @ThreadSafe
 public class ServiceMetrics {
@@ -118,6 +121,7 @@ public class ServiceMetrics {
      * <li>Service: <i>service_id</i></li>
      * <li>ServiceVersion: <i>service_version</i></li>
      * <li>ServiceStartupTime: <i>service_start_time</i></li>
+     * <li>ServiceStartupTimeMillis: <i>service_start_timemillis</i></li>
      * <li>NumberOfProcessors: <i>number_of_cpu_cores</i></li>
      * <li>MaxMemory: <i>max_memory_bytes</i> bytes</li>
      * <li>UsedMemory: <i>used_memory_bytes</i> bytes</li>
@@ -138,7 +142,8 @@ public class ServiceMetrics {
         writer.println("Status: OK");
         writer.println("Service: " + serviceId);
         writer.println("ServiceVersion: " + serviceVersion);
-        writer.println("ServiceStartupTime: " + startupTime);
+        writer.println("ServiceStartupTime: " + new DateTime(startupTime).withChronology(ISOChronology.getInstanceUTC()));
+        writer.println("ServiceStartupTimeMillis: " + startupTime);
         writer.println("NumberOfProcessors: " + runtime.availableProcessors());
         writer.println("MaxMemory: " + maxMemory + " bytes");
         writer.println("UsedMemory: " + usedMemory + " bytes");
