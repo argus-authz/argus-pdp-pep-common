@@ -32,6 +32,9 @@ public class ServiceMetrics {
 
     /** ID for the service. */
     private String serviceId;
+    
+    /** Version of the service */
+    private String serviceVersion;
 
     /** Time the service started. */
     private long startupTime;
@@ -45,14 +48,18 @@ public class ServiceMetrics {
     /**
      * Constructor. Ê
      * 
-     * @param id ID of the service whose metrics are being tracked
+     * @param id
+     *            ID of the service whose metrics are being tracked
+     * @param version
+     *            Version of the service whose metrics are being tracked
      */
-    public ServiceMetrics(String id) {
-        runtime = Runtime.getRuntime();
-        serviceId = Strings.safeTrimOrNullString(id);
-        startupTime = System.currentTimeMillis();
-        totalRequests = 0;
-        totalErrors = 0;
+    public ServiceMetrics(String id, String version) {
+        runtime= Runtime.getRuntime();
+        serviceId= Strings.safeTrimOrNullString(id);
+        serviceVersion= Strings.safeTrimOrNullString(version);
+        startupTime= System.currentTimeMillis();
+        totalRequests= 0;
+        totalErrors= 0;
     }
 
     /**
@@ -65,7 +72,8 @@ public class ServiceMetrics {
     }
 
     /**
-     * Gets the time that the service was started. The time is expressed in the system's default timezone.
+     * Gets the time that the service was started. The time is expressed in the
+     * system's default timezone.
      * 
      * @return time that PEP daemon was started
      */
@@ -74,7 +82,8 @@ public class ServiceMetrics {
     }
 
     /**
-     * Gets the total number of completed requests, successful or otherwise, serviced.
+     * Gets the total number of completed requests, successful or otherwise,
+     * serviced.
      * 
      * @return total number of completed requests
      */
@@ -102,30 +111,41 @@ public class ServiceMetrics {
     }
 
     /**
-     * Prints metric information to the output writer. The following lines are printed:
+     * Prints metric information to the output writer. The following lines are
+     * printed:
      * <ul>
-     * <li>service: <i>service_id</i></li>
-     * <li>start time: <i>service_start_time</i></li>
-     * <li>number of processors: <i>number_of_cpu_cores</i></li>
-     * <li>memory usage: <i>used_megabytes</i>MB</li>
-     * <li>total requests: <i>total_requests</i></li>
-     * <li>total completed requests: <i>total_completed_requests</i></li>
-     * <li>total request errors: <i>total_errors_requests</i></li>
+     * <li>Status: OK</li>
+     * <li>Service: <i>service_id</i></li>
+     * <li>ServiceVersion: <i>service_version</i></li>
+     * <li>ServiceStartupTime: <i>service_start_time</i></li>
+     * <li>NumberOfProcessors: <i>number_of_cpu_cores</i></li>
+     * <li>MaxMemory: <i>max_memory_bytes</i> bytes</li>
+     * <li>UsedMemory: <i>used_memory_bytes</i> bytes</li>
+     * <li>TotalRequests: <i>total_requests</i></li>
+     * <li>TotalCompletedRequests: <i>total_completed_requests</i></li>
+     * <li>TotalRequestErrors: <i>total_errors_requests</i></li>
      * </ul>
      * 
-     * @param writer writer to which metrics are printed
+     * @param writer
+     *            writer to which metrics are printed
      */
     public void printServiceMetrics(PrintWriter writer) {
-        long usedMemory = (runtime.totalMemory() - runtime.freeMemory()) / 1048576;
+        // long usedMemory = (runtime.totalMemory() - runtime.freeMemory()) /
+        // 1048576;
+        long maxMemory= runtime.maxMemory();
+        long usedMemory= (runtime.totalMemory() - runtime.freeMemory());
 
-        writer.println("service: " + serviceId);
-        writer.println("start_time: " + startupTime);
-        writer.println("number_of_processors: " + runtime.availableProcessors());
-        writer.println("memory_usage: " + usedMemory + "MB");
-        writer.println("total_requests: " + getTotalServiceRequests());
-        writer.println("total_completed_requests: "
+        writer.println("Status: OK");
+        writer.println("Service: " + serviceId);
+        writer.println("ServiceVersion: " + serviceVersion);
+        writer.println("ServiceStartupTime: " + startupTime);
+        writer.println("NumberOfProcessors: " + runtime.availableProcessors());
+        writer.println("MaxMemory: " + maxMemory + " bytes");
+        writer.println("UsedMemory: " + usedMemory + " bytes");
+        writer.println("TotalRequests: " + getTotalServiceRequests());
+        writer.println("TotalCompletedRequests: "
                 + (getTotalServiceRequests() - getTotalServiceRequestErrors()));
-        writer.println("total_request_errors: " + getTotalServiceRequestErrors());
+        writer.println("TotalRequestErrors: " + getTotalServiceRequestErrors());
 
     }
 }
