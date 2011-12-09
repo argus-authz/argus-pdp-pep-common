@@ -6,7 +6,7 @@
     <parent>
         <groupId>org.glite.authz</groupId>
         <artifactId>argus-parent</artifactId>
-        <version>1.4</version>
+        <version>1.5</version>
         <relativePath>../emi.argus.parent</relativePath>
     </parent>
 
@@ -262,8 +262,8 @@
     </licenses>
 
     <organization>
-        <name>EGEE Collaboration</name>
-        <url>http://www.eu-egee.org/</url>
+        <name>EMI - European Middleware Initiative</name>
+        <url>http://www.eu-emi.eu/</url>
     </organization>
 
     <profiles>
