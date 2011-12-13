@@ -20,13 +20,13 @@
 package org.glite.authz.common.profile;
 
 /**
- * XACML namespaces, datatype and identifiers constants for the <a
+ * XACML namespaces, datatype and identifiers constants for the gLite <a
  * href="https://edms.cern.ch/document/1078881">XACML Grid Computing Element
  * Authorization Profile v1.0</a> and the <a
  * href="http://edms.cern.ch/document/1058175">XACML Grid Worker Node
  * Authorization Profile v1.0</a> profiles.
  */
-public class AuthorizationProfileConstants {
+public class GLiteAuthorizationProfileConstants {
 
     /** Namespaces, datatypes and identifiers name components separator */
     private static final char SEPARATOR= '/';
