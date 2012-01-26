@@ -23,7 +23,6 @@ import javax.net.ssl.X509TrustManager;
 import org.glite.voms.PKIStore;
 
 import org.ini4j.Ini;
-import org.ini4j.Ini.Section;
 import org.opensaml.ws.soap.client.http.HttpClientBuilder;
 import org.opensaml.ws.soap.client.http.TLSProtocolSocketFactory;
 import org.slf4j.Logger;
@@ -91,7 +90,7 @@ public abstract class AbstractIniServiceConfigurationParser<ConfigurationType ex
      * 
      * @throws ConfigurationException thrown if the entity ID property is not set or has an empty value
      */
-    protected String getEntityId(Section configSection) throws ConfigurationException {
+    protected String getEntityId(Ini.Section configSection) throws ConfigurationException {
         return IniConfigUtil.getString(configSection, ENTITY_ID_PROP);
     }
 
@@ -105,7 +104,7 @@ public abstract class AbstractIniServiceConfigurationParser<ConfigurationType ex
      * 
      * @throws ConfigurationException thrown if no host name is given
      */
-    protected String getHostname(Section configSection) throws ConfigurationException {
+    protected String getHostname(Ini.Section configSection) throws ConfigurationException {
         return IniConfigUtil.getString(configSection, HOST_PROP);
     }
 
@@ -116,7 +115,7 @@ public abstract class AbstractIniServiceConfigurationParser<ConfigurationType ex
      * 
      * @return the value, or 0 if it is not set
      */
-    protected int getPort(Section configSection) {
+    protected int getPort(Ini.Section configSection) {
         return IniConfigUtil.getInt(configSection, PORT_PROP, 0, 1, 65535);
     }
 
@@ -127,7 +126,7 @@ public abstract class AbstractIniServiceConfigurationParser<ConfigurationType ex
      * 
      * @return whether SSL should be enabled on the service port, defaults to {@value #DEFAULT_SSL_ON_PROP}.
      */
-    protected boolean isSSLEnabled(Section configSection) {
+    protected boolean isSSLEnabled(Ini.Section configSection) {
         if (configSection == null)
             return DEFAULT_SSL_ON_PROP;
         if (configSection.containsKey(SERVICE_KEY_PROP) && configSection.containsKey(SERVICE_CERT_PROP)
@@ -146,7 +145,7 @@ public abstract class AbstractIniServiceConfigurationParser<ConfigurationType ex
      * @return whether client certificate authentication is required when a client is connecting, defaults to
      *         {@value #DEFAULT_CLIENT_CERT_AUTH}.
      */
-    protected boolean isClientCertAuthRequired(Section configSection) {
+    protected boolean isClientCertAuthRequired(Ini.Section configSection) {
         if (configSection == null)
             return DEFAULT_CLIENT_CERT_AUTH;
         if (isSSLEnabled(configSection)) {
@@ -163,7 +162,7 @@ public abstract class AbstractIniServiceConfigurationParser<ConfigurationType ex
      * 
      * @return the admin host value, or the default admin host {@value #DEFAULT_ADMIN_HOST} if it is not set
      */
-    protected String getAdminHost(Section configSection) {
+    protected String getAdminHost(Ini.Section configSection) {
         return IniConfigUtil.getString(configSection, ADMIN_HOST_PROP, DEFAULT_ADMIN_HOST);
     }
 
@@ -174,7 +173,7 @@ public abstract class AbstractIniServiceConfigurationParser<ConfigurationType ex
      * 
      * @return the value, or 0 if is not set
      */
-    protected int getAdminPort(Section configSection) {
+    protected int getAdminPort(Ini.Section configSection) {
         return IniConfigUtil.getInt(configSection, ADMIN_PORT_PROP, 0, 1, 65535);
     }
 
@@ -185,7 +184,7 @@ public abstract class AbstractIniServiceConfigurationParser<ConfigurationType ex
      * 
      * @return the value or null if it is not set
      */
-    protected String getAdminPassword(Section configSection) {
+    protected String getAdminPassword(Ini.Section configSection) {
         return IniConfigUtil.getString(configSection, ADMIN_PASSWORD_PROP, null);
     }
 
@@ -197,7 +196,7 @@ public abstract class AbstractIniServiceConfigurationParser<ConfigurationType ex
      * 
      * @return the value
      */
-    protected int getMaxRequestQueueSize(Section configSection) {
+    protected int getMaxRequestQueueSize(Ini.Section configSection) {
         return IniConfigUtil.getInt(configSection, REQUEST_QUEUE_PROP, DEFAULT_REQUEST_QUEUE, 1, Integer.MAX_VALUE);
     }
 
@@ -212,7 +211,7 @@ public abstract class AbstractIniServiceConfigurationParser<ConfigurationType ex
      */
     protected void processServiceSection(Ini iniFile, AbstractServiceConfigurationBuilder<?> configBuilder)
             throws ConfigurationException {
-        Section configSection = iniFile.get(SERVICE_SECTION_HEADER);
+        Ini.Section configSection = iniFile.get(SERVICE_SECTION_HEADER);
         if (configSection == null) {
             String errorMsg = "INI configuration does not contain the required '" + SERVICE_SECTION_HEADER
                     + "' INI section";
@@ -279,7 +278,7 @@ public abstract class AbstractIniServiceConfigurationParser<ConfigurationType ex
      */
     protected void processSecuritySection(Ini iniFile, AbstractServiceConfigurationBuilder<?> configBuilder)
             throws ConfigurationException {
-        Section securityConfig = iniFile.get(SECURITY_SECTION_HEADER);
+        Ini.Section securityConfig = iniFile.get(SECURITY_SECTION_HEADER);
         if (securityConfig==null) {
             log.warn("INI configuration does not contain the '{}' section", SECURITY_SECTION_HEADER);
         }
@@ -308,7 +307,7 @@ public abstract class AbstractIniServiceConfigurationParser<ConfigurationType ex
      * 
      * @return the constructed SOAP client
      */
-    protected HttpClientBuilder buildSOAPClientBuilder(Section configSection, X509KeyManager keyManager,
+    protected HttpClientBuilder buildSOAPClientBuilder(Ini.Section configSection, X509KeyManager keyManager,
             X509TrustManager trustManager) {
         HttpClientBuilder httpClientBuilder = new HttpClientBuilder();
         httpClientBuilder.setContentCharSet("UTF-8");

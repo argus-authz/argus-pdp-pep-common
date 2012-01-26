@@ -21,7 +21,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.glite.authz.common.util.Strings;
-import org.ini4j.Ini.Section;
+import org.ini4j.Ini;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -42,7 +42,7 @@ public class IniConfigUtil {
      * 
      * @return the value
      */
-    public static boolean getBoolean(Section configSection, String propName, boolean defaultValue) {
+    public static boolean getBoolean(Ini.Section configSection, String propName, boolean defaultValue) {
         String value = getString(configSection, propName, null);
 
         if ("true".equalsIgnoreCase(value) || "yes".equalsIgnoreCase(value) || "1".equalsIgnoreCase(value)) {
@@ -69,7 +69,7 @@ public class IniConfigUtil {
      * @throws ConfigurationException thrown if given configuration section does not contain a property with the given
      *             name
      */
-    public static boolean getBoolean(Section configSection, String propName) throws ConfigurationException {
+    public static boolean getBoolean(Ini.Section configSection, String propName) throws ConfigurationException {
         String value = getString(configSection, propName, null);
 
         if ("true".equalsIgnoreCase(value) || "yes".equalsIgnoreCase(value) || "1".equalsIgnoreCase(value)) {
@@ -94,7 +94,7 @@ public class IniConfigUtil {
      * 
      * @return the value of the property
      */
-    public static String getString(Section configSection, String propName, String defaultValue) {
+    public static String getString(Ini.Section configSection, String propName, String defaultValue) {
         String propValue = Strings.safeTrimOrNullString(configSection.get(propName));
 
         if (propValue == null) {
@@ -114,7 +114,7 @@ public class IniConfigUtil {
      * 
      * @throws ConfigurationException thrown if the value does not exist or has a null/empty value
      */
-    public static String getString(Section configSection, String propName) throws ConfigurationException {
+    public static String getString(Ini.Section configSection, String propName) throws ConfigurationException {
         String propValue = Strings.safeTrimOrNullString(configSection.get(propName));
 
         if (propValue != null) {
@@ -137,7 +137,7 @@ public class IniConfigUtil {
      * 
      * @throws ConfigurationException thrown if there is a problem getting the required integer value
      */
-    public static int getInt(Section configSection, String propName, int minValue, int maxValue)
+    public static int getInt(Ini.Section configSection, String propName, int minValue, int maxValue)
             throws ConfigurationException {
         if (configSection.containsKey(propName)) {
             try {
@@ -170,7 +170,7 @@ public class IniConfigUtil {
      * 
      * @return the value for the property
      */
-    public static int getInt(Section configSection, String propName, int defaultValue, int minValue, int maxValue) {
+    public static int getInt(Ini.Section configSection, String propName, int defaultValue, int minValue, int maxValue) {
         String strValue = Strings.safeTrimOrNullString(configSection.get(propName));
         if (strValue != null) {
             try {
@@ -206,7 +206,7 @@ public class IniConfigUtil {
      * 
      * @throws ConfigurationException thrown if the configuration property does not exist.
      */
-    public static String[] getStringsArray(Section configSection, String propName) throws ConfigurationException {
+    public static String[] getStringsArray(Ini.Section configSection, String propName) throws ConfigurationException {
         return getStringsArray(configSection, propName, STRING_LIST_SEPARATOR);
     }
 
@@ -219,7 +219,7 @@ public class IniConfigUtil {
      * @param defaultValues the default list values to return if the configuration property does not exist.
      * @return the string values array of the property
      */
-    public static String[] getStringsArray(Section configSection, String propName, String[] defaultValues) {
+    public static String[] getStringsArray(Ini.Section configSection, String propName, String[] defaultValues) {
         String[] values = null;
         try {
             values = getStringsArray(configSection, propName, STRING_LIST_SEPARATOR);
@@ -229,7 +229,7 @@ public class IniConfigUtil {
         return values;
     }
 
-    private static String[] getStringsArray(Section configSection, String propName, String listSeparator)
+    private static String[] getStringsArray(Ini.Section configSection, String propName, String listSeparator)
             throws ConfigurationException {
         String propValues = configSection.get(propName);
         if (propValues == null) {

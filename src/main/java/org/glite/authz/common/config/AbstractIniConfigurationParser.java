@@ -28,7 +28,7 @@ import org.glite.security.trustmanager.ContextWrapper;
 import org.glite.security.trustmanager.UpdatingKeyManager;
 import org.glite.security.util.CaseInsensitiveProperties;
 import org.glite.voms.PKIStore;
-import org.ini4j.Ini.Section;
+import org.ini4j.Ini;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -94,7 +94,7 @@ public abstract class AbstractIniConfigurationParser<ConfigurationType extends A
      * 
      * @return the value
      */
-    protected int getConnectionTimeout(Section configSection) {
+    protected int getConnectionTimeout(Ini.Section configSection) {
         int timeout = IniConfigUtil
                 .getInt(configSection, CONN_TIMEOUT_PROP, DEFAULT_CONN_TIMEOUT, 1, Integer.MAX_VALUE);
         return timeout * 1000;
@@ -108,7 +108,7 @@ public abstract class AbstractIniConfigurationParser<ConfigurationType extends A
      * 
      * @return the value
      */
-    protected int getMaximumRequests(Section configSection) {
+    protected int getMaximumRequests(Ini.Section configSection) {
         return IniConfigUtil.getInt(configSection, MAX_REQUESTS_PROP, DEFAULT_MAX_REQS, 1, Integer.MAX_VALUE);
     }
 
@@ -120,7 +120,7 @@ public abstract class AbstractIniConfigurationParser<ConfigurationType extends A
      * 
      * @return the value
      */
-    protected int getReceiveBufferSize(Section configSection) {
+    protected int getReceiveBufferSize(Ini.Section configSection) {
         return IniConfigUtil.getInt(configSection, REC_BUFF_SIZE_PROP, DEFAULT_REC_BUFF_SIZE, 1, Integer.MAX_VALUE);
     }
 
@@ -132,7 +132,7 @@ public abstract class AbstractIniConfigurationParser<ConfigurationType extends A
      * 
      * @return the value
      */
-    protected int getSendBufferSize(Section configSection) {
+    protected int getSendBufferSize(Ini.Section configSection) {
         return IniConfigUtil.getInt(configSection, SEND_BUFF_SIZE_PROP, DEFAULT_SEND_BUFF_SIZE, 1, Integer.MAX_VALUE);
     }
 
@@ -144,7 +144,7 @@ public abstract class AbstractIniConfigurationParser<ConfigurationType extends A
      * 
      * @return the value
      */
-    protected int getTrustMaterialRefreshInterval(Section configSection) {
+    protected int getTrustMaterialRefreshInterval(Ini.Section configSection) {
         return IniConfigUtil.getInt(configSection, TRUST_INFO_REFRSH_PROP, DEFAULT_TRUST_INFO_REFRESH, 1,
                 Integer.MAX_VALUE);
     }
@@ -159,7 +159,7 @@ public abstract class AbstractIniConfigurationParser<ConfigurationType extends A
      * 
      * @throws ConfigurationException thrown if there is a problem creating the key manager
      */
-    protected X509KeyManager getX509KeyManager(Section configSection) throws ConfigurationException {
+    protected X509KeyManager getX509KeyManager(Ini.Section configSection) throws ConfigurationException {
         if (configSection == null) {
             return null;
         }
@@ -200,7 +200,7 @@ public abstract class AbstractIniConfigurationParser<ConfigurationType extends A
      * 
      * @throws ConfigurationException thrown if there is a problem creating the trust manager
      */
-    protected PKIStore getX509TrustMaterialStore(Section configSection) throws ConfigurationException {
+    protected PKIStore getX509TrustMaterialStore(Ini.Section configSection) throws ConfigurationException {
         if (configSection == null) {
             return null;
         }
