@@ -165,6 +165,7 @@ public class JettyAdminService {
         adminService = new Server();
         adminService.setSendServerVersion(false);
         adminService.setSendDateHeader(false);
+        adminService.setStopAtShutdown(true);
 
         BlockingChannelConnector connector = new BlockingChannelConnector();
         connector.setHost(adminHost);
