@@ -13,7 +13,7 @@
     <name>Argus PDP and PEP server common library</name>
     <groupId>org.glite.authz</groupId>
     <artifactId>pdp-pep-common</artifactId>
-    <version>1.3.0</version>
+    <version>1.3.1</version>
     <packaging>jar</packaging>
 
     <description>XACML based authorization service developed within the gLite project.</description>
