@@ -31,7 +31,7 @@ public class SystemExitTask implements Runnable {
     /** Delay before system exit in milliseconds. Default: 1 sec */
     private long delay_= 1000;
 
-    /** Timer for delay */
+    /** Timer for delay (daemon) */
     Timer delayTimer_= new Timer(true);
 
     /**
@@ -46,9 +46,10 @@ public class SystemExitTask implements Runnable {
 
     /** {@inheritDoc} */
     public void run() {
+        log.info("System exit scheduled in " + delay_ / 1000 + " sec");
         delayTimer_.schedule(new TimerTask() {
             public void run() {
-                log.info("Service exit.");
+                log.info("System exit.");
                 System.exit(0);
             }
         }, delay_);
