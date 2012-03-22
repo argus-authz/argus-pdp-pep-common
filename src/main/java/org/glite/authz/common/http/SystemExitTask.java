@@ -46,9 +46,10 @@ public class SystemExitTask implements Runnable {
 
     /** {@inheritDoc} */
     public void run() {
+        log.info("System exit(0) scheduled in " + delay_ / 1000 + " sec");
         delayTimer_.schedule(new TimerTask() {
             public void run() {
-                log.info("Service exit.");
+                log.info("System exit.");
                 System.exit(0);
             }
         }, delay_);
