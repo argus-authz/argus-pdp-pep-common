@@ -1,4 +1,4 @@
-name=argus-pep-common
+name=argus-pdp-pep-common
 spec=fedora/$(name).spec
 version=$(shell grep "Version:" $(spec) | sed -e "s/Version://g" -e "s/[ \t]*//g")
 release=1
