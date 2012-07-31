@@ -19,7 +19,6 @@ BuildRequires: java-devel
 BuildRequires: maven
 
 Requires: java
-Requires: argus-pep-common
 Requires: emi-trustmanager
 Requires: voms-api-java
 Requires: bouncycastle
