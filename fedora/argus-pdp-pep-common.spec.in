@@ -59,7 +59,6 @@ rm -rf $RPM_BUILD_ROOT
 %dir %{_defaultdocdir}/%{name}-%{version}
 %{_defaultdocdir}/%{name}-%{version}/RELEASE-NOTES
 %{_defaultdocdir}/%{name}-%{version}/COPYRIGHT
-%{_defaultdocdir}/%{name}-%{version}/Hessian.LICENSE
 %{_defaultdocdir}/%{name}-%{version}/LICENSE
 
 %changelog
