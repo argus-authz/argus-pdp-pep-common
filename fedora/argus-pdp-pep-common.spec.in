@@ -1,0 +1,72 @@
+## Turn off meaningless jar repackaging on SL6
+%define __jar_repack 0
+
+Name: argus-pdp-pep-common
+
+Version: 1.3.2
+Release: 1%{?dist}
+Summary: Argus PDP and PEP Server shared library (internal)
+
+Group: System Environment/Libraries
+License: ASL 2.0
+URL: https://twiki.cern.ch/twiki/bin/view/EGEE/AuthorizationFramework
+
+Source: %{name}-%{version}.tar.gz
+BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
+BuildArch: noarch
+
+BuildRequires: java-devel
+BuildRequires: maven
+
+Requires: java
+Requires: argus-pep-common
+
+%description 
+Internal shared library for the Argus PDP and PEP Servers.
+The Argus Authorization Service renders consistent authorization decisions for distributed services (e.g., user interfaces, portals, computing elements, storage elements). The service is based on the XACML standard, and uses authorization policies to determine if a user is allowed or denied to perform a certain action on a particular service.
+The Argus Authorization Service is composed of three main components:
+- The Policy Administration Point (PAP) provides the tools to author authorization policies, organize them in the local repository and configure policy distribution among remote PAPs.
+- The Policy Decision Point (PDP) implements the authorization engine, and is responsible for the evaluation of the authorization requests against the XACML policies retrieved from the PAP.
+- The Policy Enforcement Point Server (PEP Server) ensures the integrity and consistency of the authorization requests received from the PEP clients. Lightweight PEP client libraries are also provided to ease the integration and interoperability with other EMI services or components. 
+
+%prep
+%setup -q -n argus-pdp-pep-common
+
+%build
+mvn -B @@BUILD_SETTINGS@@ package
+
+%install
+rm -rf $RPM_BUILD_ROOT
+mkdir -p $RPM_BUILD_ROOT
+tar -C $RPM_BUILD_ROOT -xvzf target/%{name}-%{version}.tar.gz
+
+%clean
+rm -rf $RPM_BUILD_ROOT
+
+%pre
+
+%preun
+
+%post
+
+%postun
+
+%files
+%defattr(-,root,root,-)
+%dir %{_datadir}/java
+%{_datadir}/java/%{name}.jar
+%{_datadir}/java/%{name}-%{version}.jar
+%dir %{_defaultdocdir}/%{name}-%{version}
+%{_defaultdocdir}/%{name}-%{version}/RELEASE-NOTES
+%{_defaultdocdir}/%{name}-%{version}/COPYRIGHT
+%{_defaultdocdir}/%{name}-%{version}/Hessian.LICENSE
+%{_defaultdocdir}/%{name}-%{version}/LICENSE
+
+%changelog
+* Tue Jul 31 2012 Valery Tschopp <valery.tschopp@switch.ch> 1.3.2-1
+- Self managed packaging with spec file.
+
+* Tue Apr 3 2012 Valery Tschopp <valery.tschopp@switch.ch> 1.3.1-1
+- Initial PDP and PEP Server common library for EMI 2.
+
+

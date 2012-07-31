@@ -43,8 +43,8 @@
                     <artifactId>jcip-annotations</artifactId>
                 </exclusion>
                 <exclusion>
-                	<artifactId>log4j</artifactId>
-                	<groupId>log4j</groupId>
+                    <artifactId>log4j</artifactId>
+                    <groupId>log4j</groupId>
                 </exclusion>
             </exclusions>
         </dependency>
@@ -138,17 +138,6 @@
                     </execution>
                 </executions>
             </plugin>
-<!--
-            <plugin>
-                <artifactId>maven-compiler-plugin</artifactId>
-                <configuration>
-                    <source>1.5</source>
-                    <target>1.5</target>
-                    <debug>true</debug>
-                </configuration>
-            </plugin>
--->
-<!--
             <plugin>
                 <artifactId>maven-assembly-plugin</artifactId>
                 <executions>
@@ -156,18 +145,14 @@
                         <id>make-assembly</id>
                         <phase>package</phase>
                         <goals>
-                            <goal>attached</goal>
+                            <goal>single</goal>
                         </goals>
                     </execution>
                 </executions>
                 <configuration>
-                    <descriptors>
-                        <descriptor>src/main/assembly/bin.xml</descriptor>
-                    </descriptors>
                     <tarLongFileMode>gnu</tarLongFileMode>
                 </configuration>
             </plugin>
--->
         </plugins>
         <extensions>
           <extension>
@@ -177,6 +162,100 @@
           </extension>
         </extensions>
     </build>
+
+    <profiles>
+        <profile>
+            <id>EMI</id>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>            
+            <build>
+                <finalName>argus-pdp-pep-common</finalName>
+                <plugins>
+                    <plugin>
+                        <artifactId>maven-assembly-plugin</artifactId>
+                        <!-- overwrite default descriptor to use -->
+                        <configuration>
+                            <descriptors>
+                                <descriptor>src/main/assembly/fakeroot.xml</descriptor>
+                                <descriptor>src/main/assembly/src-tarball.xml</descriptor>
+                            </descriptors>
+                            <attach>false</attach>
+                            <ignoreDirFormatExtensions>false</ignoreDirFormatExtensions>
+                        </configuration>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.codehaus.mojo</groupId>
+                        <artifactId>exec-maven-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>rename-jar-file</id>
+                                <phase>package</phase>
+                                <goals>
+                                    <goal>exec</goal>
+                                </goals>
+                                <configuration>
+                                    <workingDirectory>${project.build.directory}/${project.build.finalName}-fakeroot.dir/usr/share/java</workingDirectory>
+                                    <executable>/bin/mv</executable>
+                                    <arguments>
+                                        <argument>-v</argument>
+                                        <argument>${project.artifactId}-${project.version}.jar</argument>
+                                        <argument>${project.build.finalName}-${project.version}.jar</argument>
+                                    </arguments>
+                                </configuration>
+                            </execution>
+                            <execution>
+                                <id>create-emi-symlinks</id>
+                                <phase>package</phase>
+                                <goals>
+                                    <goal>exec</goal>
+                                </goals>
+                                <configuration>
+                                    <workingDirectory>${project.build.directory}/${project.build.finalName}-fakeroot.dir/usr/share/java</workingDirectory>
+                                    <executable>/bin/ln</executable>
+                                    <arguments>
+                                        <argument>-sfv</argument>
+                                        <argument>${project.build.finalName}-${project.version}.jar</argument>
+                                        <argument>${project.build.finalName}.jar</argument>
+                                    </arguments>
+                                </configuration>
+                            </execution>
+                            <execution>
+                                <id>create-emi-tarball</id>
+                                <phase>package</phase>
+                                <goals>
+                                    <goal>exec</goal>
+                                </goals>
+                                <configuration>
+                                    <workingDirectory>${project.build.directory}/${project.build.finalName}-fakeroot.dir</workingDirectory>
+                                    <executable>/bin/sh</executable>
+                                    <arguments>
+                                        <argument>${basedir}/src/main/build/emi-binary-tarball.sh</argument>
+                                        <argument>${project.build.finalName}-${project.version}</argument>
+                                   </arguments>
+                                </configuration>
+                            </execution>
+                            <execution>
+                                <id>delete-emi-symlinks</id>
+                                <phase>pre-clean</phase>
+                                <goals>
+                                    <goal>exec</goal>
+                                </goals>
+                                <configuration>
+                                    <workingDirectory>${project.build.directory}/${project.build.finalName}-fakeroot.dir</workingDirectory>
+                                    <executable>/bin/rm</executable>
+                                    <arguments>
+                                        <argument>-f</argument>
+                                        <argument>usr/share/java/${project.build.finalName}.jar</argument>
+                                    </arguments>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>     
+            </build>
+        </profile>
+    </profiles>
 
     <reporting>
         <plugins>
@@ -273,17 +352,10 @@
         <url>http://www.eu-emi.eu/</url>
     </organization>
 
-    <profiles>
-        <profile>
-            <id>EMI</id>
-            <build>
-                <finalName>pdp-pep-common</finalName>
-            </build>
-        </profile>
-    </profiles>
+
 
     <scm>
-    	<connection>scm:git:https://github.com/argus-authz/argus-pdp-pep-common.git</connection>
-    	<url>https://github.com/argus-authz/argus-pdp-pep-common</url>
+        <connection>scm:git:https://github.com/argus-authz/argus-pdp-pep-common.git</connection>
+        <url>https://github.com/argus-authz/argus-pdp-pep-common</url>
     </scm>
 </project>
