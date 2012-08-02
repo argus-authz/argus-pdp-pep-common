@@ -23,9 +23,8 @@ Requires: emi-trustmanager
 Requires: voms-api-java
 Requires: bouncycastle
 
-
 %description 
-Internal shared library for the Argus PDP and PEP Servers.
+Argus PDP and PEP Server shared library.
 The Argus Authorization Service renders consistent authorization decisions for distributed services (e.g., user interfaces, portals, computing elements, storage elements). The service is based on the XACML standard, and uses authorization policies to determine if a user is allowed or denied to perform a certain action on a particular service.
 The Argus Authorization Service is composed of three main components:
 - The Policy Administration Point (PAP) provides the tools to author authorization policies, organize them in the local repository and configure policy distribution among remote PAPs.
