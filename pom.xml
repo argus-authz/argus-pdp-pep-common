@@ -7,7 +7,7 @@
         <groupId>org.glite.authz</groupId>
         <artifactId>argus-parent</artifactId>
         <version>1.5</version>
-        <relativePath>../emi.argus.parent</relativePath>
+        <!-- <relativePath>../emi.argus.parent</relativePath> -->
     </parent>
 
     <name>Argus PDP and PEP server common library</name>
@@ -19,6 +19,14 @@
     <description>XACML based authorization service</description>
     <url>https://twiki.cern.ch/twiki/bin/view/EGEE/AuthorizationFramework</url>
     <inceptionYear>2008</inceptionYear>
+
+    <repositories>
+        <repository>
+            <id>switch</id>
+            <name>SWITCH Releases</name>
+            <url>http://www.switch.ch/grid/authz/docs/maven2/release</url>
+        </repository>
+    </repositories>
 
     <dependencies>
         <!-- Compile Dependencies-->
@@ -351,8 +359,6 @@
         <name>EMI - European Middleware Initiative</name>
         <url>http://www.eu-emi.eu/</url>
     </organization>
-
-
 
     <scm>
         <connection>scm:git:https://github.com/argus-authz/argus-pdp-pep-common.git</connection>
