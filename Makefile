@@ -45,6 +45,7 @@ etics:
 
 install:
 	@echo "Install binary in $(DESTDIR)$(prefix)"
+	test -f target/$(name)-$(version).tar.gz
 	mkdir -p $(DESTDIR)$(prefix)
 	tar -C $(DESTDIR)$(prefix) -xvzf target/$(name)-$(version).tar.gz
 
