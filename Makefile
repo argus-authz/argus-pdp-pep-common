@@ -27,14 +27,17 @@ package-etics: spec-etics
 	mvn -B -s $(settings_file) package
 
 
-rpm: 
+rpm: package
+	@echo "Building RPM and SRPM"
 	mkdir -p $(rpmbuild_dir)/BUILD $(rpmbuild_dir)/RPMS \
 		$(rpmbuild_dir)/SOURCES $(rpmbuild_dir)/SPECS \
 		$(rpmbuild_dir)/SRPMS
 	cp target/$(name)-$(version).src.tar.gz $(rpmbuild_dir)/SOURCES/$(name)-$(version).tar.gz
 	rpmbuild --nodeps -v -ba $(spec) --define "_topdir $(rpmbuild_dir)"
 
-etics: rpm
+etics: 
+	@echo "Publish RPMS, SRPMS and tarball"
+	test -f $(rpmbuild_dir)/SRPMS/$(name)-$(version)-*.src.rpm
 	mkdir -p tgz RPMS
 	cp target/*.tar.gz tgz
 	cp -r $(rpmbuild_dir)/RPMS/* $(rpmbuild_dir)/SRPMS/* RPMS
