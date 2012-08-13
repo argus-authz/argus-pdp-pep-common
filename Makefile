@@ -3,8 +3,9 @@ spec=fedora/$(name).spec
 version=$(shell grep "Version:" $(spec) | sed -e "s/Version://g" -e "s/[ \t]*//g")
 release=1
 rpmbuild_dir=$(shell pwd)/rpmbuild
-settings_file=project/emi-build-settings.xml
+settings_file=project/emi-maven-settings.xml
 stage_dir=$(shell pwd)/stage
+prefix=/
 
 .PHONY: etics package clean rpm
 
@@ -38,7 +39,15 @@ etics: rpm
 	cp target/*.tar.gz tgz
 	cp -r $(rpmbuild_dir)/RPMS/* $(rpmbuild_dir)/SRPMS/* RPMS
 
+
+install:
+	@echo "Install binary in $(DESTDIR)$(prefix)"
+	mkdir -p $(DESTDIR)$(prefix)
+	tar -C $(DESTDIR)$(prefix) -xvzf target/$(name)-$(version).tar.gz
+
+
 stage:
 	echo "Staging tarball in $(stage_dir)"
 	mkdir -p $(stage_dir)
 	tar -C $(stage_dir) -xvzf target/$(name)-$(version).tar.gz
+
