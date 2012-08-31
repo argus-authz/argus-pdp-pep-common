@@ -29,7 +29,8 @@ maven_settings_file=project/maven-settings.xml
 rpmbuild_dir=$(CURDIR)/rpmbuild
 debbuild_dir = $(CURDIR)/debbuild
 tmp_dir=$(CURDIR)/tmp
-tgz_dir= $(CURDIR)/tgz
+# ETICS directories
+tgz_dir=$(CURDIR)/tgz
 rpm_dir=$(CURDIR)/RPMS
 deb_dir=$(CURDIR)/debs
 
