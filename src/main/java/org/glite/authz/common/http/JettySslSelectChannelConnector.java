@@ -57,7 +57,7 @@ public class JettySslSelectChannelConnector extends SslSelectChannelConnector {
      *            the trust manager used for the TLS connections
      */
     public JettySslSelectChannelConnector(X509KeyManager key,
-            X509TrustManager trust) {
+                                          X509TrustManager trust) {
         super();
 
         if (key == null) {
@@ -68,7 +68,7 @@ public class JettySslSelectChannelConnector extends SslSelectChannelConnector {
         if (trust == null) {
             throw new IllegalArgumentException("X.509 trust manager may not be null");
         }
-        trustManager= trust;        
+        trustManager= trust;
     }
 
     /**
@@ -83,11 +83,15 @@ public class JettySslSelectChannelConnector extends SslSelectChannelConnector {
         List<String> cipherSuites= new ArrayList<String>(Arrays.asList(enabledCipherSuites));
         for (String cipher : enabledCipherSuites) {
             if (cipher.contains("ECDH")) {
-                log.debug("disabling cipher: {}", cipher);
+                if (log.isTraceEnabled()) {
+                    log.trace("disabling cipher: {}", cipher);
+                }
                 cipherSuites.remove(cipher);
             }
         }
-        log.debug("enabling ciphers: {}", cipherSuites);
+        if (log.isDebugEnabled()) {
+            log.debug("enabling ciphers: {}", cipherSuites);
+        }
         enabledCipherSuites= (String[]) cipherSuites.toArray(new String[cipherSuites.size()]);
         sslEngine.setEnabledCipherSuites(enabledCipherSuites);
         return sslEngine;
@@ -96,9 +100,7 @@ public class JettySslSelectChannelConnector extends SslSelectChannelConnector {
     /** {@inheritDoc} */
     protected SSLContext createSSLContext() throws Exception {
         SSLContext sslConext= SSLContext.getInstance("TLS");
-        sslConext.init(new KeyManager[] { keyManager },
-                       new TrustManager[] { trustManager },
-                       null);
+        sslConext.init(new KeyManager[] { keyManager }, new TrustManager[] { trustManager }, null);
         return sslConext;
     }
 
