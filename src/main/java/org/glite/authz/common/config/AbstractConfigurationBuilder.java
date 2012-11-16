@@ -18,11 +18,11 @@
 package org.glite.authz.common.config;
 
 import javax.net.ssl.X509KeyManager;
+import javax.net.ssl.X509TrustManager;
 
 import net.jcip.annotations.NotThreadSafe;
 
 import org.glite.authz.common.util.Strings;
-import org.glite.voms.PKIStore;
 
 /**
  * Base class for builders of {@link AbstractConfiguration} objects.
@@ -38,8 +38,8 @@ public abstract class AbstractConfigurationBuilder<ConfigType extends AbstractCo
     /** A key manager containing the service's credential. */
     private X509KeyManager keyManager;
 
-    /** Store for X.509 store material. */
-    private PKIStore trustMaterialStore;
+    /** X.509 trust material (CA bundle) */
+    private X509TrustManager trustManager;
 
     /** Maximum number of concurrent connections that may be in-process at one time. */
     private int maxConnections;
@@ -60,7 +60,7 @@ public abstract class AbstractConfigurationBuilder<ConfigType extends AbstractCo
         receiveBufferSize = 0;
         sendBufferSize = 0;
         keyManager = null;
-        trustMaterialStore = null;
+        trustManager = null;
     }
 
     /**
@@ -70,7 +70,7 @@ public abstract class AbstractConfigurationBuilder<ConfigType extends AbstractCo
      */
     protected AbstractConfigurationBuilder(AbstractConfiguration prototype) {
         keyManager = prototype.getKeyManager();
-        trustMaterialStore = prototype.getTrustMaterialStore();
+        trustManager = prototype.getTrustManager();
         maxConnections = prototype.getMaxRequests();
         connectionTimeout = prototype.getConnectionTimeout();
         receiveBufferSize = prototype.getReceiveBufferSize();
@@ -141,15 +141,6 @@ public abstract class AbstractConfigurationBuilder<ConfigType extends AbstractCo
     }
 
     /**
-     * Gets the store containing the trust material used to validate X509 certificates.
-     * 
-     * @return store containing the trust material used to validate X509 certificates
-     */
-    public PKIStore getTrustMaterialStore() {
-        return trustMaterialStore;
-    }
-
-    /**
      * Populates the given configuration with information from this builder.
      * 
      * @param config the configuration to populate
@@ -160,7 +151,7 @@ public abstract class AbstractConfigurationBuilder<ConfigType extends AbstractCo
         config.setReceiveBufferSize(receiveBufferSize);
         config.setSendBufferSize(sendBufferSize);
         config.setKeyManager(keyManager);
-        config.setX509TrustMaterial(trustMaterialStore);
+        config.setTrustManager(trustManager);
     }
 
     /**
@@ -234,7 +225,7 @@ public abstract class AbstractConfigurationBuilder<ConfigType extends AbstractCo
      * 
      * @param material store containing the trust material used to validate X509 certificates
      */
-    public void setX509TrustMaterial(PKIStore material) {
-        trustMaterialStore = material;
+    public void setTrustManager(X509TrustManager manager) {
+        trustManager= manager;
     }
 }

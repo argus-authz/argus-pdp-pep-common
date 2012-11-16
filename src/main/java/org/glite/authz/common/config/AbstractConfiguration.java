@@ -17,17 +17,10 @@
 
 package org.glite.authz.common.config;
 
-import java.io.IOException;
-import java.security.cert.CRLException;
-import java.security.cert.CertificateException;
-
 import javax.net.ssl.X509KeyManager;
 import javax.net.ssl.X509TrustManager;
 
 import net.jcip.annotations.ThreadSafe;
-
-import org.glite.voms.PKIStore;
-import org.glite.voms.VOMSTrustManager;
 
 /** Base configuration implementation for PEP clients and daemons. */
 @ThreadSafe
@@ -38,9 +31,6 @@ public abstract class AbstractConfiguration {
 
     /** A key manager containing the service's credential. */
     private X509KeyManager keyManager;
-
-    /** Store for X.509 store material. */
-    private PKIStore trustMaterialStore;
 
     /** Trust manager containing the trust certificates and CRLs used by the service. */
     private X509TrustManager trustManager;
@@ -122,15 +112,6 @@ public abstract class AbstractConfiguration {
     }
     
     /**
-     * Gets the store containing the trust material used to validate X509 certificates.
-     * 
-     * @return store containing the trust material used to validate X509 certificates
-     */
-    public PKIStore getTrustMaterialStore() {
-        return trustMaterialStore;
-    }
-
-    /**
      * Sets the HTTP connection timeout, in milliseconds.
      * 
      * @param timeout HTTP connection timeout, in milliseconds; may not be less than 1
@@ -211,20 +192,10 @@ public abstract class AbstractConfiguration {
      * 
      * @param material store containing the trust material used to validate X509 certificates
      */
-    protected final synchronized void setX509TrustMaterial(PKIStore material) {
-        if (trustMaterialStore != null) {
-            throw new IllegalStateException(
-                    "The X.509 trust material store has already been set, it may not be changed");
+    protected final synchronized void setTrustManager(X509TrustManager manager) {
+        if (trustManager != null) {
+            throw new IllegalStateException("The service trust manager has already been set, it may not be changed.");
         }
-        trustMaterialStore = material;
-        try {
-            trustManager = new VOMSTrustManager(trustMaterialStore);
-        } catch (CRLException e) {
-            throw new IllegalArgumentException("Error processing CRLs in X.509 trust material", e);
-        } catch (CertificateException e) {
-            throw new IllegalArgumentException("Error processing X509 CA certificates in X.509 trust material", e);
-        } catch (IOException e) {
-            throw new IllegalArgumentException("Error reading trust information in X.509 trust material", e);
-        }
+        trustManager = manager;
     }
 }

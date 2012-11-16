@@ -20,8 +20,6 @@ package org.glite.authz.common.config;
 import javax.net.ssl.X509KeyManager;
 import javax.net.ssl.X509TrustManager;
 
-import org.glite.voms.PKIStore;
-
 import org.ini4j.Ini;
 import org.opensaml.ws.soap.client.http.HttpClientBuilder;
 import org.opensaml.ws.soap.client.http.TLSProtocolSocketFactory;
@@ -287,8 +285,8 @@ public abstract class AbstractIniServiceConfigurationParser<ConfigurationType ex
         X509KeyManager x509KeyManager= getX509KeyManager(securityConfig);
         configBuilder.setKeyManager(x509KeyManager);
         
-        PKIStore pkiStore= getX509TrustMaterialStore(securityConfig);
-        configBuilder.setX509TrustMaterial(pkiStore);
+        X509TrustManager x509TrustManager= getX509TrustManager(securityConfig);
+        configBuilder.setTrustManager(x509TrustManager);
 
         boolean sslOn = isSSLEnabled(securityConfig);
         log.info("{}: service port using SSL: {}", name,sslOn);
