@@ -141,6 +141,15 @@ public abstract class AbstractConfigurationBuilder<ConfigType extends AbstractCo
     }
 
     /**
+     * Get the X.509 trust manager
+     * 
+     * @return the trust manager
+     */
+    public X509TrustManager getTrustManager() {
+        return trustManager;
+    }
+    
+    /**
      * Populates the given configuration with information from this builder.
      * 
      * @param config the configuration to populate
