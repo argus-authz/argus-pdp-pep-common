@@ -1,11 +1,21 @@
-pdp-pep-common 1.3.1
+pdp-pep-common 1.4.0 (EMI-3)
+--------------------
+- Maven parent module: org.glite.authz:argus-parent:1.6
+- Uses the Common Authentication Library (caNl): eu.eu-emi.security:canl
+- RPM and Debian packaging moved to separate projects.
+
+pdp-pep-common 1.3.2
+--------------------
+- Self managed packaging added.
+
+pdp-pep-common 1.3.1 (EMI-2)
 --------------------
 - Maven parent module: org.glite.authz:argus-parent:1.5
 - New ServiceMerticsServlet added for the /status handler.
 - ServiceMetrics output updated for new version.
 - New SystemExitTask shutdown task to force a System.exit(0) added.
 
-pdp-pep-common 1.2.2
+pdp-pep-common 1.2.2 (EMI-1)
 --------------------
 - Maven parent module: org.glite.authz:argus-parent:1.4
 
