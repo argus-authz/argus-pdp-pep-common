@@ -73,13 +73,12 @@
             <groupId>eu.eu-emi.security</groupId>
             <artifactId>canl</artifactId>
         </dependency>
-        <!-- Provided Dependencies -->
         <dependency>
             <!-- comes with emi.eu-emi.security:canl:1.1.0 -->
             <groupId>org.bouncycastle</groupId>
             <artifactId>bcprov-jdk16</artifactId>
-            <scope>provided</scope>
         </dependency>
+        <!-- Provided Dependencies -->
         <dependency>
             <groupId>org.mortbay.jetty</groupId>
             <artifactId>jetty</artifactId>
