@@ -290,8 +290,8 @@ public abstract class AbstractIniConfigurationParser<ConfigurationType extends A
             X509TrustManager trustManager= new CommonX509TrustManager(validator);
             return trustManager;
         } catch (Exception e) {
-            log.error("Unable to create X.509 trust material store", e);
-            throw new ConfigurationException("Unable to create X.509 trust material store", e);
+            log.error("Unable to create X.509 trust store", e);
+            throw new ConfigurationException("Unable to create X.509 trust store", e);
         }
     }
 }
