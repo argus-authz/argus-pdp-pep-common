@@ -51,13 +51,13 @@
                     <artifactId>jcip-annotations</artifactId>
                 </exclusion>
                 <exclusion>
-                    <artifactId>log4j</artifactId>
                     <groupId>log4j</groupId>
+                    <artifactId>log4j</artifactId>
                 </exclusion>
                 <!-- canl requires bcprov-jdk16 -->
                 <exclusion>
-                    <artifactId>org.bouncycastle</artifactId>
-                    <groupId>bcprov-jdk15</groupId>
+                    <groupId>org.bouncycastle</groupId>
+                    <artifactId>bcprov-jdk15</artifactId>
                 </exclusion>
             </exclusions>
         </dependency>
