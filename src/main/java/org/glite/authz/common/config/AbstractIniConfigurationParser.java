@@ -25,11 +25,13 @@ import javax.net.ssl.X509TrustManager;
 import net.jcip.annotations.ThreadSafe;
 
 import org.glite.authz.common.util.Files;
+import org.glite.authz.common.x509.TrustStoreValidationErrorLogger;
 import org.ini4j.Ini;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import eu.emi.security.authn.x509.CommonX509TrustManager;
+import eu.emi.security.authn.x509.ValidationErrorListener;
 import eu.emi.security.authn.x509.impl.OpensslCertChainValidator;
 import eu.emi.security.authn.x509.impl.PEMCredential;
 
@@ -248,7 +250,7 @@ public abstract class AbstractIniConfigurationParser<ConfigurationType extends A
     }
 
     /**
-     * Creates a {@link PKIStore} from the {@value #TRUST_INFO_DIR_PROP}
+     * Creates a {@link X509TrustManager} from the {@value #TRUST_INFO_DIR_PROP}
      * property, if they exist. This store holds the material used to validate
      * X.509 certificates.
      * 
@@ -287,6 +289,8 @@ public abstract class AbstractIniConfigurationParser<ConfigurationType extends A
         try {
             OpensslCertChainValidator validator= new OpensslCertChainValidator(trustStoreDir);
             validator.setUpdateInterval(refreshInterval);
+            ValidationErrorListener validationListener= new TrustStoreValidationErrorLogger(); 
+            validator.addValidationListener(validationListener);
             X509TrustManager trustManager= new CommonX509TrustManager(validator);
             return trustManager;
         } catch (Exception e) {
