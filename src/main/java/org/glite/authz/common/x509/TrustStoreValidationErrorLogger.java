@@ -32,12 +32,10 @@ public class TrustStoreValidationErrorLogger implements ValidationErrorListener 
     /** Class logger. */
     private final Logger log= LoggerFactory.getLogger(TrustStoreValidationErrorLogger.class);
 
-    /*
-     * (non-Javadoc)
+    /**
+     * Logs the X.509 validation error at error level.
      * 
-     * @see
-     * eu.emi.security.authn.x509.ValidationErrorListener#onValidationError(
-     * eu.emi.security.authn.x509.ValidationError)
+     * @return false, the error is not ignored.
      */
     public boolean onValidationError(ValidationError error) {
         log.error("Validation error: {}", error);
