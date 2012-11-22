@@ -229,7 +229,6 @@ public abstract class AbstractIniConfigurationParser<ConfigurationType extends A
             return null;
         }
 
-        String privateKeyPassword= IniConfigUtil.getString(configSection, SERVICE_KEY_PASSWORD_PROP, null);
 
         String certificateFilePath= IniConfigUtil.getString(configSection, SERVICE_CERT_PROP, null);
         if (certificateFilePath == null) {
@@ -237,8 +236,12 @@ public abstract class AbstractIniConfigurationParser<ConfigurationType extends A
             return null;
         }
 
-        log.info("{}: service credential will use private key {} and certificate {}", new Object[] {
-                name, privateKeyFilePath, certificateFilePath });
+        // param 'servicePrivateKeyPassword' for encrypted private key
+        String privateKeyPassword= IniConfigUtil.getString(configSection, SERVICE_KEY_PASSWORD_PROP, null);
+
+        log.info("{}: service credential certificate: {}", name, certificateFilePath );
+        log.info("{}: service credential private key: {}", name, privateKeyFilePath );
+        log.info("{}: service credential private key password: {}", name, (privateKeyPassword == null) ? "not set (unencrypted key)" : "set" );
 
         try {
             PEMCredential credential= new PEMCredential(privateKeyFilePath, certificateFilePath, (privateKeyPassword != null) ? privateKeyPassword.toCharArray() : null);
