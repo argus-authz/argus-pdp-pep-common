@@ -307,9 +307,10 @@ public abstract class AbstractIniServiceConfigurationParser<ConfigurationType ex
      */
     protected HttpClientBuilder buildSOAPClientBuilder(Ini.Section configSection, X509KeyManager keyManager,
             X509TrustManager trustManager) {
+        String name= configSection.getName();
+        log.info("{}: building SOAP client ({})", name, (keyManager != null && trustManager != null) ? "SSL" : "plain");
         HttpClientBuilder httpClientBuilder = new HttpClientBuilder();
         httpClientBuilder.setContentCharSet("UTF-8");
-        String name= configSection.getName();
         int conTimeout = getConnectionTimeout(configSection);
         log.info("{}: connection timeout: {}ms", name,conTimeout);
         httpClientBuilder.setConnectionTimeout(conTimeout);
