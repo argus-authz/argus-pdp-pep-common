@@ -22,7 +22,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /** A command that shuts down a Jetty {@link Server} if it's currently running. */
-public class JettyShutdownTask implements Runnable {
+public class JettyShutdownTask implements ShutdownTask {
 
     /** Class logger. */
     private Logger log = LoggerFactory.getLogger(JettyShutdownTask.class);

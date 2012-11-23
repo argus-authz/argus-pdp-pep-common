@@ -32,11 +32,13 @@ import org.mortbay.jetty.servlet.ServletHolder;
 /**
  * A Jetty instance that listens on a give port for command requests.
  * 
- * This command starts a separate Jetty instance that binds to 127.0.0.1 on a port given during service construction.
- * Incoming requests are delegated to registered command objects based on their path.
+ * This command starts a separate Jetty instance that binds to 127.0.0.1 on a
+ * port given during service construction. Incoming requests are delegated to
+ * registered command objects based on their path.
  * 
- * This service also registers a special shutdown command for itself. When the shutdown command, registered at
- * <em>/shutdown</em> is run a set of registered shutdown tasks are executed after which this service is also shutdown.
+ * This service also registers a special shutdown command for itself. When the
+ * shutdown command, registered at <em>/shutdown</em> is run a set of registered
+ * shutdown tasks are executed after which this service is also shutdown.
  */
 public class JettyAdminService {
 
@@ -56,22 +58,26 @@ public class JettyAdminService {
     private List<AbstractAdminCommand> adminCommands;
 
     /** Tasks performed at service shutdown time. */
-    private List<Runnable> shutdownTasks;
+    private List<ShutdownTask> shutdownTasks;
 
     /**
      * Constructor.
      * 
-     * @param hostname hostname upon which the admin service listens
-     * @param port port upon which the admin service listens
-     * @param password password required to execute admin commands, may be null if no password is required
+     * @param hostname
+     *            hostname upon which the admin service listens
+     * @param port
+     *            port upon which the admin service listens
+     * @param password
+     *            password required to execute admin commands, may be null if no
+     *            password is required
      */
     public JettyAdminService(String hostname, int port, String password) {
-        adminHost = Strings.safeTrimOrNullString(hostname);
+        adminHost= Strings.safeTrimOrNullString(hostname);
         if (adminHost == null) {
             throw new IllegalArgumentException("Admin service hostname may not be null");
         }
 
-        adminPort = port;
+        adminPort= port;
         if (adminPort < 1) {
             throw new IllegalArgumentException("Admin port must be greater than 0");
         }
@@ -80,17 +86,19 @@ public class JettyAdminService {
             throw new IllegalArgumentException("Admin port must be less than 65536");
         }
 
-        adminPassword = Strings.safeTrimOrNullString(password);
+        adminPassword= Strings.safeTrimOrNullString(password);
 
-        adminService = buildAdminService();
-        adminCommands = new LazyList<AbstractAdminCommand>();
-        shutdownTasks = new LazyList<Runnable>();
+        adminService= buildAdminService();
+        adminCommands= new LazyList<AbstractAdminCommand>();
+        shutdownTasks= new LazyList<ShutdownTask>();
     }
 
     /**
-     * Registers a new administration command. New commands may not be registered after the service has been started.
+     * Registers a new administration command. New commands may not be
+     * registered after the service has been started.
      * 
-     * @param command command to register
+     * @param command
+     *            command to register
      */
     public void registerAdminCommand(AbstractAdminCommand command) {
         if (command == null) {
@@ -112,12 +120,14 @@ public class JettyAdminService {
     }
 
     /**
-     * Registers a task to be run at shutdown time. Tasks will be run in the order they are registered. New tasks may
-     * not be registered once the service has been started.
+     * Registers a task to be run at shutdown time. Tasks will be run in the
+     * order they are registered. New tasks may not be registered once the
+     * service has been started.
      * 
-     * @param task shutdown task to run at service shutdown time
+     * @param task
+     *            shutdown task to run at service shutdown time
      */
-    public void registerShutdownTask(Runnable task) {
+    public void registerShutdownTask(ShutdownTask task) {
         if (task == null) {
             return;
         }
@@ -137,22 +147,22 @@ public class JettyAdminService {
             throw new IllegalStateException("Admin service is already running");
         }
 
-        Context commandContext = new Context(adminService, "/", false, false);
+        Context commandContext= new Context(adminService, "/", false, false);
 
         adminCommands.add(buildShutdownCommand());
 
         ServletHolder servletHolder;
         for (AbstractAdminCommand command : adminCommands) {
-            servletHolder = new ServletHolder(command);
+            servletHolder= new ServletHolder(command);
             commandContext.addServlet(servletHolder, command.getCommandPath());
         }
 
         if (adminPassword != null) {
-            FilterHolder passwordFiler = new FilterHolder(new PasswordProtectFilter(adminPassword));
+            FilterHolder passwordFiler= new FilterHolder(new PasswordProtectFilter(adminPassword));
             commandContext.addFilter(passwordFiler, "/*", Handler.REQUEST);
         }
 
-        JettyRunThread shutdownServiceRunThread = new JettyRunThread(adminService);
+        JettyRunThread shutdownServiceRunThread= new JettyRunThread(adminService);
         shutdownServiceRunThread.start();
     }
 
@@ -162,12 +172,12 @@ public class JettyAdminService {
      * @return Jetty server that will receive admin requests
      */
     protected Server buildAdminService() {
-        adminService = new Server();
+        adminService= new Server();
         adminService.setSendServerVersion(false);
         adminService.setSendDateHeader(false);
         adminService.setStopAtShutdown(true);
 
-        BlockingChannelConnector connector = new BlockingChannelConnector();
+        BlockingChannelConnector connector= new BlockingChannelConnector();
         connector.setHost(adminHost);
         connector.setPort(adminPort);
         adminService.setConnectors(new Connector[] { connector });
@@ -176,12 +186,13 @@ public class JettyAdminService {
     }
 
     /**
-     * Builds an {@link AbstractAdminCommand} which shutdowns this admin service.
+     * Builds an {@link AbstractAdminCommand} which shutdowns this admin
+     * service.
      * 
      * @return the shutdown command
      */
     protected AbstractAdminCommand buildShutdownCommand() {
-        List<Runnable> augmentedShutdownTasks = new LazyList<Runnable>();
+        List<Runnable> augmentedShutdownTasks= new LazyList<Runnable>();
         augmentedShutdownTasks.addAll(shutdownTasks);
         augmentedShutdownTasks.add(new JettyShutdownTask(adminService));
 

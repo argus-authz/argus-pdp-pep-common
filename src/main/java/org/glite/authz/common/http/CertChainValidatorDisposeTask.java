@@ -23,7 +23,7 @@ import eu.emi.security.authn.x509.X509CertChainValidatorExt;
  * A task that dispose a {@link X509CertChainValidatorExt}. This task is
  * intended to be used as a shutdown task within a {@link JettyAdminService}.
  */
-public class CertChainValidatorDisposeTask implements Runnable {
+public class CertChainValidatorDisposeTask implements ShutdownTask {
 
     /** X.509 cert chain validator to be dispose. */
     private X509CertChainValidatorExt certChainValidator;
@@ -35,14 +35,13 @@ public class CertChainValidatorDisposeTask implements Runnable {
      *            timer to be shutdown.
      */
     public CertChainValidatorDisposeTask(X509CertChainValidatorExt validator) {
-        if (validator == null) {
-            throw new IllegalArgumentException("Validator may not be null");
-        }
         certChainValidator= validator;
     }
 
     /** {@inheritDoc} */
     public void run() {
-        certChainValidator.dispose();
+        if (certChainValidator != null) {
+            certChainValidator.dispose();
+        }
     }
 }
