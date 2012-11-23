@@ -14,34 +14,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.glite.authz.common.http;
 
-import java.util.Timer;
-
 /**
- * A task that shuts down a {@link Timer}. This task is intended to be used as a shutdown task within a
- * {@link JettyAdminService}.
+ * A task to be run at shutdown time by the {@link JettyAdminService}.
  */
-public class TimerShutdownTask implements ShutdownTask {
+public interface ShutdownTask extends Runnable {
 
-    /** Timer to be shutdown. */
-    private Timer backgroundTimer;
-
-    /**
-     * Constructor.
-     * 
-     * @param timer timer to be shutdown.
-     */
-    public TimerShutdownTask(Timer timer) {
-        if (timer == null) {
-            throw new IllegalArgumentException("Timer may not be null");
-        }
-        backgroundTimer = timer;
-    }
-
-    /** {@inheritDoc} */
-    public void run() {
-        backgroundTimer.cancel();
-    }
 }

@@ -23,7 +23,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /** A command that execute a System.exit(0) after a given delay. */
-public class SystemExitTask implements Runnable {
+public class SystemExitTask implements ShutdownTask {
 
     /** Class logger. */
     private Logger log= LoggerFactory.getLogger(SystemExitTask.class);
