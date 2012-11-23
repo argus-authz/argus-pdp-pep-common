@@ -24,10 +24,13 @@ import net.jcip.annotations.NotThreadSafe;
 
 import org.glite.authz.common.util.Strings;
 
+import eu.emi.security.authn.x509.X509CertChainValidatorExt;
+
 /**
  * Base class for builders of {@link AbstractConfiguration} objects.
  * 
- * @param <ConfigType> the type of configuration object built
+ * @param <ConfigType>
+ *            the type of configuration object built
  */
 @NotThreadSafe
 public abstract class AbstractConfigurationBuilder<ConfigType extends AbstractConfiguration> {
@@ -38,10 +41,16 @@ public abstract class AbstractConfigurationBuilder<ConfigType extends AbstractCo
     /** A key manager containing the service's credential. */
     private X509KeyManager keyManager;
 
+    /** X.509 cert chain validator */
+    private X509CertChainValidatorExt certChainValidator;
+
     /** X.509 trust material (CA bundle) */
     private X509TrustManager trustManager;
 
-    /** Maximum number of concurrent connections that may be in-process at one time. */
+    /**
+     * Maximum number of concurrent connections that may be in-process at one
+     * time.
+     */
     private int maxConnections;
 
     /** Connection timeout in milliseconds. */
@@ -55,32 +64,37 @@ public abstract class AbstractConfigurationBuilder<ConfigType extends AbstractCo
 
     /** Constructor. */
     protected AbstractConfigurationBuilder() {
-        maxConnections = 0;
-        connectionTimeout = 0;
-        receiveBufferSize = 0;
-        sendBufferSize = 0;
-        keyManager = null;
-        trustManager = null;
+        maxConnections= 0;
+        connectionTimeout= 0;
+        receiveBufferSize= 0;
+        sendBufferSize= 0;
+        keyManager= null;
+        trustManager= null;
     }
 
     /**
-     * Constructor thats creates a builder factory with the same settings as the given prototype configuration.
+     * Constructor thats creates a builder factory with the same settings as the
+     * given prototype configuration.
      * 
-     * @param prototype the prototype configuration whose values will be used to initialize this builder
+     * @param prototype
+     *            the prototype configuration whose values will be used to
+     *            initialize this builder
      */
     protected AbstractConfigurationBuilder(AbstractConfiguration prototype) {
-        keyManager = prototype.getKeyManager();
-        trustManager = prototype.getTrustManager();
-        maxConnections = prototype.getMaxRequests();
-        connectionTimeout = prototype.getConnectionTimeout();
-        receiveBufferSize = prototype.getReceiveBufferSize();
-        sendBufferSize = prototype.getSendBufferSize();
+        keyManager= prototype.getKeyManager();
+        trustManager= prototype.getTrustManager();
+        certChainValidator= prototype.getCertChainValidator();
+        maxConnections= prototype.getMaxRequests();
+        connectionTimeout= prototype.getConnectionTimeout();
+        receiveBufferSize= prototype.getReceiveBufferSize();
+        sendBufferSize= prototype.getSendBufferSize();
     }
 
     /**
-     * Builds the configuration represented by the current set properties. Please note that configuration builders are
-     * <strong>not</strong> threadsafe. So care should be taken that another thread does not change properties while the
-     * configuration is being built.
+     * Builds the configuration represented by the current set properties.
+     * Please note that configuration builders are <strong>not</strong>
+     * threadsafe. So care should be taken that another thread does not change
+     * properties while the configuration is being built.
      * 
      * @return the constructed configuration
      */
@@ -105,9 +119,11 @@ public abstract class AbstractConfigurationBuilder<ConfigType extends AbstractCo
     }
 
     /**
-     * Gets the maximum number of concurrent connections that may be in-process at one time.
+     * Gets the maximum number of concurrent connections that may be in-process
+     * at one time.
      * 
-     * @return maximum number of concurrent connections that may be in-process at one time
+     * @return maximum number of concurrent connections that may be in-process
+     *         at one time
      */
     public int getMaxConnections() {
         return maxConnections;
@@ -132,9 +148,11 @@ public abstract class AbstractConfigurationBuilder<ConfigType extends AbstractCo
     }
 
     /**
-     * Gets the credential used by this service to create SSL connections and digital signatures.
+     * Gets the credential used by this service to create SSL connections and
+     * digital signatures.
      * 
-     * @return credential used by this service to create SSL connections and digital signatures
+     * @return credential used by this service to create SSL connections and
+     *         digital signatures
      */
     public X509KeyManager getKeyManager() {
         return keyManager;
@@ -148,11 +166,30 @@ public abstract class AbstractConfigurationBuilder<ConfigType extends AbstractCo
     public X509TrustManager getTrustManager() {
         return trustManager;
     }
-    
+
+    /**
+     * Returns the X.509 cert chain validator
+     * 
+     * @return the cert chain validator
+     */
+    public X509CertChainValidatorExt getCertChainValidator() {
+        return certChainValidator;
+    }
+
+    /**
+     * Set the X.509 cert chain validator
+     * 
+     * @param validator
+     */
+    public void setCertChainValidator(X509CertChainValidatorExt validator) {
+        certChainValidator= validator;
+    }
+
     /**
      * Populates the given configuration with information from this builder.
      * 
-     * @param config the configuration to populate
+     * @param config
+     *            the configuration to populate
      */
     protected void populateConfiguration(ConfigType config) {
         config.setConnectionTimeout(connectionTimeout);
@@ -160,79 +197,96 @@ public abstract class AbstractConfigurationBuilder<ConfigType extends AbstractCo
         config.setReceiveBufferSize(receiveBufferSize);
         config.setSendBufferSize(sendBufferSize);
         config.setKeyManager(keyManager);
+        config.setCertChainValidator(certChainValidator);
         config.setTrustManager(trustManager);
     }
 
     /**
      * Sets the HTTP connection timeout, in milliseconds.
      * 
-     * @param timeout HTTP connection timeout, in milliseconds; may not be less than 1
+     * @param timeout
+     *            HTTP connection timeout, in milliseconds; may not be less than
+     *            1
      */
     public void setConnectionTimeout(int timeout) {
         if (timeout < 1) {
             throw new IllegalArgumentException("Connection timeout may not be less than 1 millisecond");
         }
-        connectionTimeout = timeout;
+        connectionTimeout= timeout;
     }
 
     /**
      * Sets the path to the logging file configuration location.
      * 
-     * @param path path to the logging file configuration location
+     * @param path
+     *            path to the logging file configuration location
      */
     public void setLoggingConfigFilePath(String path) {
-        loggingConfigFilePath = Strings.safeTrimOrNullString(path);
+        loggingConfigFilePath= Strings.safeTrimOrNullString(path);
     }
 
     /**
-     * Sets the maximum number of concurrent connections that may be in-process at one time.
+     * Sets the maximum number of concurrent connections that may be in-process
+     * at one time.
      * 
-     * @param max maximum number of concurrent connections that may be in-process at one time; may not be less than 1
+     * @param max
+     *            maximum number of concurrent connections that may be
+     *            in-process at one time; may not be less than 1
      */
     public void setMaxConnections(int max) {
         if (max < 1) {
             throw new IllegalArgumentException("Maximum number of threads may not be less than 1");
         }
-        maxConnections = max;
+        maxConnections= max;
     }
 
     /**
      * Sets size of the buffer, in bytes, used when receiving data.
      * 
-     * @param size size of the buffer, in bytes, used when receiving data; may not be less than 1
+     * @param size
+     *            size of the buffer, in bytes, used when receiving data; may
+     *            not be less than 1
      */
     public void setReceiveBufferSize(int size) {
         if (size < 1) {
             throw new IllegalArgumentException("Request buffer size may not be less than 1 byte in size");
         }
-        receiveBufferSize = size;
+        receiveBufferSize= size;
     }
 
     /**
      * Sets the size of the buffer, in bytes, used when sending data.
      * 
-     * @param size size of the buffer, in bytes, used when sending data; may not be less than 1
+     * @param size
+     *            size of the buffer, in bytes, used when sending data; may not
+     *            be less than 1
      */
     public void setSendBufferSize(int size) {
         if (size < 1) {
             throw new IllegalArgumentException("Send buffer size may not be less than 1 byte in size");
         }
-        sendBufferSize = size;
+        sendBufferSize= size;
     }
 
     /**
-     * Sets the credential used by this service to create SSL connections and digital signatures.
+     * Sets the credential used by this service to create SSL connections and
+     * digital signatures.
      * 
-     * @param manager credential used by this service to create SSL connections and digital signatures
+     * @param manager
+     *            credential used by this service to create SSL connections and
+     *            digital signatures
      */
     public void setKeyManager(X509KeyManager manager) {
-        keyManager = manager;
+        keyManager= manager;
     }
 
     /**
-     * Sets the store containing the trust material used to validate X509 certificates.
+     * Sets the store containing the trust material used to validate X509
+     * certificates.
      * 
-     * @param material store containing the trust material used to validate X509 certificates
+     * @param material
+     *            store containing the trust material used to validate X509
+     *            certificates
      */
     public void setTrustManager(X509TrustManager manager) {
         trustManager= manager;

@@ -20,6 +20,8 @@ package org.glite.authz.common.config;
 import javax.net.ssl.X509KeyManager;
 import javax.net.ssl.X509TrustManager;
 
+import eu.emi.security.authn.x509.X509CertChainValidatorExt;
+
 import net.jcip.annotations.ThreadSafe;
 
 /** Base configuration implementation for PEP clients and daemons. */
@@ -27,15 +29,23 @@ import net.jcip.annotations.ThreadSafe;
 public abstract class AbstractConfiguration {
 
     /** Key under which a configuration object might be bound. */
-    public static final String BINDING_NAME = "org.glite.authz.common.config";
+    public static final String BINDING_NAME= "org.glite.authz.common.config";
 
     /** A key manager containing the service's credential. */
     private X509KeyManager keyManager;
 
-    /** Trust manager containing the trust certificates and CRLs used by the service. */
+    /**
+     * Trust manager containing the trust certificates and CRLs used by the
+     * service.
+     */
     private X509TrustManager trustManager;
 
-    /** Maximum number of concurrent requests that may be in-process at one time. */
+    /** X.509 cert chain validator */
+    private X509CertChainValidatorExt certChainValidator;
+
+    /**
+     * Maximum number of concurrent requests that may be in-process at one time.
+     */
     private int maxRequests;
 
     /** Connection timeout in milliseconds. */
@@ -49,12 +59,12 @@ public abstract class AbstractConfiguration {
 
     /** Constructor. */
     protected AbstractConfiguration() {
-        keyManager = null;
-        trustManager = null;
-        maxRequests = 0;
-        connectionTimeout = 0;
-        receiveBufferSize = 0;
-        sendBufferSize = 0;
+        keyManager= null;
+        trustManager= null;
+        maxRequests= 0;
+        connectionTimeout= 0;
+        receiveBufferSize= 0;
+        sendBufferSize= 0;
     }
 
     /**
@@ -67,9 +77,11 @@ public abstract class AbstractConfiguration {
     }
 
     /**
-     * Gets the maximum number of concurrent connections that may be in-process at one time.
+     * Gets the maximum number of concurrent connections that may be in-process
+     * at one time.
      * 
-     * @return maximum number of concurrent connections that may be in-process at one time
+     * @return maximum number of concurrent connections that may be in-process
+     *         at one time
      */
     public int getMaxRequests() {
         return maxRequests;
@@ -94,9 +106,11 @@ public abstract class AbstractConfiguration {
     }
 
     /**
-     * Gets the credential used by this service to create SSL connections and digital signatures.
+     * Gets the credential used by this service to create SSL connections and
+     * digital signatures.
      * 
-     * @return credential used by this service to create SSL connections and digital signatures
+     * @return credential used by this service to create SSL connections and
+     *         digital signatures
      */
     public X509KeyManager getKeyManager() {
         return keyManager;
@@ -110,11 +124,22 @@ public abstract class AbstractConfiguration {
     public X509TrustManager getTrustManager() {
         return trustManager;
     }
-    
+
+    /**
+     * Returns the X.509 cert chain validator
+     * 
+     * @return the cert chain validator
+     */
+    public X509CertChainValidatorExt getCertChainValidator() {
+        return certChainValidator;
+    }
+
     /**
      * Sets the HTTP connection timeout, in milliseconds.
      * 
-     * @param timeout HTTP connection timeout, in milliseconds; may not be less than 1
+     * @param timeout
+     *            HTTP connection timeout, in milliseconds; may not be less than
+     *            1
      */
     protected final synchronized void setConnectionTimeout(int timeout) {
         if (connectionTimeout != 0) {
@@ -124,30 +149,34 @@ public abstract class AbstractConfiguration {
         if (timeout < 1) {
             throw new IllegalArgumentException("Connection timeout may not be less than 1 millisecond");
         }
-        connectionTimeout = timeout;
+        connectionTimeout= timeout;
     }
 
     /**
-     * Sets the maximum number of concurrent connections that may be in-process at one time.
+     * Sets the maximum number of concurrent connections that may be in-process
+     * at one time.
      * 
-     * @param max maximum number of concurrent connections that may be in-process at one time; may not be less than 1
+     * @param max
+     *            maximum number of concurrent connections that may be
+     *            in-process at one time; may not be less than 1
      */
     protected final synchronized void setMaxRequests(int max) {
         if (maxRequests != 0) {
-            throw new IllegalStateException(
-                    "The maximum number of requests has already been set, it may not be changed.");
+            throw new IllegalStateException("The maximum number of requests has already been set, it may not be changed.");
         }
 
         if (max < 1) {
             throw new IllegalArgumentException("Maximum number of requests may not be less than 1");
         }
-        maxRequests = max;
+        maxRequests= max;
     }
 
     /**
      * Sets size of the buffer, in bytes, used when receiving data.
      * 
-     * @param size size of the buffer, in bytes, used when receiving data; may not be less than 1
+     * @param size
+     *            size of the buffer, in bytes, used when receiving data; may
+     *            not be less than 1
      */
     protected final synchronized void setReceiveBufferSize(int size) {
         if (receiveBufferSize != 0) {
@@ -157,13 +186,15 @@ public abstract class AbstractConfiguration {
         if (size < 1) {
             throw new IllegalArgumentException("Receive buffer size may not be less than 1 byte in size");
         }
-        receiveBufferSize = size;
+        receiveBufferSize= size;
     }
 
     /**
      * Sets the size of the buffer, in bytes, used when sending data.
      * 
-     * @param size size of the buffer, in bytes, used when sending data; may not be less than 1
+     * @param size
+     *            size of the buffer, in bytes, used when sending data; may not
+     *            be less than 1
      */
     protected final synchronized void setSendBufferSize(int size) {
         if (sendBufferSize != 0) {
@@ -172,30 +203,44 @@ public abstract class AbstractConfiguration {
         if (size < 1) {
             throw new IllegalArgumentException("Response buffer size may not be less than 1 byte in size");
         }
-        sendBufferSize = size;
+        sendBufferSize= size;
     }
 
     /**
-     * Sets the credential used by this service to create SSL connections and digital signatures.
+     * Sets the credential used by this service to create SSL connections and
+     * digital signatures.
      * 
-     * @param manager credential used by this service to create SSL connections and digital signatures
+     * @param manager
+     *            credential used by this service to create SSL connections and
+     *            digital signatures
      */
     protected final synchronized void setKeyManager(X509KeyManager manager) {
         if (keyManager != null) {
             throw new IllegalStateException("The service key manager has already been set, it may not be changed.");
         }
-        keyManager = manager;
+        keyManager= manager;
     }
 
     /**
-     * Sets the store containing the trust material used to validate X509 certificates.
+     * Sets the store containing the trust material used to validate X509
+     * certificates.
      * 
-     * @param material store containing the trust material used to validate X509 certificates
+     * @param material
+     *            store containing the trust material used to validate X509
+     *            certificates
      */
     protected final synchronized void setTrustManager(X509TrustManager manager) {
         if (trustManager != null) {
             throw new IllegalStateException("The service trust manager has already been set, it may not be changed.");
         }
-        trustManager = manager;
+        trustManager= manager;
     }
+
+    protected final synchronized void setCertChainValidator(X509CertChainValidatorExt validator) {
+        if (certChainValidator != null) {
+            throw new IllegalStateException("The service cert chain validator has already been set, it may not be changed.");
+        }
+        certChainValidator= validator;
+    }
+
 }

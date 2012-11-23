@@ -17,6 +17,9 @@
 
 package org.glite.authz.common.config;
 
+import java.io.Reader;
+import java.io.StringReader;
+
 import javax.net.ssl.X509KeyManager;
 import javax.net.ssl.X509TrustManager;
 
@@ -26,90 +29,159 @@ import org.opensaml.ws.soap.client.http.TLSProtocolSocketFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import eu.emi.security.authn.x509.CommonX509TrustManager;
+import eu.emi.security.authn.x509.X509CertChainValidatorExt;
+
 /**
  * Base class for configuration parsers that employ an INI file.
  * 
- * @param <ConfigurationType> the type of configuration produced by this parser
+ * @param <ConfigurationType>
+ *            the type of configuration produced by this parser
  */
 public abstract class AbstractIniServiceConfigurationParser<ConfigurationType extends AbstractServiceConfiguration>
         extends AbstractIniConfigurationParser<ConfigurationType> {
 
-    /** The name of the {@value} INI header which contains the property for configuring the service. */
-    public static final String SERVICE_SECTION_HEADER = "SERVICE";
-
-    /** The name of the {@value} property which indicates the unique identity of the service. */
-    public static final String ENTITY_ID_PROP = "entityId";
-
-    /** The name of the {@value} property which indicates the service hostname. */
-    public static final String HOST_PROP = "hostname";
-
-    /** The name of the {@value} property which indicates the port to which the service will bind. */
-    public static final String PORT_PROP = "port";
-
-    /** The name of the {@value} property which indicates that the service port should use SSL instead of plain HTTP. */
-    public static final String SSL_ON_PORT_PROP = "enableSSL";
-
-    /** The name of the {@value} property which indicates that client certificate authentication is required. */
-    public static final String CLIENT_CERT_AUTHN_PROP = "requireClientCertAuthentication";
-
-    /** The name of the {@value} property which indicates the host the service will listen on for admin commands. */
-    public static final String ADMIN_HOST_PROP = "adminHost";
-
-    /** Default value of the {@value #ADMIN_HOST_PROP} property: {@value} . */
-    public static final String DEFAULT_ADMIN_HOST = "localhost";
-
-    /** The name of the {@value} property which indicates the port the service will listen on for admin commands. */
-    public static final String ADMIN_PORT_PROP = "adminPort";
-
-    /** The name of the {@value} property which indicates the password required for admin commands. */
-    public static final String ADMIN_PASSWORD_PROP = "adminPassword";
-
-    /** The name of the {@value} property which indicates the maximum number of requests that will be queued up. */
-    public static final String REQUEST_QUEUE_PROP = "requestQueueSize";
-
-    /** Default value of the {@value #SSL_ON_PORT_PROP} property, {@value} . */
-    public static final boolean DEFAULT_SSL_ON_PROP = false;
-
-    /** Default value of the {@value #CLIENT_CERT_AUTHN_PROP} property, {@value} . */
-    public static final boolean DEFAULT_CLIENT_CERT_AUTH = false;
-
-    /** Default value of the {@value #REQUEST_QUEUE_PROP} property, {@value} . */
-    public static final int DEFAULT_REQUEST_QUEUE = 500;
-
-    /** Class logger. */
-    private final Logger log = LoggerFactory.getLogger(AbstractIniServiceConfigurationParser.class);
+    /**
+     * The name of the {@value} INI header which contains the property for
+     * configuring the service.
+     */
+    public static final String SERVICE_SECTION_HEADER= "SERVICE";
 
     /**
-     * Gets the value of the {@value #ENTITY_ID_PROP} property from the configuration section.
+     * The name of the {@value} property which indicates the unique identity of
+     * the service.
+     */
+    public static final String ENTITY_ID_PROP= "entityId";
+
+    /** The name of the {@value} property which indicates the service hostname. */
+    public static final String HOST_PROP= "hostname";
+
+    /**
+     * The name of the {@value} property which indicates the port to which the
+     * service will bind.
+     */
+    public static final String PORT_PROP= "port";
+
+    /**
+     * The name of the {@value} property which indicates that the service port
+     * should use SSL instead of plain HTTP.
+     */
+    public static final String SSL_ON_PORT_PROP= "enableSSL";
+
+    /**
+     * The name of the {@value} property which indicates that client certificate
+     * authentication is required.
+     */
+    public static final String CLIENT_CERT_AUTHN_PROP= "requireClientCertAuthentication";
+
+    /**
+     * The name of the {@value} property which indicates the host the service
+     * will listen on for admin commands.
+     */
+    public static final String ADMIN_HOST_PROP= "adminHost";
+
+    /** Default value of the {@value #ADMIN_HOST_PROP} property: {@value} . */
+    public static final String DEFAULT_ADMIN_HOST= "localhost";
+
+    /**
+     * The name of the {@value} property which indicates the port the service
+     * will listen on for admin commands.
+     */
+    public static final String ADMIN_PORT_PROP= "adminPort";
+
+    /**
+     * The name of the {@value} property which indicates the password required
+     * for admin commands.
+     */
+    public static final String ADMIN_PASSWORD_PROP= "adminPassword";
+
+    /**
+     * The name of the {@value} property which indicates the maximum number of
+     * requests that will be queued up.
+     */
+    public static final String REQUEST_QUEUE_PROP= "requestQueueSize";
+
+    /** Default value of the {@value #SSL_ON_PORT_PROP} property, {@value} . */
+    public static final boolean DEFAULT_SSL_ON_PROP= false;
+
+    /**
+     * Default value of the {@value #CLIENT_CERT_AUTHN_PROP} property, {@value}
+     * .
+     */
+    public static final boolean DEFAULT_CLIENT_CERT_AUTH= false;
+
+    /** Default value of the {@value #REQUEST_QUEUE_PROP} property, {@value} . */
+    public static final int DEFAULT_REQUEST_QUEUE= 500;
+
+    /** Class logger. */
+    private final Logger log= LoggerFactory.getLogger(AbstractIniServiceConfigurationParser.class);
+
+    /** {@inheritDoc} */
+    public ConfigurationType parse(Reader iniReader)
+            throws ConfigurationException {
+        return parseIni(iniReader);
+    }
+
+    /** {@inheritDoc} */
+    public ConfigurationType parse(String iniString)
+            throws ConfigurationException {
+        return parseIni(new StringReader(iniString));
+    }
+
+    /**
+     * Parse the ini configuration file.
      * 
-     * @param configSection configuration section from which to extract the value
+     * @param iniReader
+     *            the ini file reader
+     * @return the parsed configuration object
+     * @throws ConfigurationException
+     *             if a parsing error occurs while parsing the ini file.
+     */
+    abstract protected ConfigurationType parseIni(Reader iniReader)
+            throws ConfigurationException;
+
+    /**
+     * Gets the value of the {@value #ENTITY_ID_PROP} property from the
+     * configuration section.
+     * 
+     * @param configSection
+     *            configuration section from which to extract the value
      * 
      * @return the value
      * 
-     * @throws ConfigurationException thrown if the entity ID property is not set or has an empty value
+     * @throws ConfigurationException
+     *             thrown if the entity ID property is not set or has an empty
+     *             value
      */
-    protected String getEntityId(Ini.Section configSection) throws ConfigurationException {
+    protected String getEntityId(Ini.Section configSection)
+            throws ConfigurationException {
         return IniConfigUtil.getString(configSection, ENTITY_ID_PROP);
     }
 
     /**
-     * Gets the value of the {@value #HOST_PROP} property from the configuration section. If the property is not present
-     * or is not valid the default value of {@value #DEFAULT_HOST} will be used.
+     * Gets the value of the {@value #HOST_PROP} property from the configuration
+     * section. If the property is not present or is not valid the default value
+     * of {@value #DEFAULT_HOST} will be used.
      * 
-     * @param configSection configuration section from which to extract the value
+     * @param configSection
+     *            configuration section from which to extract the value
      * 
      * @return the value
      * 
-     * @throws ConfigurationException thrown if no host name is given
+     * @throws ConfigurationException
+     *             thrown if no host name is given
      */
-    protected String getHostname(Ini.Section configSection) throws ConfigurationException {
+    protected String getHostname(Ini.Section configSection)
+            throws ConfigurationException {
         return IniConfigUtil.getString(configSection, HOST_PROP);
     }
 
     /**
-     * Gets the value of the {@value #PORT_PROP} property from the configuration section.
+     * Gets the value of the {@value #PORT_PROP} property from the configuration
+     * section.
      * 
-     * @param configSection configuration section from which to extract the value
+     * @param configSection
+     *            configuration section from which to extract the value
      * 
      * @return the value, or 0 if it is not set
      */
@@ -118,29 +190,37 @@ public abstract class AbstractIniServiceConfigurationParser<ConfigurationType ex
     }
 
     /**
-     * Gets the value of the {@value #SSL_ON_PORT_PROP} property from the configuration section.
+     * Gets the value of the {@value #SSL_ON_PORT_PROP} property from the
+     * configuration section.
      * 
-     * @param configSection configuration section from which to extract the value
+     * @param configSection
+     *            configuration section from which to extract the value
      * 
-     * @return whether SSL should be enabled on the service port, defaults to {@value #DEFAULT_SSL_ON_PROP}.
+     * @return whether SSL should be enabled on the service port, defaults to
+     *         {@value #DEFAULT_SSL_ON_PROP}.
      */
     protected boolean isSSLEnabled(Ini.Section configSection) {
         if (configSection == null)
             return DEFAULT_SSL_ON_PROP;
-        if (configSection.containsKey(SERVICE_KEY_PROP) && configSection.containsKey(SERVICE_CERT_PROP)
+        if (configSection.containsKey(SERVICE_KEY_PROP)
+                && configSection.containsKey(SERVICE_CERT_PROP)
                 && configSection.containsKey(TRUST_INFO_DIR_PROP)) {
             return IniConfigUtil.getBoolean(configSection, SSL_ON_PORT_PROP, DEFAULT_SSL_ON_PROP);
-        } else {
+        }
+        else {
             return DEFAULT_SSL_ON_PROP;
         }
     }
 
     /**
-     * Gets the value of the {@value #CLIENT_CERT_AUTHN_PROP} property from the configuration section.
+     * Gets the value of the {@value #CLIENT_CERT_AUTHN_PROP} property from the
+     * configuration section.
      * 
-     * @param configSection configuration section from which to extract the value
+     * @param configSection
+     *            configuration section from which to extract the value
      * 
-     * @return whether client certificate authentication is required when a client is connecting, defaults to
+     * @return whether client certificate authentication is required when a
+     *         client is connecting, defaults to
      *         {@value #DEFAULT_CLIENT_CERT_AUTH}.
      */
     protected boolean isClientCertAuthRequired(Ini.Section configSection) {
@@ -148,26 +228,32 @@ public abstract class AbstractIniServiceConfigurationParser<ConfigurationType ex
             return DEFAULT_CLIENT_CERT_AUTH;
         if (isSSLEnabled(configSection)) {
             return IniConfigUtil.getBoolean(configSection, CLIENT_CERT_AUTHN_PROP, DEFAULT_CLIENT_CERT_AUTH);
-        } else {
+        }
+        else {
             return DEFAULT_CLIENT_CERT_AUTH;
         }
     }
 
     /**
-     * Gets the value of the {@value #ADMIN_HOST_PROP} property from the configuration section.
+     * Gets the value of the {@value #ADMIN_HOST_PROP} property from the
+     * configuration section.
      * 
-     * @param configSection configuration section from which to extract the value
+     * @param configSection
+     *            configuration section from which to extract the value
      * 
-     * @return the admin host value, or the default admin host {@value #DEFAULT_ADMIN_HOST} if it is not set
+     * @return the admin host value, or the default admin host
+     *         {@value #DEFAULT_ADMIN_HOST} if it is not set
      */
     protected String getAdminHost(Ini.Section configSection) {
         return IniConfigUtil.getString(configSection, ADMIN_HOST_PROP, DEFAULT_ADMIN_HOST);
     }
 
     /**
-     * Gets the value of the {@value #ADMIN_PORT_PROP} property from the configuration section.
+     * Gets the value of the {@value #ADMIN_PORT_PROP} property from the
+     * configuration section.
      * 
-     * @param configSection configuration section from which to extract the value
+     * @param configSection
+     *            configuration section from which to extract the value
      * 
      * @return the value, or 0 if is not set
      */
@@ -176,9 +262,11 @@ public abstract class AbstractIniServiceConfigurationParser<ConfigurationType ex
     }
 
     /**
-     * Gets the value of the {@value #ADMIN_PASSWORD_PROP} property from the configuration section.
+     * Gets the value of the {@value #ADMIN_PASSWORD_PROP} property from the
+     * configuration section.
      * 
-     * @param configSection configuration section from which to extract the value
+     * @param configSection
+     *            configuration section from which to extract the value
      * 
      * @return the value or null if it is not set
      */
@@ -187,10 +275,12 @@ public abstract class AbstractIniServiceConfigurationParser<ConfigurationType ex
     }
 
     /**
-     * Gets the value of the {@value #REQUEST_QUEUE_PROP} property from the configuration section. If the property is
-     * not present or is not valid the default value of {@value #DEFAULT_REQUEST_QUEUE} will be used.
+     * Gets the value of the {@value #REQUEST_QUEUE_PROP} property from the
+     * configuration section. If the property is not present or is not valid the
+     * default value of {@value #DEFAULT_REQUEST_QUEUE} will be used.
      * 
-     * @param configSection configuration section from which to extract the value
+     * @param configSection
+     *            configuration section from which to extract the value
      * 
      * @return the value
      */
@@ -199,141 +289,161 @@ public abstract class AbstractIniServiceConfigurationParser<ConfigurationType ex
     }
 
     /**
-     * Process the information contained in the {@value #SERVICE_SECTION_HEADER} configuration section.
+     * Process the information contained in the {@value #SERVICE_SECTION_HEADER}
+     * configuration section.
      * 
-     * @param iniFile INI file being processed
-     * @param configBuilder builder being populated with configuration information
+     * @param iniFile
+     *            INI file being processed
+     * @param configBuilder
+     *            builder being populated with configuration information
      * 
-     * @throws ConfigurationException thrown if there is a problem reading the information contained in the
-     *             {@value #SERVICE_SECTION_HEADER} section
+     * @throws ConfigurationException
+     *             thrown if there is a problem reading the information
+     *             contained in the {@value #SERVICE_SECTION_HEADER} section
      */
-    protected void processServiceSection(Ini iniFile, AbstractServiceConfigurationBuilder<?> configBuilder)
+    protected void processServiceSection(Ini iniFile,
+                                         AbstractServiceConfigurationBuilder<?> configBuilder)
             throws ConfigurationException {
-        Ini.Section configSection = iniFile.get(SERVICE_SECTION_HEADER);
+        Ini.Section configSection= iniFile.get(SERVICE_SECTION_HEADER);
         if (configSection == null) {
-            String errorMsg = "INI configuration does not contain the required '" + SERVICE_SECTION_HEADER
-                    + "' INI section";
+            String errorMsg= "INI configuration does not contain the required '"
+                    + SERVICE_SECTION_HEADER + "' INI section";
             log.error(errorMsg);
             throw new ConfigurationException(errorMsg);
         }
         String name= configSection.getName();
 
-        String entityId = getEntityId(configSection);
-        log.info("{}: entity ID: {}", name,entityId);
+        String entityId= getEntityId(configSection);
+        log.info("{}: entity ID: {}", name, entityId);
         configBuilder.setEntityId(entityId);
 
-        String host = getHostname(configSection);
-        log.info("{}: service hostname: {}", name,host);
+        String host= getHostname(configSection);
+        log.info("{}: service hostname: {}", name, host);
         configBuilder.setHost(host);
 
-        int port = getPort(configSection);
-        log.info("{}: service port: {}", name,port);
+        int port= getPort(configSection);
+        log.info("{}: service port: {}", name, port);
         configBuilder.setPort(port);
 
-        String adminHost = getAdminHost(configSection);
-        log.info("{}: service admin hostname: {}", name,adminHost == null ? "default" : adminHost);
+        String adminHost= getAdminHost(configSection);
+        log.info("{}: service admin hostname: {}", name, adminHost == null ? "default" : adminHost);
         configBuilder.setAdminHost(adminHost);
 
-        int adminPort = getAdminPort(configSection);
-        log.info("{}: service admin port: {}", name,adminPort == 0 ? "default" : adminPort);
+        int adminPort= getAdminPort(configSection);
+        log.info("{}: service admin port: {}", name, adminPort == 0 ? "default" : adminPort);
         configBuilder.setAdminPort(adminPort);
 
-        String adminPassword = getAdminPassword(configSection);
-        log.info("{}: service admin password set: {}", name,adminPassword == null ? "no" : "yes");
+        String adminPassword= getAdminPassword(configSection);
+        log.info("{}: service admin password set: {}", name, adminPassword == null ? "no" : "yes");
         configBuilder.setAdminPassword(adminPassword);
 
-        int maxConnections = getMaximumRequests(configSection);
-        log.info("{}: max requests: {}", name,maxConnections);
+        int maxConnections= getMaximumRequests(configSection);
+        log.info("{}: max requests: {}", name, maxConnections);
         configBuilder.setMaxConnections(maxConnections);
 
-        int connTimeout = getConnectionTimeout(configSection);
-        log.info("{}: connection timeout: {}ms", name,connTimeout);
+        int connTimeout= getConnectionTimeout(configSection);
+        log.info("{}: connection timeout: {}ms", name, connTimeout);
         configBuilder.setConnectionTimeout(connTimeout);
 
-        int maxReqQueue = getMaxRequestQueueSize(configSection);
-        log.info("{}: max request queue size: {}", name,maxReqQueue);
+        int maxReqQueue= getMaxRequestQueueSize(configSection);
+        log.info("{}: max request queue size: {}", name, maxReqQueue);
         configBuilder.setMaxRequestQueueSize(maxReqQueue);
 
-        int receiveBuffer = getReceiveBufferSize(configSection);
-        log.info("{}: recieve buffer size: {} bytes", name,receiveBuffer);
+        int receiveBuffer= getReceiveBufferSize(configSection);
+        log.info("{}: recieve buffer size: {} bytes", name, receiveBuffer);
         configBuilder.setReceiveBufferSize(receiveBuffer);
 
-        int sendBuffer = getSendBufferSize(configSection);
-        log.info("{}: send buffer size: {} bytes", name,sendBuffer);
+        int sendBuffer= getSendBufferSize(configSection);
+        log.info("{}: send buffer size: {} bytes", name, sendBuffer);
         configBuilder.setSendBufferSize(sendBuffer);
 
     }
 
-    
     /**
-     * Process the information contained in the {@value #SECURITY_SECTION_HEADER} configuration section.
+     * Process the information contained in the
+     * {@value #SECURITY_SECTION_HEADER} configuration section.
      * 
-     * @param iniFile INI file being processed
-     * @param configBuilder builder being populated with configuration information
+     * @param iniFile
+     *            INI file being processed
+     * @param configBuilder
+     *            builder being populated with configuration information
      * 
-     * @throws ConfigurationException thrown if there is a problem reading the information contained in the
-     *             {@value #SECURITY_SECTION_HEADER} section
+     * @throws ConfigurationException
+     *             thrown if there is a problem reading the information
+     *             contained in the {@value #SECURITY_SECTION_HEADER} section
      */
-    protected void processSecuritySection(Ini iniFile, AbstractServiceConfigurationBuilder<?> configBuilder)
+    protected void processSecuritySection(Ini iniFile,
+                                          AbstractServiceConfigurationBuilder<?> configBuilder)
             throws ConfigurationException {
-        Ini.Section securityConfig = iniFile.get(SECURITY_SECTION_HEADER);
-        if (securityConfig==null) {
+        Ini.Section securityConfig= iniFile.get(SECURITY_SECTION_HEADER);
+        if (securityConfig == null) {
             log.warn("INI configuration does not contain the '{}' section", SECURITY_SECTION_HEADER);
         }
-        
+
         String name= securityConfig.getName();
+        
+        // service crenditial
         X509KeyManager x509KeyManager= getX509KeyManager(securityConfig);
         configBuilder.setKeyManager(x509KeyManager);
-        
-        X509TrustManager x509TrustManager= getX509TrustManager(securityConfig);
+
+        // trust information
+        X509CertChainValidatorExt validator= getX509CertChainValidator(securityConfig);        
+        X509TrustManager x509TrustManager= new CommonX509TrustManager(validator);
         configBuilder.setTrustManager(x509TrustManager);
 
-        boolean sslOn = isSSLEnabled(securityConfig);
-        log.info("{}: service port using SSL: {}", name,sslOn);
+        boolean sslOn= isSSLEnabled(securityConfig);
+        log.info("{}: service port using SSL: {}", name, sslOn);
         configBuilder.setSslEnabled(sslOn);
 
-        boolean clientCertAuthRequired = isClientCertAuthRequired(securityConfig);
-        log.info("{}: TLS client certificate authentication required: {}", name,clientCertAuthRequired);
-        configBuilder.setClientCertAuthRequired(clientCertAuthRequired);    
+        boolean clientCertAuthRequired= isClientCertAuthRequired(securityConfig);
+        log.info("{}: TLS client certificate authentication required: {}", name, clientCertAuthRequired);
+        configBuilder.setClientCertAuthRequired(clientCertAuthRequired);
     }
+
     /**
-     * Builds a SOAP client builder from the information contained in the configuration section.
+     * Builds a SOAP client builder from the information contained in the
+     * configuration section.
      * 
-     * @param configSection client configuration
-     * @param keyManager key manager used for outbound SSL/TLS connections
-     * @param trustManager trust manager used for inbound SSL/TLS connections
+     * @param configSection
+     *            client configuration
+     * @param keyManager
+     *            key manager used for outbound SSL/TLS connections
+     * @param trustManager
+     *            trust manager used for inbound SSL/TLS connections
      * 
      * @return the constructed SOAP client
      */
-    protected HttpClientBuilder buildSOAPClientBuilder(Ini.Section configSection, X509KeyManager keyManager,
-            X509TrustManager trustManager) {
+    protected HttpClientBuilder buildSOAPClientBuilder(Ini.Section configSection,
+                                                       X509KeyManager keyManager,
+                                                       X509TrustManager trustManager) {
         String name= configSection.getName();
         log.info("{}: building SOAP client ({})", name, (keyManager != null && trustManager != null) ? "SSL" : "plain");
-        HttpClientBuilder httpClientBuilder = new HttpClientBuilder();
+        HttpClientBuilder httpClientBuilder= new HttpClientBuilder();
         httpClientBuilder.setContentCharSet("UTF-8");
-        int conTimeout = getConnectionTimeout(configSection);
-        log.info("{}: connection timeout: {}ms", name,conTimeout);
+        int conTimeout= getConnectionTimeout(configSection);
+        log.info("{}: connection timeout: {}ms", name, conTimeout);
         httpClientBuilder.setConnectionTimeout(conTimeout);
 
-        int maxRequests = getMaximumRequests(configSection);
-        log.info("{}: maximum requests: {}", name,maxRequests);
+        int maxRequests= getMaximumRequests(configSection);
+        log.info("{}: maximum requests: {}", name, maxRequests);
         httpClientBuilder.setMaxTotalConnections(maxRequests);
         httpClientBuilder.setMaxConnectionsPerHost(maxRequests);
 
-        int recBuffSize = getSendBufferSize(configSection);
-        log.info("{}: recieve buffer size: {} bytes", name,recBuffSize);
+        int recBuffSize= getSendBufferSize(configSection);
+        log.info("{}: recieve buffer size: {} bytes", name, recBuffSize);
         httpClientBuilder.setReceiveBufferSize(recBuffSize);
 
-        int sendBuffSize = getSendBufferSize(configSection);
-        log.info("{}: send buffer size: {} bytes", name,sendBuffSize);
+        int sendBuffSize= getSendBufferSize(configSection);
+        log.info("{}: send buffer size: {} bytes", name, sendBuffSize);
         httpClientBuilder.setSendBufferSize(sendBuffSize);
 
         if (keyManager != null && trustManager != null) {
             log.debug("adding configured X509 key & trust manager to SOAP client");
-            TLSProtocolSocketFactory factory = new TLSProtocolSocketFactory(keyManager, trustManager);
+            TLSProtocolSocketFactory factory= new TLSProtocolSocketFactory(keyManager, trustManager);
             httpClientBuilder.setHttpsProtocolSocketFactory(factory);
         }
 
         return httpClientBuilder;
     }
+
 }

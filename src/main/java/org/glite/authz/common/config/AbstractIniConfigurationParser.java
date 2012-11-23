@@ -30,8 +30,8 @@ import org.ini4j.Ini;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import eu.emi.security.authn.x509.CommonX509TrustManager;
 import eu.emi.security.authn.x509.ValidationErrorListener;
+import eu.emi.security.authn.x509.X509CertChainValidatorExt;
 import eu.emi.security.authn.x509.impl.OpensslCertChainValidator;
 import eu.emi.security.authn.x509.impl.PEMCredential;
 
@@ -266,7 +266,7 @@ public abstract class AbstractIniConfigurationParser<ConfigurationType extends A
      * @throws ConfigurationException
      *             thrown if there is a problem creating the trust manager
      */
-    protected X509TrustManager getX509TrustManager(Ini.Section configSection)
+    protected X509CertChainValidatorExt getX509CertChainValidator(Ini.Section configSection)
             throws ConfigurationException {
         if (configSection == null) {
             return null;
@@ -294,8 +294,7 @@ public abstract class AbstractIniConfigurationParser<ConfigurationType extends A
             validator.setUpdateInterval(refreshInterval);
             ValidationErrorListener validationListener= new TrustStoreValidationErrorLogger(); 
             validator.addValidationListener(validationListener);
-            X509TrustManager trustManager= new CommonX509TrustManager(validator);
-            return trustManager;
+            return validator;
         } catch (Exception e) {
             log.error("Unable to create X.509 trust store", e);
             throw new ConfigurationException("Unable to create X.509 trust store", e);
