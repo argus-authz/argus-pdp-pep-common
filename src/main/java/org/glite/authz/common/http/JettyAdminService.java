@@ -194,7 +194,7 @@ public class JettyAdminService {
     protected AbstractAdminCommand buildShutdownCommand() {
         List<Runnable> augmentedShutdownTasks= new LazyList<Runnable>();
         augmentedShutdownTasks.addAll(shutdownTasks);
-        augmentedShutdownTasks.add(new JettyShutdownTask(adminService));
+        augmentedShutdownTasks.add(new JettyServerShutdownTask(adminService));
 
         return new ShutdownCommand(augmentedShutdownTasks);
     }

@@ -22,10 +22,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /** A command that shuts down a Jetty {@link Server} if it's currently running. */
-public class JettyShutdownTask implements ShutdownTask {
+public class JettyServerShutdownTask implements ShutdownTask {
 
     /** Class logger. */
-    private Logger log = LoggerFactory.getLogger(JettyShutdownTask.class);
+    private Logger log = LoggerFactory.getLogger(JettyServerShutdownTask.class);
 
     /** Server to be shutdown. */
     private Server httpServer;
@@ -35,7 +35,7 @@ public class JettyShutdownTask implements ShutdownTask {
      * 
      * @param targetServer server to be shutdown
      */
-    public JettyShutdownTask(Server targetServer) {
+    public JettyServerShutdownTask(Server targetServer) {
         httpServer = targetServer;
     }
 
