@@ -507,7 +507,7 @@ public class Base64 {
 
         // Isolate options
         int gzip = (options & GZIP);
-        int dontBreakLines = (options & DONT_BREAK_LINES);
+        //int dontBreakLines = (options & DONT_BREAK_LINES);
 
         try {
             // ObjectOutputStream -> (GZIP) -> Base64 -> ByteArrayOutputStream
@@ -1236,6 +1236,7 @@ public class Base64 {
 
         private int options; // Record options used to create the stream.
 
+        @SuppressWarnings("unused")
         private byte[] alphabet; // Local copies to avoid extra method calls
 
         private byte[] decodabet; // Local copies to avoid extra method calls
@@ -1450,6 +1451,7 @@ public class Base64 {
 
         private int options; // Record for later
 
+        @SuppressWarnings("unused")
         private byte[] alphabet; // Local copies to avoid extra method calls
 
         private byte[] decodabet; // Local copies to avoid extra method calls
