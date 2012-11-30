@@ -7,7 +7,6 @@
         <groupId>org.glite.authz</groupId>
         <artifactId>argus-parent</artifactId>
         <version>1.6</version>
-        <!-- <relativePath>../emi.argus.parent</relativePath> -->
     </parent>
 
     <name>Argus PDP and PEP server common library</name>
@@ -146,6 +145,7 @@
             <!-- support for scpexe: -->
             <groupId>org.apache.maven.wagon</groupId>
             <artifactId>wagon-ssh-external</artifactId>
+            <version>2.2</version>
           </extension>
         </extensions>
     </build>
