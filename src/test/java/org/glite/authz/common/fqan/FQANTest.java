@@ -69,7 +69,15 @@ public class FQANTest extends TestCase {
         }
     }
 
-    
+    public void testGroupAndRole()  throws ParseException {
+        FQAN fqan= FQAN.parseFQAN("/atlas/analysis/Role=pilot");
+        System.out.println("FQAN: " + fqan);
+        System.out.println("group: " + fqan.getGroupName());
+        assertEquals("/atlas/analysis", fqan.getGroupName());
+        System.out.println("role: " + fqan.getRole());
+        assertEquals("pilot", fqan.getRole());
+        
+    }
     public void testInvalidRegexp() throws ParseException {
         FQAN atlas = new FQAN("/atlas");
 
