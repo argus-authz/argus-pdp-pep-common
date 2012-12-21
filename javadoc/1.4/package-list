@@ -1,0 +1,9 @@
+org.glite.authz.common
+org.glite.authz.common.config
+org.glite.authz.common.context
+org.glite.authz.common.fqan
+org.glite.authz.common.http
+org.glite.authz.common.logging
+org.glite.authz.common.profile
+org.glite.authz.common.util
+org.glite.authz.common.x509
