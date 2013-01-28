@@ -387,7 +387,8 @@ public abstract class AbstractIniServiceConfigurationParser<ConfigurationType ex
         configBuilder.setKeyManager(x509KeyManager);
 
         // trust information
-        X509CertChainValidatorExt validator= getX509CertChainValidator(securityConfig);        
+        X509CertChainValidatorExt validator= getX509CertChainValidator(securityConfig);    
+        configBuilder.setCertChainValidator(validator);
         X509TrustManager x509TrustManager= new CommonX509TrustManager(validator);
         configBuilder.setTrustManager(x509TrustManager);
 
