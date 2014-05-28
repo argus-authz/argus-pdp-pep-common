@@ -30,10 +30,18 @@ import org.ini4j.Ini;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import eu.emi.security.authn.x509.CrlCheckingMode;
+import eu.emi.security.authn.x509.NamespaceCheckingMode;
+import eu.emi.security.authn.x509.OCSPCheckingMode;
+import eu.emi.security.authn.x509.OCSPParametes;
+import eu.emi.security.authn.x509.ProxySupport;
 import eu.emi.security.authn.x509.ValidationErrorListener;
 import eu.emi.security.authn.x509.X509CertChainValidatorExt;
+import eu.emi.security.authn.x509.impl.CRLParameters;
 import eu.emi.security.authn.x509.impl.OpensslCertChainValidator;
 import eu.emi.security.authn.x509.impl.PEMCredential;
+import eu.emi.security.authn.x509.impl.RevocationParametersExt;
+import eu.emi.security.authn.x509.impl.ValidatorParamsExt;
 
 /**
  * Base class for configuration parsers that employ an INI file.
@@ -82,6 +90,16 @@ public abstract class AbstractIniConfigurationParser<ConfigurationType extends A
     public static final String TRUST_INFO_REFRSH_PROP= "trustInfoRefresh";
 
     /**
+     * The name of the {@value} which enable or disable CRL revocation and validation for X.509 certificates.
+     */
+    public static final String ENABLE_CRL_PROP= "enableCRL";
+
+    /**
+     * The name of the {@value} which enable or disable OCSP revocation and validation for X.509 certificates.
+     */
+    public static final String ENABLE_OCSP_PROP= "enableOCSP";
+    
+    /**
      * The name of the {@value} which gives the maximum number of simultaneous
      * requests.
      */
@@ -128,6 +146,25 @@ public abstract class AbstractIniConfigurationParser<ConfigurationType extends A
      * kilobytes.
      */
     public static final int DEFAULT_SEND_BUFF_SIZE= 16384;
+
+    /**
+     * Default value of the {@value #ENABLE_CRL_PROP} property: {@value}
+     */
+    public static final boolean DEFAULT_ENABLE_CRL= true;
+
+    /**
+     * Default value of the {@value #ENABLE_OCSP_PROP} property: {@value}
+     */
+    public static final boolean DEFAULT_ENABLE_OCSP= false;
+
+    
+    /**
+     * Default values for the validation and revocation of OpenSSL X.509 certificates
+     */
+    private final CrlCheckingMode DEFAULT_CRL_CHECKING_MODE= CrlCheckingMode.IF_VALID;
+    private final OCSPCheckingMode DEFAULT_OCSP_CHECKING_MODE= OCSPCheckingMode.IGNORE;
+    private final NamespaceCheckingMode DEFAULT_NAMESPACE_CHECKING_MODE= NamespaceCheckingMode.EUGRIDPMA_GLOBUS;
+    private static final ProxySupport DEFAULT_PROXY_SUPPORT= ProxySupport.ALLOW;
 
     /** Class logger. */
     private final Logger log= LoggerFactory.getLogger(AbstractIniConfigurationParser.class);
@@ -229,7 +266,6 @@ public abstract class AbstractIniConfigurationParser<ConfigurationType extends A
             return null;
         }
 
-
         String certificateFilePath= IniConfigUtil.getString(configSection, SERVICE_CERT_PROP, null);
         if (certificateFilePath == null) {
             log.info("{}: No service certificate file provided, no service credential will be used.", name);
@@ -239,9 +275,9 @@ public abstract class AbstractIniConfigurationParser<ConfigurationType extends A
         // param 'servicePrivateKeyPassword' for encrypted private key
         String privateKeyPassword= IniConfigUtil.getString(configSection, SERVICE_KEY_PASSWORD_PROP, null);
 
-        log.info("{}: service credential certificate: {}", name, certificateFilePath );
-        log.info("{}: service credential private key: {}", name, privateKeyFilePath );
-        log.info("{}: service credential private key password: {}", name, (privateKeyPassword == null) ? "not set (unencrypted key)" : "set" );
+        log.info("{}: service credential certificate: {}", name, certificateFilePath);
+        log.info("{}: service credential private key: {}", name, privateKeyFilePath);
+        log.info("{}: service credential private key password: {}", name, (privateKeyPassword == null) ? "not set (unencrypted key)" : "set");
 
         try {
             PEMCredential credential= new PEMCredential(privateKeyFilePath, certificateFilePath, (privateKeyPassword != null) ? privateKeyPassword.toCharArray() : null);
@@ -289,10 +325,44 @@ public abstract class AbstractIniConfigurationParser<ConfigurationType extends A
         int refreshInterval= getTrustMaterialRefreshInterval(configSection) * 60 * 1000;
         log.info("{}: X.509 trust information refresh interval: {}ms", name, refreshInterval);
 
+        /* BUG FIX: default MUST be CRL validation and no OCSP validation */
+        boolean enableCRL= IniConfigUtil.getBoolean(configSection,
+                                                    ENABLE_CRL_PROP, 
+                                                    DEFAULT_ENABLE_CRL);
+        log.info("{}: X.509 CRL validation: {}", name, enableCRL);
+        
+        boolean enableOCSP= IniConfigUtil.getBoolean(configSection,
+                                                     ENABLE_OCSP_PROP, DEFAULT_ENABLE_OCSP);
+        log.info("{}: X.509 OCSP validation: {}", name, enableCRL);
+
         try {
-            OpensslCertChainValidator validator= new OpensslCertChainValidator(trustStoreDir);
-            validator.setUpdateInterval(refreshInterval);
-            ValidationErrorListener validationListener= new TrustStoreValidationErrorLogger(); 
+            CrlCheckingMode crlCheckingMode= DEFAULT_CRL_CHECKING_MODE;
+            if (enableCRL) {
+                crlCheckingMode= CrlCheckingMode.IF_VALID;
+            }
+            else {
+                crlCheckingMode= CrlCheckingMode.IGNORE;
+            }
+            OCSPCheckingMode ocspCheckingMode= DEFAULT_OCSP_CHECKING_MODE;
+            if (enableOCSP) {
+                ocspCheckingMode = OCSPCheckingMode.IF_AVAILABLE;
+            }
+            else {
+                ocspCheckingMode= OCSPCheckingMode.IGNORE;
+            }
+            NamespaceCheckingMode namespaceCheckingMode= DEFAULT_NAMESPACE_CHECKING_MODE;
+            ProxySupport proxySupport= DEFAULT_PROXY_SUPPORT;
+
+            RevocationParametersExt revocationParameters= new RevocationParametersExt(crlCheckingMode, 
+                                                                                      new CRLParameters(), 
+                                                                                      new OCSPParametes(ocspCheckingMode));
+            ValidatorParamsExt validationParams= new ValidatorParamsExt(revocationParameters, proxySupport);
+            OpensslCertChainValidator validator= new OpensslCertChainValidator(trustStoreDir, 
+                                                                               namespaceCheckingMode, 
+                                                                               refreshInterval, 
+                                                                               validationParams);
+
+            ValidationErrorListener validationListener= new TrustStoreValidationErrorLogger();
             validator.addValidationListener(validationListener);
             return validator;
         } catch (Exception e) {
