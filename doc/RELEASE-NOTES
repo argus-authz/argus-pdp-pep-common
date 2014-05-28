@@ -1,3 +1,10 @@
+pdp-pep-common 1.4.1 (EMI-3)
+--------------------
+- Bug fix: X.509 trust validation with CRL enabled (if valid) and OCSP disabled.
+- Optional SECURITY config parameter 'enableCRL' added with default: true.
+- Optional SECURITY config parameter 'enableOCSP' added with default: false.
+
+
 pdp-pep-common 1.4.0 (EMI-3)
 --------------------
 - Maven parent module: org.glite.authz:argus-parent:1.6
