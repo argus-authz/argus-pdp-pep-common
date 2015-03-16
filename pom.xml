@@ -19,14 +19,6 @@
     <url>https://twiki.cern.ch/twiki/bin/view/EGEE/AuthorizationFramework</url>
     <inceptionYear>2008</inceptionYear>
 
-    <repositories>
-        <repository>
-            <id>switch</id>
-            <name>SWITCH Releases</name>
-            <url>http://www.switch.ch/grid/authz/docs/maven2/release</url>
-        </repository>
-    </repositories>
-
     <dependencies>
         <!-- Compile Dependencies-->
         <dependency>
@@ -153,7 +145,7 @@
                     <windowtitle>${project.name} 1.4 API.</windowtitle>
                     <overview>src/main/java/overview.html</overview>
                 </configuration>
-            </plugin>            
+            </plugin>
         </plugins>
         <extensions>
           <extension>
@@ -170,7 +162,7 @@
             <id>EMI</id>
             <activation>
                 <activeByDefault>true</activeByDefault>
-            </activation>            
+            </activation>
             <build>
                 <finalName>argus-pdp-pep-common</finalName>
                 <plugins>
@@ -255,7 +247,7 @@
                             </execution>
                         </executions>
                     </plugin>
-                </plugins>     
+                </plugins>
             </build>
         </profile>
     </profiles>
@@ -264,7 +256,7 @@
         <plugins>
             <plugin>
                 <artifactId>maven-jxr-plugin</artifactId>
-                <version>2.3</version>                                
+                <version>2.3</version>
                 <configuration>
                     <aggregate>true</aggregate>
                     <outputDirectory>${project.reporting.outputDirectory}/xref
@@ -279,7 +271,7 @@
             </plugin>
             <plugin>
                 <artifactId>maven-surefire-report-plugin</artifactId>
-                <version>2.12</version>                
+                <version>2.12</version>
                 <configuration>
                     <aggregate>true</aggregate>
                     <outputDirectory>${project.reporting.outputDirectory}/unitTest
