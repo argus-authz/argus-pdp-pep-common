@@ -19,7 +19,8 @@ package org.glite.authz.common.config;
 
 import org.ini4j.Ini;
 
-/** A generic parser that parses an INI {@link Section} and creates an ObjectType. */
+/** A generic parser that parses an INI Section and creates an ObjectType. 
+ * @param <ObjectType> an INI ObjectType */
 public interface IniSectionConfigurationParser<ObjectType> {
 
     /**
@@ -30,7 +31,7 @@ public interface IniSectionConfigurationParser<ObjectType> {
 
     /**
      * Creates a ObjectType from the information within
-     * the {@link Section}.
+     * the Section.
      * 
      * @param iniConfig
      *            the INI configuration for the obligation handler

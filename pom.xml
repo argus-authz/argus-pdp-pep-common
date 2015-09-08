@@ -6,13 +6,12 @@
     <parent>
         <groupId>org.glite.authz</groupId>
         <artifactId>argus-parent</artifactId>
-        <version>1.6</version>
+        <version>1.7-SNAPSHOT</version>
     </parent>
 
     <name>Argus PDP and PEP server common library</name>
-    <groupId>org.glite.authz</groupId>
     <artifactId>pdp-pep-common</artifactId>
-    <version>1.4.1</version>
+    <version>1.5.0</version>
     <packaging>jar</packaging>
 
     <description>XACML based authorization service</description>
@@ -38,21 +37,12 @@
             <artifactId>canl</artifactId>
         </dependency>
         <dependency>
-            <!-- comes with emi.eu-emi.security:canl:1.1.0 -->
-            <groupId>org.bouncycastle</groupId>
-            <artifactId>bcprov-jdk16</artifactId>
+            <groupId>org.italiangrid</groupId>
+            <artifactId>jetty-utils</artifactId>
+            <scope>compile</scope>
         </dependency>
+
         <!-- Provided Dependencies -->
-        <dependency>
-            <groupId>org.mortbay.jetty</groupId>
-            <artifactId>jetty</artifactId>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.mortbay.jetty</groupId>
-            <artifactId>jetty-sslengine</artifactId>
-            <scope>provided</scope>
-        </dependency>
         <dependency>
             <groupId>net.jcip</groupId>
             <artifactId>jcip-annotations</artifactId>

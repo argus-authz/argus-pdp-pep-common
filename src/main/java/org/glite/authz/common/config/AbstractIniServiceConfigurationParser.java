@@ -160,8 +160,7 @@ public abstract class AbstractIniServiceConfigurationParser<ConfigurationType ex
 
     /**
      * Gets the value of the {@value #HOST_PROP} property from the configuration
-     * section. If the property is not present or is not valid the default value
-     * of {@value #DEFAULT_HOST} will be used.
+     * section.
      * 
      * @param configSection
      *            configuration section from which to extract the value

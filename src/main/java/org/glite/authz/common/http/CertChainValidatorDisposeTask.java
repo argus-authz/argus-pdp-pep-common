@@ -31,10 +31,10 @@ public class CertChainValidatorDisposeTask implements ShutdownTask {
     /**
      * Constructor.
      * 
-     * @param timer
-     *            timer to be shutdown.
+     * @param validator 
+     *            the referenced validator.
      */
-    public CertChainValidatorDisposeTask(X509CertChainValidatorExt validator) {
+    public CertChainValidatorDisposeTask(X509CertChainValidatorExt  validator) {
         certChainValidator= validator;
     }
 

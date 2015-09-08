@@ -74,7 +74,7 @@ public class DecisionRequestContextHelper {
      * 
      * @param messageIssuerId
      *            The entityID of the message issuer
-     * @return
+     * @return the {@link DecisionRequestContext}
      */
     static public DecisionRequestContext buildMessageContext(
             String messageIssuerId) {

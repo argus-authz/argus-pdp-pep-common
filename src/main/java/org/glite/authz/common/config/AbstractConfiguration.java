@@ -222,12 +222,12 @@ public abstract class AbstractConfiguration {
     }
 
     /**
-     * Sets the store containing the trust material used to validate X509
+     * Sets the store containing the trust manager used to validate X509
      * certificates.
      * 
-     * @param material
-     *            store containing the trust material used to validate X509
-     *            certificates
+     * @param manager
+     *            the trust manager 
+     * 
      */
     protected final synchronized void setTrustManager(X509TrustManager manager) {
         if (trustManager != null) {

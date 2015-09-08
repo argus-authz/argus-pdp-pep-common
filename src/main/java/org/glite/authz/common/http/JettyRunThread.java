@@ -17,7 +17,7 @@
 
 package org.glite.authz.common.http;
 
-import org.mortbay.jetty.Server;
+import org.eclipse.jetty.server.Server;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
