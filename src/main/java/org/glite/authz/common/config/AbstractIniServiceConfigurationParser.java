@@ -24,8 +24,6 @@ import javax.net.ssl.X509KeyManager;
 import javax.net.ssl.X509TrustManager;
 
 import org.ini4j.Ini;
-import org.opensaml.ws.soap.client.http.HttpClientBuilder;
-import org.opensaml.ws.soap.client.http.TLSProtocolSocketFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -400,50 +398,6 @@ public abstract class AbstractIniServiceConfigurationParser<ConfigurationType ex
         configBuilder.setClientCertAuthRequired(clientCertAuthRequired);
     }
 
-    /**
-     * Builds a SOAP client builder from the information contained in the
-     * configuration section.
-     * 
-     * @param configSection
-     *            client configuration
-     * @param keyManager
-     *            key manager used for outbound SSL/TLS connections
-     * @param trustManager
-     *            trust manager used for inbound SSL/TLS connections
-     * 
-     * @return the constructed SOAP client
-     */
-    protected HttpClientBuilder buildSOAPClientBuilder(Ini.Section configSection,
-                                                       X509KeyManager keyManager,
-                                                       X509TrustManager trustManager) {
-        String name= configSection.getName();
-        log.info("{}: building SOAP client ({})", name, (keyManager != null && trustManager != null) ? "SSL" : "plain");
-        HttpClientBuilder httpClientBuilder= new HttpClientBuilder();
-        httpClientBuilder.setContentCharSet("UTF-8");
-        int conTimeout= getConnectionTimeout(configSection);
-        log.info("{}: connection timeout: {}ms", name, conTimeout);
-        httpClientBuilder.setConnectionTimeout(conTimeout);
-
-        int maxRequests= getMaximumRequests(configSection);
-        log.info("{}: maximum requests: {}", name, maxRequests);
-        httpClientBuilder.setMaxTotalConnections(maxRequests);
-        httpClientBuilder.setMaxConnectionsPerHost(maxRequests);
-
-        int recBuffSize= getSendBufferSize(configSection);
-        log.info("{}: recieve buffer size: {} bytes", name, recBuffSize);
-        httpClientBuilder.setReceiveBufferSize(recBuffSize);
-
-        int sendBuffSize= getSendBufferSize(configSection);
-        log.info("{}: send buffer size: {} bytes", name, sendBuffSize);
-        httpClientBuilder.setSendBufferSize(sendBuffSize);
-
-        if (keyManager != null && trustManager != null) {
-            log.debug("adding configured X509 key & trust manager to SOAP client");
-            TLSProtocolSocketFactory factory= new TLSProtocolSocketFactory(keyManager, trustManager);
-            httpClientBuilder.setHttpsProtocolSocketFactory(factory);
-        }
-
-        return httpClientBuilder;
-    }
+   
 
 }
