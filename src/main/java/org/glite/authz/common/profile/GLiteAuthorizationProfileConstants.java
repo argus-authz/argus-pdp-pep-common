@@ -63,6 +63,14 @@ public class GLiteAuthorizationProfileConstants {
     public static final String ID_ATTRIBUTE_SUBJECT_ISSUER= NS_ATTRIBUTE
             + SEPARATOR + "subject-issuer";
 
+    /** The attribute id x509-subject-issuer identifier: {@value} */
+    public static final String ID_ATTRIBUTE_X509_SUBJECT_ISSUER = NS_ATTRIBUTE
+        + SEPARATOR + "x509-subject-issuer";
+    
+    /** The attribute id x509-authn-profile identifier : {@value} */
+    public static final String ID_ATTRIBUTE_X509_AUTHN_PROFILE = NS_ATTRIBUTE
+        + SEPARATOR + "x509-authn-profile";
+    
     /** The attribute id subject-id identifier: {@value} */
     public static final String ID_ATTRIBUTE_SUBJECT_ID= "urn:oasis:names:tc:xacml:1.0:subject:subject-id";
 
