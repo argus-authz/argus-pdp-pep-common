@@ -49,7 +49,7 @@ public class ServiceMetrics {
     private long totalErrors;
 
     /**
-     * Constructor. Ê
+     * Constructor
      * 
      * @param id
      *            ID of the service whose metrics are being tracked
