@@ -17,7 +17,7 @@
 
 name=argus-pdp-pep-common
 
-version=1.5.1
+version=1.5.1-SNAPSHOT
 release=0
 
 prefix=/
