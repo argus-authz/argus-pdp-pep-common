@@ -60,7 +60,7 @@ pipeline {
     
     stage('analysis'){
       when{
-        anyOf { branch 'master'; branch 'develop'; branch: '1_5' }
+        anyOf { branch 'master'; branch 'develop'; branch '1_5' }
         environment name: 'CHANGE_URL', value: ''
       }
       steps {
