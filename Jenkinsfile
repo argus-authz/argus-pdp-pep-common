@@ -13,7 +13,7 @@ pipeline {
     stage('build') {
       steps {
         container('maven-runner'){
-          sh 'mvn -B clean compile'
+          sh 'mvn -U -B clean compile'
         }
       }
     }
@@ -21,7 +21,7 @@ pipeline {
     stage('test') {
       steps {
         container('maven-runner'){
-          sh 'mvn -B clean test'
+          sh 'mvn -U -B clean test'
         }
       }
 
