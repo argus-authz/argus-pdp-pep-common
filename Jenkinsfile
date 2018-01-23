@@ -86,9 +86,6 @@ pipeline {
     }
     
     stage('deploy') {
-      when{
-          environment name: 'CHANGE_URL', value: ''
-      }
       steps {
         container('maven-runner'){
           sh "mvn clean -U -B deploy"
