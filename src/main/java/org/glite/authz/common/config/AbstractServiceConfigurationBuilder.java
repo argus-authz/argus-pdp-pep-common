@@ -202,6 +202,7 @@ public abstract class AbstractServiceConfigurationBuilder<ConfigType extends Abs
         config.setHostname(hostname);
         config.setPort(port);
         config.setSslEnabled(sslEnabled);
+        config.setTlsProtocol(tlsProtocol);
         config.setClientCertAuthRequired(clientCertAuthRequired);
         config.setAdminHost(adminHost);
         config.setAdminPort(adminPort);
