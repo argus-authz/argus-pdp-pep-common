@@ -25,8 +25,8 @@ import org.opensaml.ws.soap.client.SOAPClient;
  * 
  * @param <ConfigType> the concrete type of configuration object created
  */
-public abstract class AbstractServiceConfigurationBuilder<ConfigType extends AbstractServiceConfiguration> extends
-        AbstractConfigurationBuilder<ConfigType> {
+public abstract class AbstractServiceConfigurationBuilder<T extends AbstractServiceConfiguration> extends
+        AbstractConfigurationBuilder<T> {
 
     /** The entity ID for the service. */
     private String entityId;
@@ -42,6 +42,9 @@ public abstract class AbstractServiceConfigurationBuilder<ConfigType extends Abs
 
     /** TLS protocol used when SSL is enabled. */
     private String tlsProtocol;
+
+    /** SSL enabled protocols used when SSL is enabled. */
+    private String[] enabledProtocols;
 
     /** Whether client is required to authenticate with a client certificate. */
     private boolean clientCertAuthRequired;
@@ -67,6 +70,8 @@ public abstract class AbstractServiceConfigurationBuilder<ConfigType extends Abs
         hostname = null;
         port = 0;
         sslEnabled = false;
+        tlsProtocol = "TLS";
+        enabledProtocols = null;
         clientCertAuthRequired = false;
         adminHost = null;
         adminPort = 0;
@@ -88,6 +93,8 @@ public abstract class AbstractServiceConfigurationBuilder<ConfigType extends Abs
         hostname = prototype.getHostname();
         port = prototype.getPort();
         sslEnabled = prototype.isSslEnabled();
+        tlsProtocol = prototype.getTlsProtocol();
+        enabledProtocols = prototype.getEnabledProtocols();
         clientCertAuthRequired = prototype.isClientCertAuthRequired();
         adminHost = prototype.getAdminHost();
         adminPort = prototype.getAdminPort();
@@ -196,13 +203,14 @@ public abstract class AbstractServiceConfigurationBuilder<ConfigType extends Abs
     }
 
     /** {@inheritDoc} */
-    protected void populateConfiguration(ConfigType config) {
+    protected void populateConfiguration(T config) {
         super.populateConfiguration(config);
         config.setEntityId(entityId);
         config.setHostname(hostname);
         config.setPort(port);
         config.setSslEnabled(sslEnabled);
         config.setTlsProtocol(tlsProtocol);
+        config.setEnabledProtocols(enabledProtocols);
         config.setClientCertAuthRequired(clientCertAuthRequired);
         config.setAdminHost(adminHost);
         config.setAdminPort(adminPort);
@@ -305,6 +313,15 @@ public abstract class AbstractServiceConfigurationBuilder<ConfigType extends Abs
      */
     public void setTlsProtocol(String protocol) {
         tlsProtocol = protocol;
+    }
+
+    /**
+     * Sets SSL enabled protocols used when SSL is enabled.
+     *
+     * @param SSL enabled protocols used when SSL is enabled
+     */
+    public void setEnabledProtocols(String[] protocols) {
+        enabledProtocols = protocols;
     }
 
     /**

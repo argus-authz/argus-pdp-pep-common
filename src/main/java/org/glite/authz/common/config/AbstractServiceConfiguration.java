@@ -41,6 +41,9 @@ public abstract class AbstractServiceConfiguration extends AbstractConfiguration
     /** Which TLS protocol should be used */
     private String tlsProtocol;
 
+    /** Which SSL protocols are supported */
+    private String[] enabledProtocols;
+
     /** Whether client is required to authenticate with a client certificate. */
     private Boolean clientCertAuthRequired;
 
@@ -71,6 +74,7 @@ public abstract class AbstractServiceConfiguration extends AbstractConfiguration
         port = 0;
         sslEnabled = null;
         tlsProtocol = "TLS";
+        enabledProtocols = null;
         adminHost = null;
         adminPort = 0;
         adminPassword = null;
@@ -184,6 +188,15 @@ public abstract class AbstractServiceConfiguration extends AbstractConfiguration
      */
     public synchronized String getTlsProtocol() {
       return tlsProtocol;
+    }
+
+    /**
+     * Gets the SSL enabled protocols used when SSL is enabled.
+     *
+     * @return SSL enabled protocols used
+     */
+    public synchronized String[] getEnabledProtocols() {
+      return enabledProtocols;
     }
 
     /**
@@ -317,5 +330,14 @@ public abstract class AbstractServiceConfiguration extends AbstractConfiguration
      */
     protected final synchronized void setTlsProtocol(String tlsProtocol) {
       this.tlsProtocol = tlsProtocol;
+    }
+
+    /**
+     * Sets the SSL enabled protocols used by PEP daemon server when SSL is enabled.
+     *
+     * @param SSL enabled protocols
+     */
+    protected final synchronized void setEnabledProtocols(String[] enabledProtocols) {
+      this.enabledProtocols = enabledProtocols;
     }
 }
