@@ -40,6 +40,9 @@ public abstract class AbstractServiceConfigurationBuilder<ConfigType extends Abs
     /** Whether SSL is enabled on the service port. */
     private boolean sslEnabled;
 
+    /** TLS protocol used when SSL is enabled. */
+    private String tlsProtocol;
+
     /** Whether client is required to authenticate with a client certificate. */
     private boolean clientCertAuthRequired;
 
@@ -175,6 +178,15 @@ public abstract class AbstractServiceConfigurationBuilder<ConfigType extends Abs
     }
 
     /**
+     * Gets TLS protocol used when SSL is enabled.
+     * 
+     * @return TLS protocol used when SSL is enabled
+     */
+    public String getTlsProtocol() {
+        return tlsProtocol;
+    }
+
+    /**
      * Gets whether client certificate authentication is required when a client is connecting.
      * 
      * @return whether client certificate authentication is required
@@ -283,6 +295,15 @@ public abstract class AbstractServiceConfigurationBuilder<ConfigType extends Abs
      */
     public void setSslEnabled(boolean enabled) {
         sslEnabled = enabled;
+    }
+
+    /**
+     * Sets TLS protocol used when SSL is enabled.
+     * 
+     * @param TLS protocol used when SSL is enabled
+     */
+    public void setTlsProtocol(String protocol) {
+        tlsProtocol = protocol;
     }
 
     /**

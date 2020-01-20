@@ -79,7 +79,7 @@ public abstract class AbstractServiceConfiguration extends AbstractConfiguration
      * 
      * @return entity ID of the service
      */
-    public String getEntityId() {
+    public synchronized String getEntityId() {
         return entityId;
     }
 
@@ -88,7 +88,7 @@ public abstract class AbstractServiceConfiguration extends AbstractConfiguration
      * 
      * @return hostname upon which the service listens
      */
-    public String getHostname() {
+    public synchronized String getHostname() {
         return hostname;
     }
 
@@ -97,7 +97,7 @@ public abstract class AbstractServiceConfiguration extends AbstractConfiguration
      * 
      * @return whether client certificate authentication is required
      */
-    public boolean isClientCertAuthRequired() {
+    public synchronized boolean isClientCertAuthRequired() {
         return clientCertAuthRequired == null ? false : clientCertAuthRequired;
     }
 
@@ -106,7 +106,7 @@ public abstract class AbstractServiceConfiguration extends AbstractConfiguration
      * 
      * @return maximum number of requests the will queue up if all of its request processing threads are busy
      */
-    public int getMaxRequestQueueSize() {
+    public synchronized int getMaxRequestQueueSize() {
         return maxRequestQueueSize;
     }
 
@@ -115,7 +115,7 @@ public abstract class AbstractServiceConfiguration extends AbstractConfiguration
      * 
      * @return the port number upon which the service listens
      */
-    public int getPort() {
+    public synchronized int getPort() {
         return port;
     }
 
@@ -124,7 +124,7 @@ public abstract class AbstractServiceConfiguration extends AbstractConfiguration
      * 
      * @return metrics for this service
      */
-    public ServiceMetrics getServiceMetrics() {
+    public synchronized ServiceMetrics getServiceMetrics() {
         return serviceMetrics;
     }
 
@@ -133,7 +133,7 @@ public abstract class AbstractServiceConfiguration extends AbstractConfiguration
      * 
      * @return host upon which the admin service listens
      */
-    public String getAdminHost() {
+    public synchronized String getAdminHost() {
         return adminHost;
     }
 
@@ -142,7 +142,7 @@ public abstract class AbstractServiceConfiguration extends AbstractConfiguration
      * 
      * @return port number upon which the admin service listens
      */
-    public int getAdminPort() {
+    public synchronized int getAdminPort() {
         return adminPort;
     }
 
@@ -151,7 +151,7 @@ public abstract class AbstractServiceConfiguration extends AbstractConfiguration
      * 
      * @return password required for admin commands
      */
-    public String getAdminPassword() {
+    public synchronized String getAdminPassword() {
         return adminPassword;
     }
 
@@ -160,7 +160,7 @@ public abstract class AbstractServiceConfiguration extends AbstractConfiguration
      * 
      * @return SOAP client used to communicate with other services
      */
-    public SOAPClient getSOAPClient() {
+    public synchronized SOAPClient getSOAPClient() {
         return soapClient;
     }
 
@@ -169,7 +169,7 @@ public abstract class AbstractServiceConfiguration extends AbstractConfiguration
      * 
      * @return whether SSL is enabled on the service port
      */
-    public boolean isSslEnabled() {
+    public synchronized boolean isSslEnabled() {
         return sslEnabled == null ? false : sslEnabled;
     }
 
