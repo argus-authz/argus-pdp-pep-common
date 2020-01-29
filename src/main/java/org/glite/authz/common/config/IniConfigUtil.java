@@ -237,7 +237,7 @@ public class IniConfigUtil {
                     + " does not contain the required property " + propName);
 
         }
-        List<String> values = new ArrayList<String>();
+        List<String> values = new ArrayList<>();
         for (String value : propValues.split(listSeparator)) {
             String trimmedValue = Strings.safeTrimOrNullString(value);
             if (trimmedValue != null) {
