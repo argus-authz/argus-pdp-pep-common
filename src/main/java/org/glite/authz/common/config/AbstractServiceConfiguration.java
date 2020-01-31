@@ -38,6 +38,12 @@ public abstract class AbstractServiceConfiguration extends AbstractConfiguration
     /** Whether SSL is enabled on the service port. */
     private Boolean sslEnabled;
 
+    /** Which TLS protocol should be used */
+    private String tlsProtocol;
+
+    /** Which SSL protocols are supported */
+    private String[] enabledProtocols;
+
     /** Whether client is required to authenticate with a client certificate. */
     private Boolean clientCertAuthRequired;
 
@@ -67,6 +73,8 @@ public abstract class AbstractServiceConfiguration extends AbstractConfiguration
         hostname = null;
         port = 0;
         sslEnabled = null;
+        tlsProtocol = "TLS";
+        enabledProtocols = null;
         adminHost = null;
         adminPort = 0;
         adminPassword = null;
@@ -79,7 +87,7 @@ public abstract class AbstractServiceConfiguration extends AbstractConfiguration
      * 
      * @return entity ID of the service
      */
-    public String getEntityId() {
+    public synchronized String getEntityId() {
         return entityId;
     }
 
@@ -88,7 +96,7 @@ public abstract class AbstractServiceConfiguration extends AbstractConfiguration
      * 
      * @return hostname upon which the service listens
      */
-    public String getHostname() {
+    public synchronized String getHostname() {
         return hostname;
     }
 
@@ -97,7 +105,7 @@ public abstract class AbstractServiceConfiguration extends AbstractConfiguration
      * 
      * @return whether client certificate authentication is required
      */
-    public boolean isClientCertAuthRequired() {
+    public synchronized boolean isClientCertAuthRequired() {
         return clientCertAuthRequired == null ? false : clientCertAuthRequired;
     }
 
@@ -106,7 +114,7 @@ public abstract class AbstractServiceConfiguration extends AbstractConfiguration
      * 
      * @return maximum number of requests the will queue up if all of its request processing threads are busy
      */
-    public int getMaxRequestQueueSize() {
+    public synchronized int getMaxRequestQueueSize() {
         return maxRequestQueueSize;
     }
 
@@ -115,7 +123,7 @@ public abstract class AbstractServiceConfiguration extends AbstractConfiguration
      * 
      * @return the port number upon which the service listens
      */
-    public int getPort() {
+    public synchronized int getPort() {
         return port;
     }
 
@@ -124,7 +132,7 @@ public abstract class AbstractServiceConfiguration extends AbstractConfiguration
      * 
      * @return metrics for this service
      */
-    public ServiceMetrics getServiceMetrics() {
+    public synchronized ServiceMetrics getServiceMetrics() {
         return serviceMetrics;
     }
 
@@ -133,7 +141,7 @@ public abstract class AbstractServiceConfiguration extends AbstractConfiguration
      * 
      * @return host upon which the admin service listens
      */
-    public String getAdminHost() {
+    public synchronized String getAdminHost() {
         return adminHost;
     }
 
@@ -142,7 +150,7 @@ public abstract class AbstractServiceConfiguration extends AbstractConfiguration
      * 
      * @return port number upon which the admin service listens
      */
-    public int getAdminPort() {
+    public synchronized int getAdminPort() {
         return adminPort;
     }
 
@@ -151,7 +159,7 @@ public abstract class AbstractServiceConfiguration extends AbstractConfiguration
      * 
      * @return password required for admin commands
      */
-    public String getAdminPassword() {
+    public synchronized String getAdminPassword() {
         return adminPassword;
     }
 
@@ -160,7 +168,7 @@ public abstract class AbstractServiceConfiguration extends AbstractConfiguration
      * 
      * @return SOAP client used to communicate with other services
      */
-    public SOAPClient getSOAPClient() {
+    public synchronized SOAPClient getSOAPClient() {
         return soapClient;
     }
 
@@ -169,8 +177,26 @@ public abstract class AbstractServiceConfiguration extends AbstractConfiguration
      * 
      * @return whether SSL is enabled on the service port
      */
-    public boolean isSslEnabled() {
+    public synchronized boolean isSslEnabled() {
         return sslEnabled == null ? false : sslEnabled;
+    }
+
+    /**
+     * Gets the TLS protocol used when SSL is enabled.
+     *
+     * @return TLS protocol used
+     */
+    public synchronized String getTlsProtocol() {
+      return tlsProtocol;
+    }
+
+    /**
+     * Gets the SSL enabled protocols used when SSL is enabled.
+     *
+     * @return SSL enabled protocols used
+     */
+    public synchronized String[] getEnabledProtocols() {
+      return enabledProtocols;
     }
 
     /**
@@ -295,5 +321,23 @@ public abstract class AbstractServiceConfiguration extends AbstractConfiguration
                     "SSL enablement of service port has already been set, it may not be changed");
         }
         sslEnabled = enabled;
+    }
+
+    /**
+     * Sets the TLS protocol used by PEP daemon server when SSL is enabled.
+     *
+     * @param TLS protocol
+     */
+    protected final synchronized void setTlsProtocol(String tlsProtocol) {
+      this.tlsProtocol = tlsProtocol;
+    }
+
+    /**
+     * Sets the SSL enabled protocols used by PEP daemon server when SSL is enabled.
+     *
+     * @param SSL enabled protocols
+     */
+    protected final synchronized void setEnabledProtocols(String[] enabledProtocols) {
+      this.enabledProtocols = enabledProtocols;
     }
 }
