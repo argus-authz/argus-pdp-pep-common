@@ -70,12 +70,12 @@ public abstract class AbstractServiceConfiguration extends AbstractConfiguration
     protected AbstractServiceConfiguration(ServiceMetrics metrics) {
         super();
         serviceMetrics = metrics;
-        hostname = null;
+        hostname = "localhost";
         port = 0;
         sslEnabled = null;
         tlsProtocol = "TLS";
         enabledProtocols = null;
-        adminHost = null;
+        adminHost = "localhost";
         adminPort = 0;
         adminPassword = null;
         maxRequestQueueSize = 0;
