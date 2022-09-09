@@ -107,11 +107,12 @@ public final class Files {
             offset += numRead;
         } while (offset < bytes.length && numRead >= 0);
 
+        ins.close();
+
         if (offset < bytes.length) {
-            throw new IOException("Could not completely read file " + file.getName());
+          throw new IOException("Could not completely read file " + file.getName());
         }
 
-        ins.close();
         return bytes;
     }
 }
