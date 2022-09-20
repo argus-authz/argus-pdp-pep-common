@@ -5,14 +5,7 @@ def kubeLabel = getKubeLabel()
 
 pipeline {
 
-  agent {
-    kubernetes {
-      label "${kubeLabel}"
-      cloud 'Kube mwdevel'
-      defaultContainer 'runner'
-      inheritFrom 'ci-template'
-    }
-  }
+  agent { label 'java11' }
 
   options {
     timeout(time: 1, unit: 'HOURS')
@@ -22,7 +15,7 @@ pipeline {
   triggers {
     cron('@daily')
   }
-  
+
   stages {
     stage('build') {
       steps {
@@ -42,13 +35,13 @@ pipeline {
         }
       }
     }
-    
+
     stage('deploy') {
       steps {
         sh "mvn clean -U -B deploy"
       }
     }
-    
+
     stage('result') {
       steps {
         script {
@@ -57,12 +50,11 @@ pipeline {
       }
     }
   }
-  
+
   post {
     failure {
       slackSend color: 'danger', message: "${env.JOB_NAME} - #${env.BUILD_NUMBER} Failure (<${env.BUILD_URL}|Open>)"
     }
-    
     changed {
       script {
         if ('SUCCESS'.equals(currentBuild.result)) {
